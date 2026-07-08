@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">HealthTracker</string>
+    <string name="onboarding_title_step1">Thông tin cơ bản</string>
+    <string name="onboarding_title_step2">Chỉ số cơ thể</string>
+    <string name="onboarding_title_step3">Mục tiêu &amp; Vận động</string>
+    <string name="onboarding_title_step4">Kết quả</string>
+    <string name="name_hint">Họ và tên</string>
+    <string name="dob_hint">Ngày sinh (dd/MM/yyyy)</string>
+    <string name="gender_male">Nam</string>
+    <string name="gender_female">Nữ</string>
+    <string name="weight_hint">Cân nặng (kg)</string>
+    <string name="height_hint">Chiều cao (cm)</string>
+    <string name="activity_level">Mức độ vận động</string>
+    <string name="goal">Mục tiêu</string>
+    <string name="next">Tiếp tục</string>
+    <string name="back">Quay lại</string>
+    <string name="finish">Hoàn tất</string>
+    <string name="bmi_result">BMI của bạn: %1$.1f</string>
+    <string name="tdee_result">Calo mục tiêu: %1$d kcal</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
 </resources>

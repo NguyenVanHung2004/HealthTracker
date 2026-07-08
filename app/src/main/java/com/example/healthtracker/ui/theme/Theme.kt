@@ -50,9 +50,13 @@ fun HealthTrackerTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalSpacing provides Spacing()
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }
