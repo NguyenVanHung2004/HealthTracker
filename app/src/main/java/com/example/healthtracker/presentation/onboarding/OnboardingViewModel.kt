@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import androidx.annotation.StringRes
+import com.example.healthtracker.R
 
 
 
@@ -39,20 +41,20 @@ class OnboardingViewModel(
         _uiState.update { it.copy(name = name) }
     }
 
-    fun updateDob(dob: String) {
-        _uiState.update { it.copy(dobString = dob) }
+    fun updateAge(age: Int) {
+        _uiState.update { it.copy(age = age) }
     }
 
     fun updateGender(gender: Gender) {
         _uiState.update { it.copy(gender = gender) }
     }
 
-    fun updateWeight(weight: String) {
-        _uiState.update { it.copy(weightString = weight) }
+    fun updateWeight(weight: Float) {
+        _uiState.update { it.copy(weight = weight) }
     }
 
-    fun updateHeight(height: String) {
-        _uiState.update { it.copy(heightString = height) }
+    fun updateHeight(height: Float) {
+        _uiState.update { it.copy(height = height) }
     }
 
     fun updateActivityLevel(level: ActivityLevel) {
@@ -66,37 +68,27 @@ class OnboardingViewModel(
     fun nextStep() {
         when (_uiState.value.currentStep) {
             1 -> {
-                if (_uiState.value.name.isBlank()) {
-                    emitError("Vui lòng nhập tên")
-                    return
-                }
-                if (!isValidDob(_uiState.value.dobString)) {
-                    emitError("Ngày sinh không hợp lệ (dd/MM/yyyy)")
-                    return
-                }
+                if (_uiState.value.name.isBlank()) { emitError(R.string.error_empty_name); return }
                 _uiState.update { it.copy(currentStep = 2) }
             }
             2 -> {
-                val weight = _uiState.value.weightString.toFloatOrNull()
-                val height = _uiState.value.heightString.toFloatOrNull()
-                if (weight == null || weight <= 0f) {
-                    emitError("Cân nặng không hợp lệ")
-                    return
-                }
-                if (height == null || height <= 0f) {
-                    emitError("Chiều cao không hợp lệ")
-                    return
-                }
+                val weight = _uiState.value.weight
+                val height = _uiState.value.height
+                if (weight <= 0f) { emitError(R.string.error_invalid_weight); return }
+                if (height <= 0f) { emitError(R.string.error_invalid_height); return }
                 _uiState.update { it.copy(currentStep = 3) }
             }
             3 -> {
-                calculateResults()
                 _uiState.update { it.copy(currentStep = 4) }
             }
             4 -> {
+                calculateResults()
+                _uiState.update { it.copy(currentStep = 5) }
+            }
+            5 -> {
                 saveUserAndFinish()
             }
-        }
+            }
     }
 
     fun previousStep() {
@@ -107,9 +99,9 @@ class OnboardingViewModel(
 
     private fun calculateResults() {
         val state = _uiState.value
-        val weight = state.weightString.toFloat()
-        val height = state.heightString.toFloat()
-        val dob = parseDob(state.dobString) ?: return
+        val weight = state.weight
+        val height = state.height
+        val dob = LocalDate.now().minusYears(state.age.toLong())
 
         val bmr = calculateBMRUseCase(weight, height, state.gender, dob)
         val tdee = calculateTDEEUseCase(bmr, state.activityLevel, state.goal)
@@ -127,10 +119,10 @@ class OnboardingViewModel(
         val state = _uiState.value
         val user = User(
             name = state.name,
-            dateOfBirth = parseDob(state.dobString) ?: LocalDate.now(),
+            dateOfBirth = LocalDate.now().minusYears(state.age.toLong()),
             gender = state.gender,
-            weightKg = state.weightString.toFloat(),
-            heightCm = state.heightString.toFloat(),
+            weightKg = state.weight,
+            heightCm = state.height,
             activityLevel = state.activityLevel,
             goal = state.goal,
             targetCalories = state.calculatedTdee,
@@ -142,25 +134,11 @@ class OnboardingViewModel(
         }
     }
 
-    private fun isValidDob(dob: String): Boolean {
-        return parseDob(dob) != null
-    }
 
-    private fun parseDob(dob: String): LocalDate? {
-        if (dob.length != 10) return null
-        return try {
-            val parts = dob.split("/")
-            if (parts.size == 3) {
-                LocalDate.of(parts[2].toInt(), parts[1].toInt(), parts[0].toInt())
-            } else null
-        } catch (e: Exception) {
-            null
-        }
-    }
 
-    private fun emitError(message: String) {
+    private fun emitError(@StringRes messageId: Int) {
         viewModelScope.launch {
-            _uiEvent.emit(OnboardingUiEvent.ShowError(message))
+            _uiEvent.emit(OnboardingUiEvent.ShowError(messageId))
         }
     }
 }

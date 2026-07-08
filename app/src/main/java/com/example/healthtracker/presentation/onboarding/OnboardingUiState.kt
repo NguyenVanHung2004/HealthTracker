@@ -6,10 +6,10 @@ import com.example.healthtracker.domain.model.Goal
 
 data class OnboardingUiState(
     val name: String = "",
-    val dobString: String = "", // dd/MM/yyyy
+    val age: Int = 24,
     val gender: Gender = Gender.MALE,
-    val weightString: String = "",
-    val heightString: String = "",
+    val weight: Float = 60f,
+    val height: Float = 170f,
     val activityLevel: ActivityLevel = ActivityLevel.SEDENTARY,
     val goal: Goal = Goal.MAINTAIN_WEIGHT,
     val calculatedBmi: Float = 0f,

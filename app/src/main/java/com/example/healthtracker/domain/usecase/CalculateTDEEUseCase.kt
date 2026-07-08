@@ -10,6 +10,7 @@ class CalculateTDEEUseCase {
             Goal.LOSE_WEIGHT -> tdee - 500
             Goal.MAINTAIN_WEIGHT -> tdee
             Goal.GAIN_WEIGHT -> tdee + 500
+            Goal.BUILD_MUSCLE -> tdee + 250
         }
         return finalCalories.toInt()
     }
