@@ -35,4 +35,5 @@ val appModule = module {
     factory { SaveUserProfileUseCase(get(), get()) }
 
     viewModel { OnboardingViewModel(get(), get(), get(), get()) }
+    viewModel { com.example.healthtracker.presentation.settings.SettingsViewModel(get(), get(), get(), get()) }
 }

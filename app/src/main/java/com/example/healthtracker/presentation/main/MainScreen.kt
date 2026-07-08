@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.healthtracker.R
+import com.example.healthtracker.presentation.settings.SettingsScreen
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -70,7 +71,11 @@ fun MainScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                if (selectedItem == 3) {
+                    com.example.healthtracker.presentation.settings.SettingsScreen()
+                } else {
+                    Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                }
             }
         }
     } else {
@@ -104,7 +109,11 @@ fun MainScreen(navController: NavController) {
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                if (selectedItem == 3) {
+                    SettingsScreen()
+                } else {
+                    Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                }
             }
         }
     }

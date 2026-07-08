@@ -302,12 +302,13 @@ fun NumberInputField(
     value: String,
     onValueChange: (String) -> Unit,
     hint: String,
-    suffix: String
+    suffix: String,
+    modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     OutlinedTextField(
+        modifier = modifier,
         value = value,
         onValueChange = { raw ->
-            // chỉ cho phép chữ số và dấu chấm
             if (raw.all { it.isDigit() || it == '.' }) onValueChange(raw)
         },
         placeholder = { Text(hint, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)) },
@@ -320,7 +321,6 @@ fun NumberInputField(
                 modifier = Modifier.padding(end = 12.dp)
             )
         },
-        modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         shape = RoundedCornerShape(12.dp),
