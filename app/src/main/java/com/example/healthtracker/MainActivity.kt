@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.healthtracker.presentation.dashboard.MainScreen
+import com.example.healthtracker.presentation.main.MainScreen
 import com.example.healthtracker.presentation.onboarding.OnboardingRoute
 import com.example.healthtracker.ui.theme.HealthTrackerTheme
 
