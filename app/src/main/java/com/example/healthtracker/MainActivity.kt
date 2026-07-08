@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.healthtracker.presentation.dashboard.MainScreen
 import com.example.healthtracker.presentation.onboarding.OnboardingRoute
 import com.example.healthtracker.ui.theme.HealthTrackerTheme
 
@@ -24,12 +25,15 @@ class MainActivity : ComponentActivity() {
                     composable("onboarding") {
                         OnboardingRoute(
                             onNavigateToDashboard = {
-                                // We will navigate to dashboard here in phase 4
-                                // navController.navigate("dashboard")
+                                navController.navigate("main") {
+                                    popUpTo("onboarding") { inclusive = true }
+                                }
                             }
                         )
                     }
-                    // TODO: add dashboard route
+                    composable("main") {
+                        MainScreen(navController)
+                    }
                 }
             }
         }

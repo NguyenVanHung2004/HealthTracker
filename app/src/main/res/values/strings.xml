@@ -66,4 +66,9 @@
     <string name="hint_age">VD: 25</string>
     <string name="hint_weight">VD: 65.0</string>
     <string name="hint_height">VD: 170</string>
+    
+    <string name="tab_dashboard">Trang chủ</string>
+    <string name="tab_meal">Bữa ăn</string>
+    <string name="tab_activity">Vận động</string>
+    <string name="tab_setting">Cài đặt</string>
 </resources>
