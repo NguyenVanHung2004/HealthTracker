@@ -43,6 +43,7 @@ import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ActivityLevel
 import com.example.healthtracker.domain.model.Gender
 import com.example.healthtracker.domain.model.Goal
+import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.LocalSpacing
 import com.example.healthtracker.ui.theme.OrangeGradientEnd
 import com.example.healthtracker.ui.theme.OrangeGradientStart
@@ -56,8 +57,6 @@ fun OnboardingRoute(
     onNavigateToDashboard: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -65,11 +64,9 @@ fun OnboardingRoute(
             when (event) {
                 is OnboardingUiEvent.NavigateToDashboard -> onNavigateToDashboard()
                 is OnboardingUiEvent.ShowError -> { 
-                    snackbarHostState.showSnackbar(
-                        com.example.healthtracker.presentation.components.CustomSnackbarVisuals(
-                            message = context.getString(event.messageId),
-                            isError = true
-                        )
+                    SnackbarController.showSnackbar(
+                        message = context.getString(event.messageId),
+                        isError = true
                     )
                 }
             }
@@ -78,7 +75,6 @@ fun OnboardingRoute(
 
     OnboardingScreen(
         uiState = uiState,
-        snackbarHostState = snackbarHostState,
         onNameChange = viewModel::updateName,
         onAgeChange = viewModel::updateAge,
         onGenderChange = viewModel::updateGender,
@@ -95,7 +91,6 @@ fun OnboardingRoute(
 @Composable
 fun OnboardingScreen(
     uiState: OnboardingUiState,
-    snackbarHostState: SnackbarHostState,
     onNameChange: (String) -> Unit,
     onAgeChange: (Int) -> Unit,
     onGenderChange: (Gender) -> Unit,
@@ -112,11 +107,6 @@ fun OnboardingScreen(
 
     Scaffold(
         containerColor = backgroundColor,
-        snackbarHost = { 
-            SnackbarHost(snackbarHostState) { data ->
-                com.example.healthtracker.presentation.components.CustomSnackbar(snackbarData = data)
-            }
-        },
         topBar = {
             Column(
                 modifier = Modifier

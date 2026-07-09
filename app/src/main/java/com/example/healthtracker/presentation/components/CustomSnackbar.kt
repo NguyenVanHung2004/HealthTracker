@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.ui.theme.LocalSpacing
+import com.example.healthtracker.ui.theme.SuccessGreen
 
 class CustomSnackbarVisuals(
     override val message: String,
@@ -31,7 +31,7 @@ fun CustomSnackbar(
     val isError = visuals?.isError ?: false
     val spacing = LocalSpacing.current
 
-    val containerColor = if (isError) MaterialTheme.colorScheme.errorContainer else Color(0xFF4CAF50)
+    val containerColor = if (isError) MaterialTheme.colorScheme.errorContainer else SuccessGreen
     val contentColor = if (isError) MaterialTheme.colorScheme.onErrorContainer else Color.White
     val icon = if (isError) Icons.Default.Error else Icons.Default.CheckCircle
 
@@ -41,7 +41,7 @@ fun CustomSnackbar(
             containerColor = containerColor,
             contentColor = contentColor
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = spacing.extraSmall + spacing.extraSmall / 2),
         modifier = modifier
             .padding(horizontal = spacing.medium, vertical = spacing.small)
             .fillMaxWidth()
@@ -60,6 +60,52 @@ fun CustomSnackbar(
             )
             Text(
                 text = snackbarData.visuals.message,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = contentColor,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun CustomSnackbar(
+    message: String,
+    isError: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    val containerColor = if (isError) MaterialTheme.colorScheme.errorContainer else SuccessGreen
+    val contentColor = if (isError) MaterialTheme.colorScheme.onErrorContainer else Color.White
+    val icon = if (isError) Icons.Default.Error else Icons.Default.CheckCircle
+
+    Card(
+        shape = RoundedCornerShape(spacing.cornerSmall),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = spacing.extraSmall + spacing.extraSmall / 2),
+        modifier = modifier
+            .padding(horizontal = spacing.medium, vertical = spacing.small)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(spacing.medium)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = contentColor
+            )
+            Text(
+                text = message,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = contentColor,

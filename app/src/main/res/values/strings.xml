@@ -87,4 +87,41 @@
     <string name="settings_gender_female">Nữ</string>
     <string name="settings_save_btn">Lưu hồ sơ &amp; Tính lại TDEE</string>
     <string name="profile_saved_successfully">Lưu hồ sơ thành công!</string>
+    <string name="total_calories_burned">Tổng calo tiêu thụ</string>
+    <string name="today_activities">Hoạt động hôm nay</string>
+    <string name="no_activities_yet">Chưa có hoạt động nào trong ngày</string>
+    <string name="minutes">phút</string>
+    <string name="add_activity">Thêm hoạt động</string>
+    <string name="select_activity">Chọn loại hoạt động</string>
+    <string name="duration_minutes">Thời gian (phút)</string>
+    <string name="add">Thêm</string>
+    <string name="delete">Xóa</string>
+
+    <!-- Exercise type names -->
+    <string name="exercise_walking">Đi bộ</string>
+    <string name="exercise_running">Chạy bộ</string>
+    <string name="exercise_cycling">Đạp xe</string>
+    <string name="exercise_swimming">Bơi lội</string>
+    <string name="exercise_yoga">Yoga</string>
+    <string name="exercise_gym">Gym</string>
+    <string name="exercise_stairs">Leo cầu thang</string>
+    <string name="exercise_jump_rope">Nhảy dây</string>
+    <string name="exercise_badminton">Cầu lông</string>
+    <string name="exercise_football">Bóng đá</string>
+    <string name="exercise_basketball">Bóng rổ</string>
+    <string name="exercise_tennis">Tennis</string>
+    <string name="exercise_volleyball">Bóng chuyền</string>
+    <string name="exercise_dancing">Nhảy múa</string>
+    <string name="exercise_aerobics">Thể dục nhịp điệu</string>
+    <string name="exercise_hiking">Đi bộ đường dài</string>
+    <string name="exercise_pilates">Pilates</string>
+    <string name="exercise_boxing">Quyền anh</string>
+    <string name="exercise_skateboarding">Trượt ván</string>
+    <string name="exercise_martial_arts">Võ thuật</string>
+
+    <!-- Toast messages -->
+    <string name="toast_activity_added">Đã thêm hoạt động thành công!</string>
+    <string name="toast_activity_deleted">Đã xóa hoạt động thành công!</string>
+    <string name="toast_select_activity">Vui lòng chọn loại hoạt động</string>
+    <string name="toast_enter_duration">Vui lòng nhập thời gian</string>
 </resources>

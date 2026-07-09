@@ -30,6 +30,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.healthtracker.R
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.healthtracker.presentation.activity.ActivityScreen
+import com.example.healthtracker.presentation.activity.AddExerciseScreen
 import com.example.healthtracker.presentation.settings.SettingsScreen
 
 @Composable
@@ -70,12 +75,33 @@ fun MainScreen(navController: NavController) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (selectedItem == 3) {
-                    com.example.healthtracker.presentation.settings.SettingsScreen()
-                } else {
+                if (selectedItem == 0) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                        Text("Dashboard")
                     }
+                }
+                if (selectedItem == 1) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Meal")
+                    }
+                }
+                if (selectedItem == 2) {
+                    val activityNavController = rememberNavController()
+                    NavHost(navController = activityNavController, startDestination = "activity_list") {
+                        composable("activity_list") {
+                            com.example.healthtracker.presentation.activity.ActivityScreen(
+                                onNavigateToAdd = { activityNavController.navigate("add_exercise") }
+                            )
+                        }
+                        composable("add_exercise") {
+                            AddExerciseScreen(
+                                onNavigateBack = { activityNavController.popBackStack() }
+                            )
+                        }
+                    }
+                }
+                if (selectedItem == 3) {
+                    SettingsScreen()
                 }
             }
         }
@@ -109,12 +135,33 @@ fun MainScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding())
             ) {
+                if (selectedItem == 0) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Dashboard")
+                    }
+                }
+                if (selectedItem == 1) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Meal")
+                    }
+                }
+                if (selectedItem == 2) {
+                    val activityNavController = rememberNavController()
+                    NavHost(navController = activityNavController, startDestination = "activity_list") {
+                        composable("activity_list") {
+                            ActivityScreen(
+                                onNavigateToAdd = { activityNavController.navigate("add_exercise") }
+                            )
+                        }
+                        composable("add_exercise") {
+                            AddExerciseScreen(
+                                onNavigateBack = { activityNavController.popBackStack() }
+                            )
+                        }
+                    }
+                }
                 if (selectedItem == 3) {
                     SettingsScreen()
-                } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
-                    }
                 }
             }
         }

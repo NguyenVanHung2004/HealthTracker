@@ -87,4 +87,41 @@
     <string name="settings_gender_female">Female</string>
     <string name="settings_save_btn">Save Profile &amp; Recalculate TDEE</string>
     <string name="profile_saved_successfully">Profile saved successfully!</string>
+    <string name="total_calories_burned">Total calories burned</string>
+    <string name="today_activities">Today\'s Activities</string>
+    <string name="no_activities_yet">No activities yet today</string>
+    <string name="minutes">minutes</string>
+    <string name="add_activity">Add Activity</string>
+    <string name="select_activity">Select activity</string>
+    <string name="duration_minutes">Duration (minutes)</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
+
+    <!-- Exercise type names -->
+    <string name="exercise_walking">Walking</string>
+    <string name="exercise_running">Running</string>
+    <string name="exercise_cycling">Cycling</string>
+    <string name="exercise_swimming">Swimming</string>
+    <string name="exercise_yoga">Yoga</string>
+    <string name="exercise_gym">Gym</string>
+    <string name="exercise_stairs">Stair Climbing</string>
+    <string name="exercise_jump_rope">Jump Rope</string>
+    <string name="exercise_badminton">Badminton</string>
+    <string name="exercise_football">Football</string>
+    <string name="exercise_basketball">Basketball</string>
+    <string name="exercise_tennis">Tennis</string>
+    <string name="exercise_volleyball">Volleyball</string>
+    <string name="exercise_dancing">Dancing</string>
+    <string name="exercise_aerobics">Aerobics</string>
+    <string name="exercise_hiking">Hiking</string>
+    <string name="exercise_pilates">Pilates</string>
+    <string name="exercise_boxing">Boxing</string>
+    <string name="exercise_skateboarding">Skateboarding</string>
+    <string name="exercise_martial_arts">Martial Arts</string>
+
+    <!-- Toast messages -->
+    <string name="toast_activity_added">Activity added successfully!</string>
+    <string name="toast_activity_deleted">Activity deleted successfully!</string>
+    <string name="toast_select_activity">Please select an activity type</string>
+    <string name="toast_enter_duration">Please enter the duration</string>
 </resources>

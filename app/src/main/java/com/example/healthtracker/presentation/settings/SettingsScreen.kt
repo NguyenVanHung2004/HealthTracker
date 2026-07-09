@@ -29,6 +29,7 @@ import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.Gender
 import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
+import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.LocalSpacing
 import org.koin.androidx.compose.koinViewModel
 
@@ -39,16 +40,13 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val themePreference by viewModel.themePreference.collectAsState()
     val languagePreference by viewModel.languagePreference.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.snackbarEvent.collect { messageId ->
-            snackbarHostState.showSnackbar(
-                CustomSnackbarVisuals(
-                    message = context.getString(messageId),
-                    isError = false
-                )
+            SnackbarController.showSnackbar(
+                message = context.getString(messageId),
+                isError = false
             )
         }
     }
@@ -57,7 +55,6 @@ fun SettingsScreen(
         uiState = uiState,
         themePreference = themePreference,
         languagePreference = languagePreference,
-        snackbarHostState = snackbarHostState,
         onThemeChange = viewModel::updateTheme,
         onLanguageChange = viewModel::updateLanguage,
         onNameChange = viewModel::onNameChange,
@@ -74,7 +71,6 @@ fun SettingsContent(
     uiState: SettingsUiState,
     themePreference: String,
     languagePreference: String,
-    snackbarHostState: SnackbarHostState,
     onThemeChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
     onNameChange: (String) -> Unit,
@@ -98,11 +94,6 @@ fun SettingsContent(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
-        },
-        snackbarHost = {
-            SnackbarHost(snackbarHostState) { data ->
-                CustomSnackbar(snackbarData = data)
-            }
         },
         bottomBar = {
             Surface(
