@@ -86,4 +86,5 @@
     <string name="settings_gender_male">Nam</string>
     <string name="settings_gender_female">Nữ</string>
     <string name="settings_save_btn">Lưu hồ sơ &amp; Tính lại TDEE</string>
+    <string name="profile_saved_successfully">Lưu hồ sơ thành công!</string>
 </resources>

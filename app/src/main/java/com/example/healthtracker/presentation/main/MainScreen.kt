@@ -68,13 +68,14 @@ fun MainScreen(navController: NavController) {
                 }
             }
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize()
             ) {
                 if (selectedItem == 3) {
                     com.example.healthtracker.presentation.settings.SettingsScreen()
                 } else {
-                    Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                    }
                 }
             }
         }
@@ -106,13 +107,14 @@ fun MainScreen(navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
+                    .padding(bottom = innerPadding.calculateBottomPadding())
             ) {
                 if (selectedItem == 3) {
                     SettingsScreen()
                 } else {
-                    Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = stringResource(items[selectedItem].first), style = MaterialTheme.typography.headlineMedium)
+                    }
                 }
             }
         }

@@ -57,17 +57,28 @@ fun OnboardingRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is OnboardingUiEvent.NavigateToDashboard -> onNavigateToDashboard()
-                is OnboardingUiEvent.ShowError -> { /* Show Snackbar */ }
+                is OnboardingUiEvent.ShowError -> { 
+                    snackbarHostState.showSnackbar(
+                        com.example.healthtracker.presentation.components.CustomSnackbarVisuals(
+                            message = context.getString(event.messageId),
+                            isError = true
+                        )
+                    )
+                }
             }
         }
     }
 
     OnboardingScreen(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onNameChange = viewModel::updateName,
         onAgeChange = viewModel::updateAge,
         onGenderChange = viewModel::updateGender,
@@ -84,6 +95,7 @@ fun OnboardingRoute(
 @Composable
 fun OnboardingScreen(
     uiState: OnboardingUiState,
+    snackbarHostState: SnackbarHostState,
     onNameChange: (String) -> Unit,
     onAgeChange: (Int) -> Unit,
     onGenderChange: (Gender) -> Unit,
@@ -100,6 +112,11 @@ fun OnboardingScreen(
 
     Scaffold(
         containerColor = backgroundColor,
+        snackbarHost = { 
+            SnackbarHost(snackbarHostState) { data ->
+                com.example.healthtracker.presentation.components.CustomSnackbar(snackbarData = data)
+            }
+        },
         topBar = {
             Column(
                 modifier = Modifier
