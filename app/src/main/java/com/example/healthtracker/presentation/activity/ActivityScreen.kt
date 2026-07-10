@@ -68,7 +68,7 @@ fun ActivityScreenContent(
     val spacing = LocalSpacing.current
 
     Scaffold(
-        containerColor = ActivityBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToAdd,

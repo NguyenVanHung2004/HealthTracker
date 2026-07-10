@@ -103,7 +103,7 @@ fun OnboardingScreen(
     onSkipClick: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    val backgroundColor = Color(0xFFF5F5F5)
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     Scaffold(
         containerColor = backgroundColor,
@@ -148,7 +148,7 @@ fun OnboardingScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(spacing.large)
             ) {
                 Button(
@@ -198,7 +198,7 @@ fun OnboardingScreen(
                 Surface(
                     modifier = Modifier.fillMaxSize().padding(top = 16.dp),
                     shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 8.dp
                 ) {
                     Column(
@@ -238,7 +238,7 @@ fun StepDot(step: Int, currentStep: Int) {
         if (isPast) {
             Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
         } else {
-            Text(text = step.toString(), color = if (isCurrent) Color.White else MaterialTheme.colorScheme.surfaceVariant, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(text = step.toString(), color = if (isCurrent) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f), fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -443,9 +443,9 @@ fun SimpleTextField(
 
 @Composable
 fun PillSelection(text: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val bgColor = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+    val bgColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
     
     Box(
         modifier = modifier
@@ -489,7 +489,7 @@ fun ResultSection(bmi: Float, tdee: Int, name: String) {
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(80.dp).padding(bottom = 24.dp)
         )
-        Text(text = "BMI: ${String.format("%.1f", bmi)}", style = MaterialTheme.typography.titleLarge)
-        Text(text = "Calo: $tdee kcal", style = MaterialTheme.typography.titleLarge)
+        Text(text = "BMI: ${String.format("%.1f", bmi)}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = "Calo: $tdee kcal", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
     }
 }

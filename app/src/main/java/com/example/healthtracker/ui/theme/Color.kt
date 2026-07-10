@@ -18,8 +18,6 @@ val SurfaceDark = Color(0xFF1E1E1E)
 val TextPrimaryDark = Color(0xFFF5F5F5)
 val TextSecondaryDark = Color(0xFFAAAAAA)
 
-// Activity screen surface
-val ActivityBackground = Color(0xFFF4F6F9)
 
 // Gradient pairs for exercise cards (6 pairs)
 val Gradient1Start = Color(0xFFa18cd1)

@@ -96,7 +96,7 @@ fun AddExerciseScreenContent(
     val spacing = LocalSpacing.current
 
     Scaffold(
-        containerColor = ActivityBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -115,7 +115,7 @@ fun AddExerciseScreenContent(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = ActivityBackground,
+                    containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
