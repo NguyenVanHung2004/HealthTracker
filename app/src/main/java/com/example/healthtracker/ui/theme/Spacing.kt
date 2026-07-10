@@ -16,7 +16,9 @@ data class Spacing(
     val cornerLarge: Dp = 24.dp,
     val buttonHeight: Dp = 56.dp,
     val paddingHorizontal: Dp = 32.dp,
-    val paddingVertical: Dp = 12.dp
+    val paddingVertical: Dp = 12.dp,
+    val loadingCardSize: Dp = 150.dp,
+    val loadingSpinnerSize: Dp = 56.dp
 )
 
 val LocalSpacing = compositionLocalOf { Spacing() }

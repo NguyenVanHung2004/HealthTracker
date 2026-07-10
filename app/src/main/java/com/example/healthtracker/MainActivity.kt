@@ -41,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
 import com.example.healthtracker.presentation.components.SnackbarController
+import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -122,6 +123,9 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+
+                        // Global Loading Overlay
+                        GlobalLoadingOverlay()
                     }
                 }
             }

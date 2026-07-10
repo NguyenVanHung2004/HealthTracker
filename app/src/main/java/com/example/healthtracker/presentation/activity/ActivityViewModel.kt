@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.example.healthtracker.presentation.components.LoadingController
+import kotlinx.coroutines.delay
 
 data class ActivityUiState(
     val selectedDate: LocalDate = LocalDate.now(),
@@ -97,16 +99,30 @@ class ActivityViewModel(
         }
 
         viewModelScope.launch {
-            addExerciseUseCase(state.selectedExerciseType, duration, state.selectedDate)
-            _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_added))
-            _uiEvent.emit(ActivityUiEvent.NavigateBack)
+            try {
+                LoadingController.withLoading {
+                    delay(600)
+                    addExerciseUseCase(state.selectedExerciseType, duration, state.selectedDate)
+                }
+                _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_added))
+                _uiEvent.emit(ActivityUiEvent.NavigateBack)
+            } catch (e: Exception) {
+                _uiEvent.emit(ActivityUiEvent.ShowError(R.string.error_occurred))
+            }
         }
     }
 
     fun deleteExercise(exerciseLog: ExerciseLog) {
         viewModelScope.launch {
-            deleteExerciseUseCase(exerciseLog)
-            _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_deleted))
+            try {
+                LoadingController.withLoading {
+                    delay(500)
+                    deleteExerciseUseCase(exerciseLog)
+                }
+                _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_deleted))
+            } catch (e: Exception) {
+                _uiEvent.emit(ActivityUiEvent.ShowError(R.string.error_occurred))
+            }
         }
     }
 

@@ -17,10 +17,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import com.example.healthtracker.R
+import com.example.healthtracker.presentation.components.LoadingController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import androidx.annotation.StringRes
-import com.example.healthtracker.R
 
 
 
@@ -129,8 +131,15 @@ class OnboardingViewModel(
             bmi = state.calculatedBmi
         )
         viewModelScope.launch {
-            saveUserProfileUseCase(user)
-            _uiEvent.emit(OnboardingUiEvent.NavigateToDashboard)
+            try {
+                LoadingController.withLoading {
+                    delay(1000)
+                    saveUserProfileUseCase(user)
+                }
+                _uiEvent.emit(OnboardingUiEvent.NavigateToDashboard)
+            } catch (e: Exception) {
+                _uiEvent.emit(OnboardingUiEvent.ShowError(R.string.error_occurred))
+            }
         }
     }
 

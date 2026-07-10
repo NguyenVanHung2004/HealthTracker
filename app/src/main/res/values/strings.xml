@@ -82,6 +82,7 @@
     <string name="settings_theme_blue_light">Xanh dương sáng</string>
     <string name="settings_theme_blue_dark">Xanh dương tối</string>
     <string name="settings_language">Ngôn ngữ</string>
+    <string name="loading">Đang tải...</string>
     <string name="settings_edit_profile">Chỉnh sửa hồ sơ</string>
     <string name="settings_name">Tên</string>
     <string name="settings_weight">Cân nặng</string>
@@ -128,4 +129,5 @@
     <string name="toast_activity_deleted">Đã xóa hoạt động thành công!</string>
     <string name="toast_select_activity">Vui lòng chọn loại hoạt động</string>
     <string name="toast_enter_duration">Vui lòng nhập thời gian</string>
+    <string name="error_occurred">Đã xảy ra lỗi, vui lòng thử lại!</string>
 </resources>

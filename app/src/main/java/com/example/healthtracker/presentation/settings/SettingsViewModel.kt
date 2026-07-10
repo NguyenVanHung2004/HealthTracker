@@ -2,6 +2,7 @@ package com.example.healthtracker.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.healthtracker.R
 import com.example.healthtracker.data.local.preferences.UserPreferences
 import com.example.healthtracker.domain.model.ActivityLevel
 import com.example.healthtracker.domain.model.Gender
@@ -23,6 +24,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.example.healthtracker.presentation.components.LoadingController
+import kotlinx.coroutines.delay
 
 data class SettingsUiState(
     val user: User? = null,
@@ -119,8 +122,15 @@ class SettingsViewModel(
                 bmi = bmi
             )
 
-            saveUserProfileUseCase(updatedUser)
-            _snackbarEvent.emit(com.example.healthtracker.R.string.profile_saved_successfully)
+            try {
+                LoadingController.withLoading {
+                    delay(1000)
+                    saveUserProfileUseCase(updatedUser)
+                }
+                _snackbarEvent.emit(R.string.profile_saved_successfully)
+            } catch (e: Exception) {
+                _snackbarEvent.emit(R.string.error_occurred)
+            }
         }
     }
 
