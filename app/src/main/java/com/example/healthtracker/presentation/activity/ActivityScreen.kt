@@ -6,15 +6,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -25,14 +22,6 @@ import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
 
-private val exerciseGradients = listOf(
-    Brush.linearGradient(listOf(Gradient1Start, Gradient1End)),
-    Brush.linearGradient(listOf(Gradient2Start, Gradient2End)),
-    Brush.linearGradient(listOf(Gradient3Start, Gradient3End)),
-    Brush.linearGradient(listOf(Gradient4Start, Gradient4End)),
-    Brush.linearGradient(listOf(Gradient5Start, Gradient5End)),
-    Brush.linearGradient(listOf(Gradient6Start, Gradient6End))
-)
 
 @Composable
 fun ActivityScreen(
@@ -259,11 +248,22 @@ fun ExerciseItem(
                     .width(spacing.extraLarge * 2)
                     .height(spacing.extraLarge + spacing.large)
                     .background(bgGradient, RoundedCornerShape(spacing.cornerMedium)),
-                contentAlignment = Alignment.TopEnd
+                contentAlignment = Alignment.Center
             ) {
+                // Large centered exercise icon
+                val meta = exerciseMeta[exercise.type]
+                Icon(
+                    imageVector = meta?.icon ?: Icons.Default.FitnessCenter,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.35f),
+                    modifier = Modifier.size(spacing.extraLarge + spacing.small)
+                )
+
+                // Delete button in top end
                 IconButton(
                     onClick = onDelete,
                     modifier = Modifier
+                        .align(Alignment.TopEnd)
                         .size(spacing.large)
                         .padding(spacing.extraSmall)
                 ) {
