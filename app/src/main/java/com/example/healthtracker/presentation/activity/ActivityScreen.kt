@@ -69,6 +69,19 @@ fun ActivityScreenContent(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.tab_activity),
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToAdd,
@@ -85,16 +98,6 @@ fun ActivityScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Text(
-                text = stringResource(R.string.tab_activity),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(
-                    horizontal = spacing.large,
-                    vertical = spacing.medium
-                )
-            )
 
             // Calorie summary row
             Row(
