@@ -162,7 +162,7 @@ fun OnboardingScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Brush.horizontalGradient(colors = listOf(OrangeGradientStart, OrangeGradientEnd))),
+                            .background(Brush.horizontalGradient(colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

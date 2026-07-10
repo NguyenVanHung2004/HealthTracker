@@ -21,7 +21,9 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = TextPrimaryDark,
-    onSurface = TextPrimaryDark
+    onSurface = TextPrimaryDark,
+    primaryContainer = PrimaryOrangeDark,
+    onPrimaryContainer = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -33,24 +35,84 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = TextPrimaryLight,
-    onSurface = TextPrimaryLight
+    onSurface = TextPrimaryLight,
+    primaryContainer = PrimaryOrangeLight,
+    onPrimaryContainer = PrimaryOrangeDark
+)
+
+private val DarkGreenColorScheme = darkColorScheme(
+    primary = PrimaryGreenLight,
+    secondary = PrimaryGreen,
+    tertiary = PrimaryGreenDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+    primaryContainer = PrimaryGreenDark,
+    onPrimaryContainer = Color.White
+)
+
+private val LightGreenColorScheme = lightColorScheme(
+    primary = PrimaryGreen,
+    secondary = PrimaryGreenLight,
+    tertiary = PrimaryGreenDark,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+    primaryContainer = PrimaryGreenLight,
+    onPrimaryContainer = PrimaryGreenDark
+)
+
+private val DarkBlueColorScheme = darkColorScheme(
+    primary = PrimaryBlueLight,
+    secondary = PrimaryBlue,
+    tertiary = PrimaryBlueDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+    primaryContainer = PrimaryBlueDark,
+    onPrimaryContainer = Color.White
+)
+
+private val LightBlueColorScheme = lightColorScheme(
+    primary = PrimaryBlue,
+    secondary = PrimaryBlueLight,
+    tertiary = PrimaryBlueDark,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+    primaryContainer = PrimaryBlueLight,
+    onPrimaryContainer = PrimaryBlueDark
 )
 
 @Composable
 fun HealthTrackerTheme(
+    themePref: String = "system",
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colorScheme = when (themePref) {
+        "green_light" -> LightGreenColorScheme
+        "green_dark" -> DarkGreenColorScheme
+        "green" -> if (darkTheme) DarkGreenColorScheme else LightGreenColorScheme
+        "blue_light" -> LightBlueColorScheme
+        "blue_dark" -> DarkBlueColorScheme
+        "blue" -> if (darkTheme) DarkBlueColorScheme else LightBlueColorScheme
+        "dark" -> DarkColorScheme
+        "light" -> LightColorScheme
+        else -> if (darkTheme) DarkColorScheme else LightColorScheme
     }
 
     androidx.compose.runtime.CompositionLocalProvider(

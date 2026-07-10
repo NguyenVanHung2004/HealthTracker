@@ -75,8 +75,12 @@
     <string name="settings_preferences">Tùy chọn</string>
     <string name="settings_theme">Giao diện</string>
     <string name="settings_theme_system">Hệ thống</string>
-    <string name="settings_theme_light">Sáng</string>
-    <string name="settings_theme_dark">Tối</string>
+    <string name="settings_theme_light">Cam sáng</string>
+    <string name="settings_theme_dark">Cam tối</string>
+    <string name="settings_theme_green_light">Xanh lá sáng</string>
+    <string name="settings_theme_green_dark">Xanh lá tối</string>
+    <string name="settings_theme_blue_light">Xanh dương sáng</string>
+    <string name="settings_theme_blue_dark">Xanh dương tối</string>
     <string name="settings_language">Ngôn ngữ</string>
     <string name="settings_edit_profile">Chỉnh sửa hồ sơ</string>
     <string name="settings_name">Tên</string>

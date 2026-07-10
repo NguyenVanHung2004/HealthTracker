@@ -56,9 +56,13 @@ class MainActivity : ComponentActivity() {
             val darkTheme = when (themePref) {
                 "light" -> false
                 "dark" -> true
+                "green_light" -> false
+                "green_dark" -> true
+                "blue_light" -> false
+                "blue_dark" -> true
                 else -> isSystemInDarkTheme()
             }
-            HealthTrackerTheme(darkTheme = darkTheme) {
+            HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme) {
                 val locale = Locale(languagePref)
                 val configuration = Configuration(LocalConfiguration.current).apply {
                     setLocale(locale)

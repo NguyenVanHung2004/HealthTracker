@@ -8,6 +8,16 @@ val PrimaryOrangeLight = Color(0xFFFF9E80)
 val OrangeGradientStart = Color(0xFFFF9800)
 val OrangeGradientEnd = Color(0xFFFF5722)
 
+// Green Theme Colors
+val PrimaryGreen = Color(0xFF2E7D32)
+val PrimaryGreenDark = Color(0xFF1B5E20)
+val PrimaryGreenLight = Color(0xFF81C784)
+
+// Blue Theme Colors
+val PrimaryBlue = Color(0xFF1565C0)
+val PrimaryBlueDark = Color(0xFF0D47A1)
+val PrimaryBlueLight = Color(0xFF90CAF9)
+
 val BackgroundLight = Color(0xFFFFFFFF)
 val SurfaceLight = Color(0xFFF5F6F8)
 val TextPrimaryLight = Color(0xFF1E1E1E)

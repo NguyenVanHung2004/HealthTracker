@@ -30,7 +30,12 @@ import com.example.healthtracker.domain.model.Gender
 import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
 import com.example.healthtracker.presentation.components.SnackbarController
-import com.example.healthtracker.ui.theme.LocalSpacing
+import com.example.healthtracker.ui.theme.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
+import androidx.compose.foundation.Canvas
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -136,18 +141,65 @@ fun SettingsContent(
 
             // App Preferences Card
             SettingsCard(title = stringResource(R.string.settings_preferences)) {
-                // Theme
-                SettingsSegmentedControl(
-                    title = stringResource(R.string.settings_theme),
-                    icon = Icons.Default.SettingsSuggest,
-                    items = listOf(
-                        stringResource(R.string.settings_theme_system) to "system",
-                        stringResource(R.string.settings_theme_light) to "light",
-                        stringResource(R.string.settings_theme_dark) to "dark"
-                    ),
-                    selectedValue = themePreference,
-                    onValueChange = onThemeChange
-                )
+                // Theme Options Grid
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = spacing.small)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsSuggest,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(spacing.cornerLarge)
+                        )
+                        Spacer(modifier = Modifier.width(spacing.small))
+                        Text(
+                            text = stringResource(R.string.settings_theme),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    val themeOptions = listOf(
+                        ThemeOption("system", R.string.settings_theme_system, MaterialTheme.colorScheme.primary, BackgroundLight, SurfaceDark),
+                        ThemeOption("light", R.string.settings_theme_light, PrimaryOrange, BackgroundLight, PrimaryOrangeLight),
+                        ThemeOption("dark", R.string.settings_theme_dark, PrimaryOrange, SurfaceDark, PrimaryOrangeDark),
+                        ThemeOption("green_light", R.string.settings_theme_green_light, PrimaryGreen, BackgroundLight, PrimaryGreenLight),
+                        ThemeOption("green_dark", R.string.settings_theme_green_dark, PrimaryGreen, SurfaceDark, PrimaryGreenDark),
+                        ThemeOption("blue_light", R.string.settings_theme_blue_light, PrimaryBlue, BackgroundLight, PrimaryBlueLight),
+                        ThemeOption("blue_dark", R.string.settings_theme_blue_dark, PrimaryBlue, SurfaceDark, PrimaryBlueDark)
+                    )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(spacing.small)
+                    ) {
+                        themeOptions.chunked(3).forEach { rowItems ->
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(spacing.medium),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                rowItems.forEach { option ->
+                                    ThemeGridItem(
+                                        label = stringResource(option.labelRes),
+                                        isSelected = themePreference == option.key,
+                                        primaryColor = option.primaryColor,
+                                        lightBg = option.lightBg,
+                                        darkBg = option.darkBg,
+                                        onClick = { onThemeChange(option.key) },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (rowItems.size < 3) {
+                                    repeat(3 - rowItems.size) {
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = spacing.small),
@@ -380,3 +432,95 @@ fun SegmentButton(
         )
     }
 }
+
+@Composable
+fun ThemeGridItem(
+    label: String,
+    isSelected: Boolean,
+    primaryColor: Color,
+    lightBg: Color,
+    darkBg: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+    val borderThickness = if (isSelected) 2.dp else 1.dp
+
+    Column(
+        modifier = modifier.clickable { onClick() },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Preview Box
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .clip(RoundedCornerShape(spacing.cornerMedium))
+                .background(lightBg)
+                .border(borderThickness, borderColor, RoundedCornerShape(spacing.cornerMedium))
+        ) {
+            // Draw diagonal split for dark theme view
+            if (lightBg != darkBg) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val path = androidx.compose.ui.graphics.Path().apply {
+                        moveTo(size.width, 0f)
+                        lineTo(size.width, size.height)
+                        lineTo(0f, size.height)
+                        close()
+                    }
+                    drawPath(path = path, color = darkBg)
+                }
+            }
+
+            // Primary color accent circle in the center
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.Center)
+                    .clip(CircleShape)
+                    .background(primaryColor)
+                    .border(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else Color.White, CircleShape)
+            )
+
+            // Checkmark overlay if selected
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(spacing.extraSmall))
+
+        // Label
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            maxLines = 1
+        )
+    }
+}
+
+data class ThemeOption(
+    val key: String,
+    val labelRes: Int,
+    val primaryColor: Color,
+    val lightBg: Color,
+    val darkBg: Color
+)
