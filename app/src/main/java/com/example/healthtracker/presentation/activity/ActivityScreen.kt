@@ -82,6 +82,7 @@ fun ActivityScreenContent(
     onDateRangeSelected: (LocalDate, LocalDate) -> Unit
 ) {
     val spacing = LocalSpacing.current
+    val context = LocalContext.current
     var showDatePicker by remember { mutableStateOf(false) }
 
     val dateRangeText = remember(uiState.filterType, uiState.selectedDate, uiState.customStartDate, uiState.customEndDate) {
@@ -127,58 +128,64 @@ fun ActivityScreenContent(
             modifier = Modifier.padding(horizontal = spacing.medium),
 
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        val startMillis = dateRangePickerState.selectedStartDateMillis
-                        val endMillis = dateRangePickerState.selectedEndDateMillis
-                        if (startMillis != null) {
-                            val startDate = Instant.ofEpochMilli(startMillis)
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
-                            val endDate = if (endMillis != null) {
-                                Instant.ofEpochMilli(endMillis)
+                CompositionLocalProvider(LocalContext provides context) {
+                    TextButton(
+                        onClick = {
+                            val startMillis = dateRangePickerState.selectedStartDateMillis
+                            val endMillis = dateRangePickerState.selectedEndDateMillis
+                            if (startMillis != null) {
+                                val startDate = Instant.ofEpochMilli(startMillis)
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
-                            } else {
-                                startDate
+                                val endDate = if (endMillis != null) {
+                                    Instant.ofEpochMilli(endMillis)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate()
+                                } else {
+                                    startDate
+                                }
+                                onDateRangeSelected(startDate, endDate)
                             }
-                            onDateRangeSelected(startDate, endDate)
+                            showDatePicker = false
                         }
-                        showDatePicker = false
+                    ) {
+                        Text(stringResource(R.string.confirm))
                     }
-                ) {
-                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text(stringResource(R.string.cancel))
+                CompositionLocalProvider(LocalContext provides context) {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
                 }
             }
         ) {
-            DateRangePicker(
-                state = dateRangePickerState,
-                title = {
-                    Text(
-                        text = stringResource(R.string.select_date_range),
-                        modifier = Modifier.padding(start = spacing.medium, top = spacing.medium),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                headline = {
-                    Text(
-                        text = stringResource(R.string.select_range_headline),
-                        modifier = Modifier.padding(start = spacing.medium, bottom = spacing.small),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                showModeToggle = false,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
+            CompositionLocalProvider(LocalContext provides context) {
+                DateRangePicker(
+                    state = dateRangePickerState,
+                    title = {
+                        Text(
+                            text = stringResource(R.string.select_date_range),
+                            modifier = Modifier.padding(start = spacing.medium, top = spacing.medium),
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    },
+                    headline = {
+                        Text(
+                            text = stringResource(R.string.select_range_headline),
+                            modifier = Modifier.padding(start = spacing.medium, bottom = spacing.small),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    showModeToggle = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
         }
     }
 
