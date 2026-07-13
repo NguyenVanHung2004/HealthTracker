@@ -77,67 +77,16 @@ class MealViewModel(
     }
 
     private var observeLogsJob: Job? = null
-    private var hasCheckedSeeding = false
-
     private fun observeLogsForDate(date: LocalDate) {
         observeLogsJob?.cancel()
         observeLogsJob = viewModelScope.launch {
             mealRepository.getMealsByDate(date).collect { logs ->
-                // Seed initial logs for today if empty and we haven't checked seeding yet
-                if (logs.isEmpty() && !hasCheckedSeeding && date.isEqual(LocalDate.now())) {
-                    hasCheckedSeeding = true
-                    val initialLogs = listOf(
-                        MealLog(
-                            date = date,
-                            mealType = MealType.BREAKFAST,
-                            foodName = "Cơm trắng",
-                            caloriesPerServing = 130,
-                            servingInfo = "100g",
-                            quantity = 1.5
-                        ),
-                        MealLog(
-                            date = date,
-                            mealType = MealType.BREAKFAST,
-                            foodName = "Trứng gà luộc",
-                            caloriesPerServing = 78,
-                            servingInfo = "1 quả",
-                            quantity = 2.0
-                        ),
-                        MealLog(
-                            date = date,
-                            mealType = MealType.LUNCH,
-                            foodName = "Phở bò (tô nhỏ)",
-                            caloriesPerServing = 350,
-                            servingInfo = "1 tô",
-                            quantity = 1.0
-                        ),
-                        MealLog(
-                            date = date,
-                            mealType = MealType.DINNER,
-                            foodName = "Ức gà áp chảo",
-                            caloriesPerServing = 165,
-                            servingInfo = "100g",
-                            quantity = 1.2
-                        ),
-                        MealLog(
-                            date = date,
-                            mealType = MealType.DINNER,
-                            foodName = "Rau muống luộc",
-                            caloriesPerServing = 40,
-                            servingInfo = "1 đĩa",
-                            quantity = 1.0
-                        )
+                val total = logs.sumOf { it.totalCalories }
+                _uiState.update { state ->
+                    state.copy(
+                        loggedMeals = logs,
+                        totalCalories = total
                     )
-                    initialLogs.forEach { mealRepository.insertMeal(it) }
-                } else {
-                    hasCheckedSeeding = true
-                    val total = logs.sumOf { it.totalCalories }
-                    _uiState.update { state ->
-                        state.copy(
-                            loggedMeals = logs,
-                            totalCalories = total
-                        )
-                    }
                 }
             }
         }

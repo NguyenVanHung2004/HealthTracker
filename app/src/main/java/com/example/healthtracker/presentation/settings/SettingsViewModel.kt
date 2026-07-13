@@ -102,20 +102,22 @@ class SettingsViewModel(
     fun saveProfile() {
         viewModelScope.launch {
             val currentState = _uiState.value
-            val currentUser = currentState.user ?: return@launch
+            val currentUser = currentState.user
             
-            val newWeight = currentState.weight.toFloatOrNull() ?: currentUser.weightKg
-            val newHeight = currentState.height.toFloatOrNull() ?: currentUser.heightCm
+            val birthDate = currentUser?.dateOfBirth ?: LocalDate.now().minusYears(25)
+            val newWeight = currentState.weight.toFloatOrNull() ?: 60f
+            val newHeight = currentState.height.toFloatOrNull() ?: 170f
 
-            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, currentUser.dateOfBirth)
+            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate)
             val tdee = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
             val bmi = calculateBMIUseCase(newWeight, newHeight)
 
-            val updatedUser = currentUser.copy(
+            val updatedUser = User(
                 name = currentState.name,
+                dateOfBirth = birthDate,
+                gender = currentState.gender,
                 weightKg = newWeight,
                 heightCm = newHeight,
-                gender = currentState.gender,
                 activityLevel = currentState.activityLevel,
                 goal = currentState.goal,
                 targetCalories = tdee,

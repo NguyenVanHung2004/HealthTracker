@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.Gender
+import com.example.healthtracker.domain.model.ActivityLevel
+import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
 import com.example.healthtracker.presentation.components.SnackbarController
@@ -66,6 +68,8 @@ fun SettingsScreen(
         onWeightChange = viewModel::onWeightChange,
         onHeightChange = viewModel::onHeightChange,
         onGenderChange = viewModel::onGenderChange,
+        onActivityLevelChange = viewModel::onActivityLevelChange,
+        onGoalChange = viewModel::onGoalChange,
         onSaveProfile = viewModel::saveProfile
     )
 }
@@ -82,6 +86,8 @@ fun SettingsContent(
     onWeightChange: (String) -> Unit,
     onHeightChange: (String) -> Unit,
     onGenderChange: (Gender) -> Unit,
+    onActivityLevelChange: (ActivityLevel) -> Unit,
+    onGoalChange: (Goal) -> Unit,
     onSaveProfile: () -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -233,56 +239,56 @@ fun SettingsContent(
 
                 Spacer(modifier = Modifier.height(spacing.medium))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing.medium)) {
-                    OutlinedTextField(
-                        value = uiState.weight,
-                        onValueChange = {
-                            if (it.all { char -> char.isDigit() || char == '.' }) onWeightChange(
-                                it
-                            )
-                        },
-                        label = { Text(stringResource(R.string.settings_weight)) },
-                        trailingIcon = {
-                            Text(
-                                stringResource(R.string.unit_kg),
-                                modifier = Modifier.padding(end = spacing.cornerSmall),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Outlined.MonitorWeight,
-                                contentDescription = null
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(spacing.cornerSmall),
-                        singleLine = true
-                    )
+                OutlinedTextField(
+                    value = uiState.weight,
+                    onValueChange = {
+                        if (it.all { char -> char.isDigit() || char == '.' }) onWeightChange(
+                            it
+                        )
+                    },
+                    label = { Text(stringResource(R.string.settings_weight)) },
+                    trailingIcon = {
+                        Text(
+                            stringResource(R.string.unit_kg),
+                            modifier = Modifier.padding(end = spacing.cornerSmall),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.MonitorWeight,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = RoundedCornerShape(spacing.cornerSmall),
+                    singleLine = true
+                )
 
-                    OutlinedTextField(
-                        value = uiState.height,
-                        onValueChange = {
-                            if (it.all { char -> char.isDigit() || char == '.' }) onHeightChange(
-                                it
-                            )
-                        },
-                        label = { Text(stringResource(R.string.settings_height)) },
-                        trailingIcon = {
-                            Text(
-                                stringResource(R.string.unit_cm),
-                                modifier = Modifier.padding(end = spacing.cornerSmall),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        },
-                        leadingIcon = { Icon(Icons.Outlined.Height, contentDescription = null) },
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(spacing.cornerSmall),
-                        singleLine = true
-                    )
-                }
+                Spacer(modifier = Modifier.height(spacing.medium))
+
+                OutlinedTextField(
+                    value = uiState.height,
+                    onValueChange = {
+                        if (it.all { char -> char.isDigit() || char == '.' }) onHeightChange(
+                            it
+                        )
+                    },
+                    label = { Text(stringResource(R.string.settings_height)) },
+                    trailingIcon = {
+                        Text(
+                            stringResource(R.string.unit_cm),
+                            modifier = Modifier.padding(end = spacing.cornerSmall),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    leadingIcon = { Icon(Icons.Outlined.Height, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = RoundedCornerShape(spacing.cornerSmall),
+                    singleLine = true
+                )
 
                 Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -308,6 +314,120 @@ fun SettingsContent(
                         onClick = { onGenderChange(Gender.FEMALE) },
                         modifier = Modifier.weight(1f)
                     )
+                }
+
+                Spacer(modifier = Modifier.height(spacing.medium))
+
+                Text(
+                    stringResource(R.string.activity_level),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(spacing.small))
+
+                var activityExpanded by remember { mutableStateOf(false) }
+                val activityLevels = ActivityLevel.entries
+                ExposedDropdownMenuBox(
+                    expanded = activityExpanded,
+                    onExpandedChange = { activityExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = when (uiState.activityLevel) {
+                            ActivityLevel.SEDENTARY -> stringResource(R.string.activity_sedentary)
+                            ActivityLevel.LIGHTLY_ACTIVE -> stringResource(R.string.activity_lightly)
+                            ActivityLevel.MODERATELY_ACTIVE -> stringResource(R.string.activity_moderately)
+                            ActivityLevel.VERY_ACTIVE -> stringResource(R.string.activity_very)
+                            ActivityLevel.EXTRA_ACTIVE -> stringResource(R.string.activity_extra)
+                        },
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = activityExpanded) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
+                        shape = RoundedCornerShape(spacing.cornerSmall),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    ExposedDropdownMenu(
+                        expanded = activityExpanded,
+                        onDismissRequest = { activityExpanded = false }
+                    ) {
+                        activityLevels.forEach { level ->
+                            val text = when (level) {
+                                ActivityLevel.SEDENTARY -> stringResource(R.string.activity_sedentary)
+                                ActivityLevel.LIGHTLY_ACTIVE -> stringResource(R.string.activity_lightly)
+                                ActivityLevel.MODERATELY_ACTIVE -> stringResource(R.string.activity_moderately)
+                                ActivityLevel.VERY_ACTIVE -> stringResource(R.string.activity_very)
+                                ActivityLevel.EXTRA_ACTIVE -> stringResource(R.string.activity_extra)
+                            }
+                            DropdownMenuItem(
+                                text = { Text(text) },
+                                onClick = {
+                                    onActivityLevelChange(level)
+                                    activityExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(spacing.medium))
+
+                Text(
+                    stringResource(R.string.goal),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(spacing.small))
+
+                var goalExpanded by remember { mutableStateOf(false) }
+                val goals = Goal.entries
+                ExposedDropdownMenuBox(
+                    expanded = goalExpanded,
+                    onExpandedChange = { goalExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = when (uiState.goal) {
+                            Goal.LOSE_WEIGHT -> stringResource(R.string.goal_lose_weight)
+                            Goal.MAINTAIN_WEIGHT -> stringResource(R.string.goal_maintain)
+                            Goal.GAIN_WEIGHT -> stringResource(R.string.goal_gain_weight)
+                            Goal.BUILD_MUSCLE -> stringResource(R.string.goal_build_muscle)
+                        },
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = goalExpanded) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
+                        shape = RoundedCornerShape(spacing.cornerSmall),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    ExposedDropdownMenu(
+                        expanded = goalExpanded,
+                        onDismissRequest = { goalExpanded = false }
+                    ) {
+                        goals.forEach { goal ->
+                            val text = when (goal) {
+                                Goal.LOSE_WEIGHT -> stringResource(R.string.goal_lose_weight)
+                                Goal.MAINTAIN_WEIGHT -> stringResource(R.string.goal_maintain)
+                                Goal.GAIN_WEIGHT -> stringResource(R.string.goal_gain_weight)
+                                Goal.BUILD_MUSCLE -> stringResource(R.string.goal_build_muscle)
+                            }
+                            DropdownMenuItem(
+                                text = { Text(text) },
+                                onClick = {
+                                    onGoalChange(goal)
+                                    goalExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             }
 

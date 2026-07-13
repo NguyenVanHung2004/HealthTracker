@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themePref by userPreferences.themePreference.collectAsState(initial = "system")
             val languagePref by userPreferences.languagePreference.collectAsState(initial = "vi")
+            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsState(initial = null)
 
             val darkTheme = when (themePref) {
                 "light" -> false
@@ -74,25 +75,27 @@ class MainActivity : ComponentActivity() {
                     LocalContext provides context,
                     LocalConfiguration provides configuration
                 ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        val navController = rememberNavController()
-                        NavHost(
-                            navController = navController,
-                            startDestination = "onboarding"
-                        ) {
-                            composable("onboarding") {
-                                OnboardingRoute(
-                                    onNavigateToDashboard = {
-                                        navController.navigate("main") {
-                                            popUpTo("onboarding") { inclusive = true }
+                    if (isOnboardingCompleted != null) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            val navController = rememberNavController()
+                            val startDestination = if (isOnboardingCompleted == true) "main" else "onboarding"
+                            NavHost(
+                                navController = navController,
+                                startDestination = startDestination
+                            ) {
+                                composable("onboarding") {
+                                    OnboardingRoute(
+                                        onNavigateToDashboard = {
+                                            navController.navigate("main") {
+                                                popUpTo("onboarding") { inclusive = true }
+                                            }
                                         }
-                                    }
-                                )
+                                    )
+                                }
+                                composable("main") {
+                                    MainScreen(navController)
+                                }
                             }
-                            composable("main") {
-                                MainScreen(navController)
-                            }
-                        }
 
                         // Stacked Toast Overlay
                         val activeMessages = SnackbarController.activeMessages
@@ -128,6 +131,7 @@ class MainActivity : ComponentActivity() {
                         GlobalLoadingOverlay()
                     }
                 }
+            }
             }
         }
     }
