@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +20,19 @@ import com.example.healthtracker.domain.model.ExerciseLog
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters.firstDayOfMonth
+import java.time.temporal.TemporalAdjusters.lastDayOfMonth
+import java.time.temporal.TemporalAdjusters.nextOrSame
+import java.time.temporal.TemporalAdjusters.previousOrSame
 
 
 @Composable
@@ -54,7 +66,9 @@ fun ActivityScreen(
     ActivityScreenContent(
         uiState = uiState,
         onNavigateToAdd = onNavigateToAdd,
-        onDeleteExercise = viewModel::deleteExercise
+        onDeleteExercise = viewModel::deleteExercise,
+        onFilterSelected = viewModel::setFilterType,
+        onDateRangeSelected = viewModel::setCustomRange
     )
 }
 
@@ -63,9 +77,110 @@ fun ActivityScreen(
 fun ActivityScreenContent(
     uiState: ActivityUiState,
     onNavigateToAdd: () -> Unit,
-    onDeleteExercise: (ExerciseLog) -> Unit
+    onDeleteExercise: (ExerciseLog) -> Unit,
+    onFilterSelected: (DateFilterType) -> Unit,
+    onDateRangeSelected: (LocalDate, LocalDate) -> Unit
 ) {
     val spacing = LocalSpacing.current
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val dateRangeText = remember(uiState.filterType, uiState.selectedDate, uiState.customStartDate, uiState.customEndDate) {
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val shortFormatter = DateTimeFormatter.ofPattern("dd/MM")
+        val today = LocalDate.now()
+        when (uiState.filterType) {
+            DateFilterType.TODAY -> today.format(formatter)
+            DateFilterType.WEEK -> {
+                val monday = today.with(previousOrSame(java.time.DayOfWeek.MONDAY))
+                val sunday = today.with(nextOrSame(java.time.DayOfWeek.SUNDAY))
+                "${monday.format(shortFormatter)} - ${sunday.format(shortFormatter)}"
+            }
+            DateFilterType.MONTH -> {
+                val start = today.with(firstDayOfMonth())
+                val end = today.with(lastDayOfMonth())
+                "${start.format(shortFormatter)} - ${end.format(shortFormatter)}"
+            }
+            DateFilterType.CUSTOM -> {
+                if (uiState.customStartDate.isEqual(uiState.customEndDate)) {
+                    uiState.customStartDate.format(formatter)
+                } else {
+                    "${uiState.customStartDate.format(shortFormatter)} - ${uiState.customEndDate.format(shortFormatter)}"
+                }
+            }
+        }
+    }
+
+    if (showDatePicker) {
+        val dateRangePickerState = rememberDateRangePickerState(
+            initialSelectedStartDateMillis = uiState.customStartDate
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli(),
+            initialSelectedEndDateMillis = uiState.customEndDate
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+
+            modifier = Modifier.padding(horizontal = spacing.medium),
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val startMillis = dateRangePickerState.selectedStartDateMillis
+                        val endMillis = dateRangePickerState.selectedEndDateMillis
+                        if (startMillis != null) {
+                            val startDate = Instant.ofEpochMilli(startMillis)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            val endDate = if (endMillis != null) {
+                                Instant.ofEpochMilli(endMillis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                            } else {
+                                startDate
+                            }
+                            onDateRangeSelected(startDate, endDate)
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DateRangePicker(
+                state = dateRangePickerState,
+                title = {
+                    Text(
+                        text = stringResource(R.string.select_date_range),
+                        modifier = Modifier.padding(start = spacing.medium, top = spacing.medium),
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                headline = {
+                    Text(
+                        text = stringResource(R.string.select_range_headline),
+                        modifier = Modifier.padding(start = spacing.medium, bottom = spacing.small),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                showModeToggle = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -98,12 +213,95 @@ fun ActivityScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // Selected Filter Summary
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.medium, vertical = spacing.small),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = when (uiState.filterType) {
+                            DateFilterType.TODAY -> stringResource(R.string.filter_today)
+                            DateFilterType.WEEK -> stringResource(R.string.filter_week)
+                            DateFilterType.MONTH -> stringResource(R.string.filter_month)
+                            DateFilterType.CUSTOM -> stringResource(R.string.filter_custom)
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = dateRangeText,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // Segmented Filter Pills Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.medium)
+                    .padding(bottom = spacing.medium),
+                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                val filters = listOf(
+                    DateFilterType.TODAY to R.string.filter_today,
+                    DateFilterType.WEEK to R.string.filter_week,
+                    DateFilterType.MONTH to R.string.filter_month,
+                    DateFilterType.CUSTOM to R.string.filter_custom
+                )
+
+                filters.forEach { (type, labelRes) ->
+                    val isSelected = uiState.filterType == type
+                    val containerColor = if (isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    }
+                    val contentColor = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp)
+                            .background(containerColor, RoundedCornerShape(spacing.cornerSmall))
+                            .clickable {
+                                if (type == DateFilterType.CUSTOM) {
+                                    showDatePicker = true
+                                } else {
+                                    onFilterSelected(type)
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(labelRes),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = contentColor
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.small))
 
             // Calorie summary row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = spacing.large)
+                    .padding(horizontal = spacing.medium)
                     .padding(bottom = spacing.medium),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -136,22 +334,54 @@ fun ActivityScreenContent(
                     )
                 }
             } else {
+                val groupedExercises = remember(uiState.exercises) {
+                    uiState.exercises.groupBy { it.date }.toSortedMap(compareByDescending { it })
+                }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f),
                     contentPadding = PaddingValues(
-                        start = spacing.large,
-                        end = spacing.large,
+                        start = spacing.medium,
+                        end = spacing.medium,
                         bottom = spacing.extraLarge + spacing.extraLarge
                     ),
                     verticalArrangement = Arrangement.spacedBy(spacing.medium)
                 ) {
-                    items(uiState.exercises) { exercise ->
-                        ExerciseItem(
-                            exercise = exercise,
-                            onDelete = { onDeleteExercise(exercise) }
-                        )
+                    groupedExercises.forEach { (date, exercisesForDate) ->
+                        item(key = date.toString()) {
+                            val today = LocalDate.now()
+                            val dateLabel = if (date.isEqual(today)) {
+                                stringResource(R.string.filter_today)
+                            } else {
+                                val formatter = remember { DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy", Locale.getDefault()) }
+                                date.format(formatter)
+                            }
+
+                            Surface(
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(spacing.cornerSmall),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = spacing.small)
+                            ) {
+                                Text(
+                                    text = dateLabel,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
+                                )
+                            }
+                        }
+
+                        items(exercisesForDate, key = { it.id }) { exercise ->
+                            ExerciseItem(
+                                exercise = exercise,
+                                onDelete = { onDeleteExercise(exercise) }
+                            )
+                        }
                     }
                 }
             }
@@ -166,7 +396,6 @@ fun ExerciseItem(
 ) {
     val spacing = LocalSpacing.current
     val bgGradient = exerciseGradients[exercise.type.ordinal % exerciseGradients.size]
-    // Progress: 60 min = 100%, cap at 1f
     val progress = minOf(1f, exercise.durationMinutes / 60f)
 
     Card(
@@ -181,7 +410,6 @@ fun ExerciseItem(
                 .padding(spacing.medium),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left: info + progress
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(exercise.type.nameRes),
@@ -224,7 +452,6 @@ fun ExerciseItem(
                     )
                 }
                 Spacer(modifier = Modifier.height(spacing.small))
-                // Progress label
                 Text(
                     text = "${exercise.durationMinutes}/60m",
                     style = MaterialTheme.typography.labelSmall,
@@ -245,7 +472,6 @@ fun ExerciseItem(
 
             Spacer(modifier = Modifier.width(spacing.medium))
 
-            // Right: gradient box + delete button
             Box(
                 modifier = Modifier
                     .width(spacing.extraLarge * 2)
@@ -253,7 +479,6 @@ fun ExerciseItem(
                     .background(bgGradient, RoundedCornerShape(spacing.cornerMedium)),
                 contentAlignment = Alignment.Center
             ) {
-                // Large centered exercise icon
                 val meta = exerciseMeta[exercise.type]
                 Icon(
                     imageVector = meta?.icon ?: Icons.Default.FitnessCenter,
@@ -262,7 +487,6 @@ fun ExerciseItem(
                     modifier = Modifier.size(spacing.extraLarge + spacing.small)
                 )
 
-                // Delete button in top end
                 IconButton(
                     onClick = onDelete,
                     modifier = Modifier

@@ -130,4 +130,11 @@
     <string name="toast_select_activity">Vui lòng chọn loại hoạt động</string>
     <string name="toast_enter_duration">Vui lòng nhập thời gian</string>
     <string name="error_occurred">Đã xảy ra lỗi, vui lòng thử lại!</string>
+    <string name="filter_today">Hôm nay</string>
+    <string name="filter_week">Tuần này</string>
+    <string name="filter_month">Tháng này</string>
+    <string name="filter_custom">Lịch</string>
+    <string name="select_date">Chọn ngày</string>
+    <string name="select_date_range">Chọn khoảng ngày</string>
+    <string name="select_range_headline">Chọn ngày bắt đầu và kết thúc</string>
 </resources>

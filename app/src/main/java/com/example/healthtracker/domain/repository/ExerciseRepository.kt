@@ -8,4 +8,5 @@ interface ExerciseRepository {
     suspend fun addExercise(exerciseLog: ExerciseLog)
     suspend fun deleteExercise(exerciseLog: ExerciseLog)
     fun getExercisesByDate(date: LocalDate): Flow<List<ExerciseLog>>
+    fun getExercisesByDateRange(startDate: LocalDate, endDate: LocalDate): Flow<List<ExerciseLog>>
 }

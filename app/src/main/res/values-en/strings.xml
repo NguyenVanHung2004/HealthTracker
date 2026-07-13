@@ -130,4 +130,11 @@
     <string name="toast_select_activity">Please select an activity type</string>
     <string name="toast_enter_duration">Please enter the duration</string>
     <string name="error_occurred">An error occurred, please try again!</string>
+    <string name="filter_today">Today</string>
+    <string name="filter_week">This Week</string>
+    <string name="filter_month">This Month</string>
+    <string name="filter_custom">Calendar</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_date_range">Select Date Range</string>
+    <string name="select_range_headline">Choose start and end dates</string>
 </resources>

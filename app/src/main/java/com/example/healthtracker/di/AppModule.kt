@@ -13,6 +13,7 @@ import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.DeleteExerciseUseCase
 import com.example.healthtracker.domain.usecase.GetExercisesByDateUseCase
+import com.example.healthtracker.domain.usecase.GetExercisesByDateRangeUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
 import com.example.healthtracker.presentation.activity.ActivityViewModel
 import com.example.healthtracker.presentation.onboarding.OnboardingViewModel
@@ -45,6 +46,7 @@ val appModule = module {
     factory { SaveUserProfileUseCase(get(), get()) }
     factory { AddExerciseUseCase(get(), get()) }
     factory { GetExercisesByDateUseCase(get()) }
+    factory { GetExercisesByDateRangeUseCase(get()) }
     factory { DeleteExerciseUseCase(get()) }
 
     viewModel { OnboardingViewModel(get(), get(), get(), get()) }

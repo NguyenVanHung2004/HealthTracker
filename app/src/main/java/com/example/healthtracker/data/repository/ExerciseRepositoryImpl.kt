@@ -25,6 +25,12 @@ class ExerciseRepositoryImpl(
             entities.map { it.toDomainModel() }
         }
     }
+
+    override fun getExercisesByDateRange(startDate: LocalDate, endDate: LocalDate): Flow<List<ExerciseLog>> {
+        return dao.getExercisesByDateRange(startDate.toString(), endDate.toString()).map { entities ->
+            entities.map { it.toDomainModel() }
+        }
+    }
 }
 
 fun ExerciseLog.toEntity(): ExerciseEntity {

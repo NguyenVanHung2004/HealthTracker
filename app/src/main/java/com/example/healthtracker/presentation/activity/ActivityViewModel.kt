@@ -8,7 +8,7 @@ import com.example.healthtracker.domain.model.ExerciseType
 import com.example.healthtracker.domain.repository.UserRepository
 import com.example.healthtracker.domain.usecase.AddExerciseUseCase
 import com.example.healthtracker.domain.usecase.DeleteExerciseUseCase
-import com.example.healthtracker.domain.usecase.GetExercisesByDateUseCase
+import com.example.healthtracker.domain.usecase.GetExercisesByDateRangeUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,11 +18,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import com.example.healthtracker.presentation.components.LoadingController
+import java.time.temporal.TemporalAdjusters
+
+enum class DateFilterType {
+    TODAY, WEEK, MONTH, CUSTOM
+}
 
 data class ActivityUiState(
     val selectedDate: LocalDate = LocalDate.now(),
+    val filterType: DateFilterType = DateFilterType.TODAY,
+    val customStartDate: LocalDate = LocalDate.now(),
+    val customEndDate: LocalDate = LocalDate.now(),
     val exercises: List<ExerciseLog> = emptyList(),
     val totalCaloriesBurned: Int = 0,
     val showAddDialog: Boolean = false,
@@ -34,7 +43,7 @@ data class ActivityUiState(
 class ActivityViewModel(
     private val userRepository: UserRepository,
     private val addExerciseUseCase: AddExerciseUseCase,
-    private val getExercisesByDateUseCase: GetExercisesByDateUseCase,
+    private val getExercisesByDateRangeUseCase: GetExercisesByDateRangeUseCase,
     private val deleteExerciseUseCase: DeleteExerciseUseCase
 ) : ViewModel() {
 
@@ -57,9 +66,46 @@ class ActivityViewModel(
         }
     }
 
+    private var loadJob: Job? = null
+
+    fun setFilterType(filterType: DateFilterType) {
+        _uiState.update { it.copy(filterType = filterType) }
+        loadExercises()
+    }
+
+    fun setCustomRange(startDate: LocalDate, endDate: LocalDate) {
+        _uiState.update {
+            it.copy(
+                filterType = DateFilterType.CUSTOM,
+                customStartDate = startDate,
+                customEndDate = endDate
+            )
+        }
+        loadExercises()
+    }
+
     private fun loadExercises() {
-        viewModelScope.launch {
-            getExercisesByDateUseCase(_uiState.value.selectedDate).collect { logs ->
+        loadJob?.cancel()
+        val today = LocalDate.now()
+        val (start, end) = when (_uiState.value.filterType) {
+            DateFilterType.TODAY -> today to today
+            DateFilterType.WEEK -> {
+                val s = today.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                val e = today.with(TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY))
+                s to e
+            }
+            DateFilterType.MONTH -> {
+                val s = today.with(TemporalAdjusters.firstDayOfMonth())
+                val e = today.with(TemporalAdjusters.lastDayOfMonth())
+                s to e
+            }
+            DateFilterType.CUSTOM -> {
+                _uiState.value.customStartDate to _uiState.value.customEndDate
+            }
+        }
+
+        loadJob = viewModelScope.launch {
+            getExercisesByDateRangeUseCase(start, end).collect { logs ->
                 _uiState.update { state ->
                     state.copy(
                         exercises = logs,
@@ -68,10 +114,6 @@ class ActivityViewModel(
                 }
             }
         }
-    }
-
-    fun setShowAddDialog(show: Boolean) {
-        _uiState.update { it.copy(showAddDialog = show, selectedExerciseType = null, durationInput = "") }
     }
 
     fun selectExerciseType(type: ExerciseType) {

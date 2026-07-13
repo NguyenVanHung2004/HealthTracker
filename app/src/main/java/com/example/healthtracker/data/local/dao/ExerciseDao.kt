@@ -19,5 +19,7 @@ interface ExerciseDao {
 
     @Query("SELECT * FROM exercises WHERE date = :date ORDER BY id DESC")
     fun getExercisesByDate(date: String): Flow<List<ExerciseEntity>>
-    
+
+    @Query("SELECT * FROM exercises WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC, id DESC")
+    fun getExercisesByDateRange(startDate: String, endDate: String): Flow<List<ExerciseEntity>>
 }
