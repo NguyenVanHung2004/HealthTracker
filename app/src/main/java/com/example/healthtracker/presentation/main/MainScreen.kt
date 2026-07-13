@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthtracker.presentation.activity.ActivityScreen
 import com.example.healthtracker.presentation.activity.AddExerciseScreen
 import com.example.healthtracker.presentation.settings.SettingsScreen
+import com.example.healthtracker.presentation.meal.MealScreen
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -81,9 +82,7 @@ fun MainScreen(navController: NavController) {
                     }
                 }
                 if (selectedItem == 1) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Meal")
-                    }
+                    MealScreen()
                 }
                 if (selectedItem == 2) {
                     val activityNavController = rememberNavController()
@@ -141,9 +140,7 @@ fun MainScreen(navController: NavController) {
                     }
                 }
                 if (selectedItem == 1) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Meal")
-                    }
+                    MealScreen()
                 }
                 if (selectedItem == 2) {
                     val activityNavController = rememberNavController()

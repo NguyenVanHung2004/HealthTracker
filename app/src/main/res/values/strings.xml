@@ -131,10 +131,39 @@
     <string name="toast_enter_duration">Vui lòng nhập thời gian</string>
     <string name="error_occurred">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="filter_today">Hôm nay</string>
+    <string name="filter_yesterday">Hôm qua</string>
     <string name="filter_week">Tuần này</string>
     <string name="filter_month">Tháng này</string>
     <string name="filter_custom">Lịch</string>
     <string name="select_date">Chọn ngày</string>
     <string name="select_date_range">Chọn khoảng ngày</string>
     <string name="select_range_headline">Chọn ngày bắt đầu và kết thúc</string>
+
+    <!-- Meal Tracker Strings -->
+    <string name="meal_breakfast">Bữa sáng</string>
+    <string name="meal_lunch">Bữa trưa</string>
+    <string name="meal_dinner">Bữa tối</string>
+    <string name="meal_snack">Bữa phụ</string>
+    <string name="total_calories_consumed">Tổng calo nạp vào</string>
+    <string name="total_meal_calories">Tổng: %1$d kcal</string>
+    <string name="total_day_calories">Tổng trong ngày: %1$d kcal</string>
+    <string name="add_food">Thêm món ăn</string>
+    <string name="food_name">Tên món ăn</string>
+    <string name="calories">Lượng calo (kcal)</string>
+    <string name="serving_size">Khẩu phần / Số lượng</string>
+    <string name="quantity">Số lượng</string>
+    <string name="delete_food">Xóa món ăn</string>
+    <string name="search_food">Tìm kiếm món ăn...</string>
+    <string name="or_enter_manually">Hoặc tự nhập món mới:</string>
+    <string name="no_food_added">Chưa thêm món ăn nào</string>
+    <string name="toast_enter_food_name">Vui lòng nhập tên món ăn</string>
+    <string name="toast_enter_calories">Vui lòng nhập lượng calo hợp lệ</string>
+    <string name="toast_enter_quantity">Vui lòng nhập số lượng hợp lệ</string>
+    <string name="toast_food_added">Đã thêm món ăn thành công!</string>
+    <string name="toast_food_deleted">Đã xóa món ăn thành công!</string>
+    <string name="food_custom">Tự nhập</string>
+    <string name="food_list_title">Danh sách món ăn</string>
+    <string name="daily_nutrition">Dinh dưỡng hàng ngày</string>
+    <string name="food_serving_hint">Khẩu phần (VD: 100g, 1 bát)</string>
+    <string name="food_serving_label">Khẩu phần: %1$s</string>
 </resources>
