@@ -64,15 +64,25 @@ class MainActivity : ComponentActivity() {
                 "blue_dark" -> true
                 else -> isSystemInDarkTheme()
             }
+            val context = LocalContext.current
+            val locale = java.util.Locale(languagePref)
+
+            LaunchedEffect(languagePref) {
+                val resources = context.resources
+                val configuration = resources.configuration
+                java.util.Locale.setDefault(locale)
+                configuration.setLocale(locale)
+                resources.updateConfiguration(configuration, resources.displayMetrics)
+            }
+
             HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme) {
-                val locale = Locale(languagePref)
                 val configuration = Configuration(LocalConfiguration.current).apply {
                     setLocale(locale)
                 }
-                val context = LocalContext.current.createConfigurationContext(configuration)
+                val localizedContext = context.createConfigurationContext(configuration)
 
                 CompositionLocalProvider(
-                    LocalContext provides context,
+                    LocalContext provides localizedContext,
                     LocalConfiguration provides configuration
                 ) {
                     if (isOnboardingCompleted != null) {
