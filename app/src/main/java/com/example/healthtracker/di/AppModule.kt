@@ -4,8 +4,10 @@ import androidx.room.Room
 import com.example.healthtracker.data.local.HealthDatabase
 import com.example.healthtracker.data.local.preferences.UserPreferences
 import com.example.healthtracker.data.repository.ExerciseRepositoryImpl
+import com.example.healthtracker.data.repository.MealRepositoryImpl
 import com.example.healthtracker.data.repository.UserRepositoryImpl
 import com.example.healthtracker.domain.repository.ExerciseRepository
+import com.example.healthtracker.domain.repository.MealRepository
 import com.example.healthtracker.domain.repository.UserRepository
 import com.example.healthtracker.domain.usecase.AddExerciseUseCase
 import com.example.healthtracker.domain.usecase.CalculateBMIUseCase
@@ -35,11 +37,14 @@ val appModule = module {
 
     single { get<HealthDatabase>().userDao() }
     single { get<HealthDatabase>().exerciseDao() }
+    single { get<HealthDatabase>().mealDao() }
+    single { get<HealthDatabase>().foodItemDao() }
 
     single { UserPreferences(androidContext()) }
 
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<ExerciseRepository> { ExerciseRepositoryImpl(get()) }
+    single<MealRepository> { MealRepositoryImpl(get(), get()) }
 
     factory { CalculateBMRUseCase() }
     factory { CalculateTDEEUseCase() }
@@ -53,5 +58,5 @@ val appModule = module {
     viewModel { OnboardingViewModel(get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ActivityViewModel(get(), get(), get(), get()) }
-    viewModel { MealViewModel(get()) }
+    viewModel { MealViewModel(get(), get()) }
 }

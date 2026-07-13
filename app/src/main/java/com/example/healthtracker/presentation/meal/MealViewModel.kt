@@ -7,6 +7,8 @@ import com.example.healthtracker.domain.model.FoodItem
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
 import com.example.healthtracker.domain.repository.UserRepository
+import com.example.healthtracker.domain.repository.MealRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,10 +17,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.healthtracker.data.local.FoodItemSeedData
 import java.time.LocalDate
 
 class MealViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val mealRepository: MealRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MealUiState())
@@ -27,103 +31,19 @@ class MealViewModel(
     private val _uiEvent = MutableSharedFlow<MealUiEvent>()
     val uiEvent: SharedFlow<MealUiEvent> = _uiEvent.asSharedFlow()
 
-    // Mock database for logged meals in-memory
-    private val mealDatabase = mutableMapOf<LocalDate, MutableList<MealLog>>()
-
-    // Pre-defined sample food items list (34 items)
-    private val sampleFoods = listOf(
-        FoodItem(name = "Cơm trắng", calories = 130, servingInfo = "100g"),
-        FoodItem(name = "Phở bò (tô nhỏ)", calories = 350, servingInfo = "1 tô"),
-        FoodItem(name = "Phở gà", calories = 300, servingInfo = "1 tô"),
-        FoodItem(name = "Trứng gà luộc", calories = 78, servingInfo = "1 quả"),
-        FoodItem(name = "Bánh mì kẹp thịt", calories = 400, servingInfo = "1 cái"),
-        FoodItem(name = "Bánh mì không", calories = 265, servingInfo = "1 cái"),
-        FoodItem(name = "Ức gà áp chảo", calories = 165, servingInfo = "100g"),
-        FoodItem(name = "Thịt heo luộc", calories = 240, servingInfo = "100g"),
-        FoodItem(name = "Thịt bò nướng", calories = 250, servingInfo = "100g"),
-        FoodItem(name = "Cá hồi áp chảo", calories = 200, servingInfo = "100g"),
-        FoodItem(name = "Bún chả", calories = 450, servingInfo = "1 phần"),
-        FoodItem(name = "Bún bò Huế", calories = 480, servingInfo = "1 tô"),
-        FoodItem(name = "Xôi xéo", calories = 400, servingInfo = "1 gói"),
-        FoodItem(name = "Bánh cuốn", calories = 320, servingInfo = "1 đĩa"),
-        FoodItem(name = "Chuối chín", calories = 90, servingInfo = "1 quả"),
-        FoodItem(name = "Táo", calories = 52, servingInfo = "1 quả"),
-        FoodItem(name = "Sữa tươi không đường", calories = 62, servingInfo = "100ml"),
-        FoodItem(name = "Sữa chua ít đường", calories = 80, servingInfo = "1 hộp"),
-        FoodItem(name = "Rau muống luộc", calories = 40, servingInfo = "1 đĩa"),
-        FoodItem(name = "Đậu hũ sốt cà chua", calories = 200, servingInfo = "1 đĩa"),
-        FoodItem(name = "Quả bơ", calories = 160, servingInfo = "1 quả"),
-        FoodItem(name = "Hạt điều", calories = 170, servingInfo = "30g"),
-        FoodItem(name = "Hạt hạnh nhân", calories = 180, servingInfo = "30g"),
-        FoodItem(name = "Khoai lang luộc", calories = 86, servingInfo = "100g"),
-        FoodItem(name = "Ngô ngọt luộc", calories = 150, servingInfo = "1 bắp"),
-        FoodItem(name = "Bánh ngọt", calories = 300, servingInfo = "1 cái"),
-        FoodItem(name = "Nước cam ép", calories = 110, servingInfo = "1 ly"),
-        FoodItem(name = "Cafe sữa đá", calories = 150, servingInfo = "1 ly"),
-        FoodItem(name = "Trà sữa", calories = 350, servingInfo = "1 ly"),
-        FoodItem(name = "Đùi gà rán", calories = 240, servingInfo = "1 cái"),
-        FoodItem(name = "Pizza", calories = 280, servingInfo = "1 miếng"),
-        FoodItem(name = "Mì ăn liền", calories = 350, servingInfo = "1 gói"),
-        FoodItem(name = "Cháo thịt băm", calories = 250, servingInfo = "1 tô"),
-        FoodItem(name = "Canh bí đao sườn heo", calories = 120, servingInfo = "1 tô")
-    )
-
     init {
-        // Pre-populate mock logs for today
         val today = LocalDate.now()
-        val initialLogs = mutableListOf(
-            MealLog(
-                date = today,
-                mealType = MealType.BREAKFAST,
-                foodName = "Cơm trắng",
-                caloriesPerServing = 130,
-                servingInfo = "100g",
-                quantity = 1.5
-            ),
-            MealLog(
-                date = today,
-                mealType = MealType.BREAKFAST,
-                foodName = "Trứng gà luộc",
-                caloriesPerServing = 78,
-                servingInfo = "1 quả",
-                quantity = 2.0
-            ),
-            MealLog(
-                date = today,
-                mealType = MealType.LUNCH,
-                foodName = "Phở bò (tô nhỏ)",
-                caloriesPerServing = 350,
-                servingInfo = "1 tô",
-                quantity = 1.0
-            ),
-            MealLog(
-                date = today,
-                mealType = MealType.DINNER,
-                foodName = "Ức gà áp chảo",
-                caloriesPerServing = 165,
-                servingInfo = "100g",
-                quantity = 1.2
-            ),
-            MealLog(
-                date = today,
-                mealType = MealType.DINNER,
-                foodName = "Rau muống luộc",
-                caloriesPerServing = 40,
-                servingInfo = "1 đĩa",
-                quantity = 1.0
-            )
-        )
-        mealDatabase[today] = initialLogs
-
-        _uiState.update {
-            it.copy(
-                availableFoods = sampleFoods,
-                filteredFoods = sampleFoods
-            )
+        loadUserData()
+        
+        viewModelScope.launch {
+            // Seed food items in database if empty
+            if (mealRepository.getFoodItemCount() == 0) {
+                mealRepository.insertFoodItems(FoodItemSeedData.sampleFoods)
+            }
         }
 
-        loadUserData()
-        loadLogsForDate(today)
+        observeFoodItems()
+        observeLogsForDate(today)
     }
 
     private fun loadUserData() {
@@ -135,33 +55,107 @@ class MealViewModel(
         }
     }
 
+    private var observeFoodsJob: Job? = null
+
+    private fun observeFoodItems() {
+        observeFoodsJob?.cancel()
+        observeFoodsJob = viewModelScope.launch {
+            mealRepository.getAllFoodItems().collect { foods ->
+                _uiState.update { state ->
+                    state.copy(
+                        availableFoods = foods,
+                        filteredFoods = if (state.searchQuery.isBlank()) foods else state.filteredFoods
+                    )
+                }
+            }
+        }
+    }
+
     fun setDate(date: LocalDate) {
         _uiState.update { it.copy(selectedDate = date) }
-        loadLogsForDate(date)
+        observeLogsForDate(date)
     }
 
-    private fun loadLogsForDate(date: LocalDate) {
-        val logs = mealDatabase[date] ?: emptyList<MealLog>()
-        val total = logs.sumOf { it.totalCalories }
-        _uiState.update {
-            it.copy(
-                loggedMeals = logs,
-                totalCalories = total
-            )
+    private var observeLogsJob: Job? = null
+    private var hasCheckedSeeding = false
+
+    private fun observeLogsForDate(date: LocalDate) {
+        observeLogsJob?.cancel()
+        observeLogsJob = viewModelScope.launch {
+            mealRepository.getMealsByDate(date).collect { logs ->
+                // Seed initial logs for today if empty and we haven't checked seeding yet
+                if (logs.isEmpty() && !hasCheckedSeeding && date.isEqual(LocalDate.now())) {
+                    hasCheckedSeeding = true
+                    val initialLogs = listOf(
+                        MealLog(
+                            date = date,
+                            mealType = MealType.BREAKFAST,
+                            foodName = "Cơm trắng",
+                            caloriesPerServing = 130,
+                            servingInfo = "100g",
+                            quantity = 1.5
+                        ),
+                        MealLog(
+                            date = date,
+                            mealType = MealType.BREAKFAST,
+                            foodName = "Trứng gà luộc",
+                            caloriesPerServing = 78,
+                            servingInfo = "1 quả",
+                            quantity = 2.0
+                        ),
+                        MealLog(
+                            date = date,
+                            mealType = MealType.LUNCH,
+                            foodName = "Phở bò (tô nhỏ)",
+                            caloriesPerServing = 350,
+                            servingInfo = "1 tô",
+                            quantity = 1.0
+                        ),
+                        MealLog(
+                            date = date,
+                            mealType = MealType.DINNER,
+                            foodName = "Ức gà áp chảo",
+                            caloriesPerServing = 165,
+                            servingInfo = "100g",
+                            quantity = 1.2
+                        ),
+                        MealLog(
+                            date = date,
+                            mealType = MealType.DINNER,
+                            foodName = "Rau muống luộc",
+                            caloriesPerServing = 40,
+                            servingInfo = "1 đĩa",
+                            quantity = 1.0
+                        )
+                    )
+                    initialLogs.forEach { mealRepository.insertMeal(it) }
+                } else {
+                    hasCheckedSeeding = true
+                    val total = logs.sumOf { it.totalCalories }
+                    _uiState.update { state ->
+                        state.copy(
+                            loggedMeals = logs,
+                            totalCalories = total
+                        )
+                    }
+                }
+            }
         }
     }
+
+    private var searchJob: Job? = null
 
     fun setSearchQuery(query: String) {
-        val filtered = if (query.isBlank()) {
-            sampleFoods
-        } else {
-            sampleFoods.filter { it.name.contains(query, ignoreCase = true) }
-        }
-        _uiState.update {
-            it.copy(
-                searchQuery = query,
-                filteredFoods = filtered
-            )
+        _uiState.update { it.copy(searchQuery = query) }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            if (query.isBlank()) {
+                _uiState.update { it.copy(filteredFoods = it.availableFoods) }
+            } else {
+                mealRepository.searchFoodItems(query).collect { filtered ->
+                    _uiState.update { it.copy(filteredFoods = filtered) }
+                }
+            }
         }
     }
 
@@ -171,7 +165,7 @@ class MealViewModel(
                 isAddFoodDialogVisible = true,
                 selectedMealType = mealType,
                 searchQuery = "",
-                filteredFoods = sampleFoods,
+                filteredFoods = it.availableFoods,
                 selectedFoodItem = null,
                 quantityInput = "1",
                 customFoodName = "",
@@ -264,23 +258,25 @@ class MealViewModel(
             )
         }
 
-        val logs = mealDatabase[date] ?: mutableListOf()
-        logs.add(newLog)
-        mealDatabase[date] = logs
-
-        loadLogsForDate(date)
-        emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
-        closeAddFoodDialog()
+        viewModelScope.launch {
+            try {
+                mealRepository.insertMeal(newLog)
+                emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
+                closeAddFoodDialog()
+            } catch (e: Exception) {
+                emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
+            }
+        }
     }
 
     fun deleteMealLog(mealLog: MealLog) {
-        val date = mealLog.date
-        val logs = mealDatabase[date]
-        if (logs != null) {
-            logs.remove(mealLog)
-            mealDatabase[date] = logs
-            loadLogsForDate(date)
-            emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
+        viewModelScope.launch {
+            try {
+                mealRepository.deleteMeal(mealLog)
+                emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
+            } catch (e: Exception) {
+                emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
+            }
         }
     }
 
