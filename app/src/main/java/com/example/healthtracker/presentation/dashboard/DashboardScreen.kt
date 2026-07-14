@@ -206,6 +206,10 @@ fun DashboardScreen(
                     }
                 }
 
+                // 4.1 Today's Logs (Meals & Exercises)
+                TodayMealsCard(meals = uiState.todayMeals)
+                TodayExercisesCard(exercises = uiState.todayExercises)
+
                 // 5. Statistics Charts
                 Text(
                     text = stringResource(R.string.stats_title),

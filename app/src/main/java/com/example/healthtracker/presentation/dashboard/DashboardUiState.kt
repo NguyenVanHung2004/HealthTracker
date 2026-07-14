@@ -1,5 +1,7 @@
 package com.example.healthtracker.presentation.dashboard
 
+import com.example.healthtracker.domain.model.ExerciseLog
+import com.example.healthtracker.domain.model.MealLog
 import java.time.LocalDate
 
 data class BarChartData(
@@ -37,6 +39,10 @@ data class DashboardUiState(
     val avgCaloriesConsumed: Float = 0f,
     val avgCaloriesBurned: Float = 0f,
     val daysTargetMet: Int = 0,
+    
+    // Today's logs
+    val todayMeals: List<MealLog> = emptyList(),
+    val todayExercises: List<ExerciseLog> = emptyList(),
     
     val isLoading: Boolean = true
 )

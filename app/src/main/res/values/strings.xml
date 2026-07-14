@@ -189,4 +189,9 @@
     <string name="stats_avg_burned">Trung bình tiêu thụ / ngày</string>
     <string name="stats_days_met">Số ngày đạt mục tiêu</string>
     <string name="stats_days_unit">%1$d ngày</string>
+    <string name="dashboard_today_meals">Món ăn hôm nay</string>
+    <string name="dashboard_today_exercises">Vận động hôm nay</string>
+    <string name="dashboard_no_meals_today">Chưa có món ăn nào được thêm hôm nay.</string>
+    <string name="dashboard_no_exercises_today">Chưa có hoạt động nào được thêm hôm nay.</string>
+    <string name="dashboard_serving">khẩu phần</string>
 </resources>

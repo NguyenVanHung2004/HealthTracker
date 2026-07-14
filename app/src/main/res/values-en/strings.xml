@@ -189,4 +189,9 @@
     <string name="stats_avg_burned">Avg Burned / day</string>
     <string name="stats_days_met">Days Target Met</string>
     <string name="stats_days_unit">%1$d days</string>
+    <string name="dashboard_today_meals">Today\'s Meals</string>
+    <string name="dashboard_today_exercises">Today\'s Exercises</string>
+    <string name="dashboard_no_meals_today">No meals added yet today.</string>
+    <string name="dashboard_no_exercises_today">No exercises added yet today.</string>
+    <string name="dashboard_serving">serving</string>
 </resources>
