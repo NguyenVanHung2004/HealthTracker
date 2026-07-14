@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseLog
 import com.example.healthtracker.domain.model.ExerciseType
-import com.example.healthtracker.domain.repository.UserRepository
+import com.example.healthtracker.domain.usecase.GetUserUseCase
 import com.example.healthtracker.domain.usecase.AddExerciseUseCase
 import com.example.healthtracker.domain.usecase.DeleteExerciseUseCase
 import com.example.healthtracker.domain.usecase.GetExercisesByDateRangeUseCase
@@ -41,7 +41,7 @@ data class ActivityUiState(
 )
 
 class ActivityViewModel(
-    private val userRepository: UserRepository,
+    private val getUserUseCase: GetUserUseCase,
     private val addExerciseUseCase: AddExerciseUseCase,
     private val getExercisesByDateRangeUseCase: GetExercisesByDateRangeUseCase,
     private val deleteExerciseUseCase: DeleteExerciseUseCase
@@ -60,7 +60,7 @@ class ActivityViewModel(
 
     private fun checkUser() {
         viewModelScope.launch {
-            userRepository.getUser().collect { user ->
+            getUserUseCase().collect { user ->
                 _uiState.update { it.copy(isUserLoading = user == null) }
             }
         }

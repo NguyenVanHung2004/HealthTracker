@@ -18,6 +18,13 @@ import com.example.healthtracker.domain.usecase.GetExercisesByDateUseCase
 import com.example.healthtracker.domain.usecase.GetExercisesByDateRangeUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
 import com.example.healthtracker.domain.usecase.GetDashboardDataUseCase
+import com.example.healthtracker.domain.usecase.GetUserUseCase
+import com.example.healthtracker.domain.usecase.SeedFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.GetAllFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
+import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.AddMealUseCase
+import com.example.healthtracker.domain.usecase.DeleteMealUseCase
 import com.example.healthtracker.presentation.activity.ActivityViewModel
 import com.example.healthtracker.presentation.onboarding.OnboardingViewModel
 import com.example.healthtracker.presentation.settings.SettingsViewModel
@@ -57,10 +64,17 @@ val appModule = module {
     factory { GetExercisesByDateRangeUseCase(get()) }
     factory { DeleteExerciseUseCase(get()) }
     factory { GetDashboardDataUseCase(get(), get(), get()) }
+    factory { GetUserUseCase(get()) }
+    factory { SeedFoodItemsUseCase(get()) }
+    factory { GetAllFoodItemsUseCase(get()) }
+    factory { GetMealsByDateUseCase(get()) }
+    factory { SearchFoodItemsUseCase(get()) }
+    factory { AddMealUseCase(get()) }
+    factory { DeleteMealUseCase(get()) }
 
     viewModel { OnboardingViewModel(get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ActivityViewModel(get(), get(), get(), get()) }
-    viewModel { MealViewModel(get(), get()) }
+    viewModel { MealViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { DashboardViewModel(get()) }
 }

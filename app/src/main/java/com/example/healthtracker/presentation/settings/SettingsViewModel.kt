@@ -8,7 +8,7 @@ import com.example.healthtracker.domain.model.ActivityLevel
 import com.example.healthtracker.domain.model.Gender
 import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.domain.model.User
-import com.example.healthtracker.domain.repository.UserRepository
+import com.example.healthtracker.domain.usecase.GetUserUseCase
 import com.example.healthtracker.domain.usecase.CalculateBMIUseCase
 import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
@@ -39,7 +39,7 @@ data class SettingsUiState(
 )
 
 class SettingsViewModel(
-    private val userRepository: UserRepository,
+    private val getUserUseCase: GetUserUseCase,
     private val userPreferences: UserPreferences,
     private val calculateBMRUseCase: CalculateBMRUseCase,
     private val calculateTDEEUseCase: CalculateTDEEUseCase,
@@ -68,7 +68,7 @@ class SettingsViewModel(
 
     private fun loadUser() {
         viewModelScope.launch {
-            userRepository.getUser().collect { user ->
+            getUserUseCase().collect { user ->
                 if (user != null) {
                     _uiState.update {
                         it.copy(

@@ -6,8 +6,13 @@ import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.FoodItem
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
-import com.example.healthtracker.domain.repository.UserRepository
-import com.example.healthtracker.domain.repository.MealRepository
+import com.example.healthtracker.domain.usecase.GetUserUseCase
+import com.example.healthtracker.domain.usecase.SeedFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.GetAllFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
+import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.AddMealUseCase
+import com.example.healthtracker.domain.usecase.DeleteMealUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +26,13 @@ import com.example.healthtracker.data.local.FoodItemSeedData
 import java.time.LocalDate
 
 class MealViewModel(
-    private val userRepository: UserRepository,
-    private val mealRepository: MealRepository
+    private val getUserUseCase: GetUserUseCase,
+    private val seedFoodItemsUseCase: SeedFoodItemsUseCase,
+    private val getAllFoodItemsUseCase: GetAllFoodItemsUseCase,
+    private val getMealsByDateUseCase: GetMealsByDateUseCase,
+    private val searchFoodItemsUseCase: SearchFoodItemsUseCase,
+    private val addMealUseCase: AddMealUseCase,
+    private val deleteMealUseCase: DeleteMealUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MealUiState())
@@ -37,9 +47,7 @@ class MealViewModel(
         
         viewModelScope.launch {
             // Seed food items in database if empty
-            if (mealRepository.getFoodItemCount() == 0) {
-                mealRepository.insertFoodItems(FoodItemSeedData.sampleFoods)
-            }
+            seedFoodItemsUseCase(FoodItemSeedData.sampleFoods)
         }
 
         observeFoodItems()
@@ -48,7 +56,7 @@ class MealViewModel(
 
     private fun loadUserData() {
         viewModelScope.launch {
-            userRepository.getUser().collect { user ->
+            getUserUseCase().collect { user ->
                 val target = if (user != null && user.targetCalories > 0) user.targetCalories else 2000
                 _uiState.update { it.copy(targetCalories = target) }
             }
@@ -60,7 +68,7 @@ class MealViewModel(
     private fun observeFoodItems() {
         observeFoodsJob?.cancel()
         observeFoodsJob = viewModelScope.launch {
-            mealRepository.getAllFoodItems().collect { foods ->
+            getAllFoodItemsUseCase().collect { foods ->
                 _uiState.update { state ->
                     state.copy(
                         availableFoods = foods,
@@ -80,7 +88,7 @@ class MealViewModel(
     private fun observeLogsForDate(date: LocalDate) {
         observeLogsJob?.cancel()
         observeLogsJob = viewModelScope.launch {
-            mealRepository.getMealsByDate(date).collect { logs ->
+            getMealsByDateUseCase(date).collect { logs ->
                 val total = logs.sumOf { it.totalCalories }
                 _uiState.update { state ->
                     state.copy(
@@ -101,7 +109,7 @@ class MealViewModel(
             if (query.isBlank()) {
                 _uiState.update { it.copy(filteredFoods = it.availableFoods) }
             } else {
-                mealRepository.searchFoodItems(query).collect { filtered ->
+                searchFoodItemsUseCase(query).collect { filtered ->
                     _uiState.update { it.copy(filteredFoods = filtered) }
                 }
             }
@@ -209,7 +217,7 @@ class MealViewModel(
 
         viewModelScope.launch {
             try {
-                mealRepository.insertMeal(newLog)
+                addMealUseCase(newLog)
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
                 closeAddFoodDialog()
             } catch (e: Exception) {
@@ -221,7 +229,7 @@ class MealViewModel(
     fun deleteMealLog(mealLog: MealLog) {
         viewModelScope.launch {
             try {
-                mealRepository.deleteMeal(mealLog)
+                deleteMealUseCase(mealLog)
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
             } catch (e: Exception) {
                 emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
