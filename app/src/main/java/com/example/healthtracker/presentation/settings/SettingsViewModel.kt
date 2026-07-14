@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
 
@@ -33,6 +35,8 @@ data class SettingsUiState(
     val name: String = "",
     val weight: String = "",
     val height: String = "",
+    val dateOfBirth: String = "",
+    val bmi: Float = 0f,
     val gender: Gender = Gender.MALE,
     val activityLevel: ActivityLevel = ActivityLevel.SEDENTARY,
     val goal: Goal = Goal.MAINTAIN_WEIGHT
@@ -61,6 +65,8 @@ class SettingsViewModel(
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     init {
         loadUser()
@@ -77,6 +83,8 @@ class SettingsViewModel(
                             name = user.name,
                             weight = user.weightKg.toString(),
                             height = user.heightCm.toInt().toString(),
+                            dateOfBirth = user.dateOfBirth.format(dateFormatter),
+                            bmi = user.bmi,
                             gender = user.gender,
                             activityLevel = user.activityLevel,
                             goal = user.goal
@@ -92,6 +100,7 @@ class SettingsViewModel(
     fun onNameChange(name: String) { _uiState.update { it.copy(name = name) } }
     fun onWeightChange(weight: String) { _uiState.update { it.copy(weight = weight) } }
     fun onHeightChange(height: String) { _uiState.update { it.copy(height = height) } }
+    fun onDateOfBirthChange(dob: String) { _uiState.update { it.copy(dateOfBirth = dob) } }
     fun onGenderChange(gender: Gender) { _uiState.update { it.copy(gender = gender) } }
     fun onActivityLevelChange(level: ActivityLevel) { _uiState.update { it.copy(activityLevel = level) } }
     fun onGoalChange(goal: Goal) { _uiState.update { it.copy(goal = goal) } }
@@ -104,7 +113,11 @@ class SettingsViewModel(
             val currentState = _uiState.value
             val currentUser = currentState.user
             
-            val birthDate = currentUser?.dateOfBirth ?: LocalDate.now().minusYears(25)
+            val birthDate = try {
+                LocalDate.parse(currentState.dateOfBirth, dateFormatter)
+            } catch (e: DateTimeParseException) {
+                currentUser?.dateOfBirth ?: LocalDate.now().minusYears(25)
+            }
             val newWeight = currentState.weight.toFloatOrNull() ?: 60f
             val newHeight = currentState.height.toFloatOrNull() ?: 170f
 

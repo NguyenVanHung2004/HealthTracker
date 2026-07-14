@@ -66,6 +66,7 @@ fun SettingsScreen(
         onThemeChange = viewModel::updateTheme,
         onLanguageChange = viewModel::updateLanguage,
         onNameChange = viewModel::onNameChange,
+        onDateOfBirthChange = viewModel::onDateOfBirthChange,
         onWeightChange = viewModel::onWeightChange,
         onHeightChange = viewModel::onHeightChange,
         onGenderChange = viewModel::onGenderChange,
@@ -84,6 +85,7 @@ fun SettingsContent(
     onThemeChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
     onNameChange: (String) -> Unit,
+    onDateOfBirthChange: (String) -> Unit,
     onWeightChange: (String) -> Unit,
     onHeightChange: (String) -> Unit,
     onGenderChange: (Gender) -> Unit,
@@ -145,22 +147,21 @@ fun SettingsContent(
                 .padding(horizontal = spacing.medium, vertical = spacing.small),
             verticalArrangement = Arrangement.spacedBy(spacing.large)
         ) {
-
-            PreferencesSection(
-                themePreference = themePreference,
-                languagePreference = languagePreference,
-                onThemeChange = onThemeChange,
-                onLanguageChange = onLanguageChange
-            )
-
             ProfileSection(
                 uiState = uiState,
                 onNameChange = onNameChange,
+                onDateOfBirthChange = onDateOfBirthChange,
                 onWeightChange = onWeightChange,
                 onHeightChange = onHeightChange,
                 onGenderChange = onGenderChange,
                 onActivityLevelChange = onActivityLevelChange,
                 onGoalChange = onGoalChange
+            )
+            PreferencesSection(
+                themePreference = themePreference,
+                languagePreference = languagePreference,
+                onThemeChange = onThemeChange,
+                onLanguageChange = onLanguageChange
             )
 
             Spacer(modifier = Modifier.height(spacing.extraLarge))

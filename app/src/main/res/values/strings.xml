@@ -16,6 +16,11 @@
     <string name="back">Quay lại</string>
     <string name="finish">Hoàn tất</string>
     <string name="bmi_result">BMI của bạn: %1$.1f</string>
+    <string name="bmi_category_underweight">Thiếu cân</string>
+    <string name="bmi_category_normal">Bình thường</string>
+    <string name="bmi_category_overweight">Thừa cân</string>
+    <string name="bmi_category_obese">Béo phì</string>
+    <string name="settings_dob">Ngày sinh (dd/MM/yyyy)</string>
     <string name="tdee_result">Calo mục tiêu: %1$d kcal</string>
     <string name="confirm">Xác nhận</string>
     <string name="cancel">Hủy</string>
@@ -72,7 +77,7 @@
     <string name="tab_activity">Vận động</string>
     <string name="tab_setting">Cài đặt</string>
     
-    <string name="settings_preferences">Tùy chọn</string>
+    <string name="settings_preferences">Cài đặt hệ thống</string>
     <string name="settings_theme">Giao diện</string>
     <string name="settings_theme_system">Hệ thống</string>
     <string name="settings_theme_light">Cam sáng</string>

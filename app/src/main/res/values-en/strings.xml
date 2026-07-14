@@ -16,6 +16,11 @@
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="bmi_result">Your BMI: %1$.1f</string>
+    <string name="bmi_category_underweight">Underweight</string>
+    <string name="bmi_category_normal">Normal</string>
+    <string name="bmi_category_overweight">Overweight</string>
+    <string name="bmi_category_obese">Obese</string>
+    <string name="settings_dob">Date of Birth (dd/MM/yyyy)</string>
     <string name="tdee_result">Target Calories: %1$d kcal</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
