@@ -60,22 +60,20 @@ fun ProfileSection(
     val spacing = LocalSpacing.current
 
     var personalInfoExpanded by rememberSaveable { mutableStateOf(false) }
-    var genderExpanded by rememberSaveable { mutableStateOf(false) }
     var lifestyleExpanded by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        // ── BMI Card (top highlight) ──
+        // ── BMI Card ──
         if (uiState.bmi > 0f) {
             BmiGaugeCard(bmi = uiState.bmi)
         }
 
         // ── Personal Info Section ──
-        ProfileGroupCard(
+        SettingsCard(
             title = stringResource(R.string.settings_edit_profile),
-            icon = Icons.Default.Person,
             isExpanded = personalInfoExpanded,
             onExpandedChange = { personalInfoExpanded = it }
         ) {
@@ -176,15 +174,15 @@ fun ProfileSection(
                     colors = profileTextFieldColors()
                 )
             }
-        }
 
-        // ── Gender Section ──
-        ProfileGroupCard(
-            title = stringResource(R.string.settings_gender),
-            icon = Icons.Outlined.Wc,
-            isExpanded = genderExpanded,
-            onExpandedChange = { genderExpanded = it }
-        ) {
+            Spacer(modifier = Modifier.height(spacing.medium))
+            Text(
+                text = stringResource(R.string.settings_gender),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = spacing.extraSmall, bottom = spacing.small)
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(spacing.small)
@@ -207,9 +205,8 @@ fun ProfileSection(
         }
 
         // ── Activity Level & Goal (compact) ──
-        ProfileGroupCard(
+        SettingsCard(
             title = stringResource(R.string.lifestyle_goals),
-            icon = Icons.Outlined.FitnessCenter,
             isExpanded = lifestyleExpanded,
             onExpandedChange = { lifestyleExpanded = it }
         ) {
@@ -325,79 +322,6 @@ fun ProfileSection(
 // ═══════════════════════════════════════════
 // Sub-components
 // ═══════════════════════════════════════════
-
-@Composable
-private fun ProfileGroupCard(
-    title: String,
-    icon: ImageVector,
-    isExpanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val spacing = LocalSpacing.current
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(spacing.cornerLarge),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = spacing.extraSmall / 2)
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            // Clickable header
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onExpandedChange(!isExpanded) }
-                    .padding(spacing.medium)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(spacing.small))
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(spacing.small))
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // Collapsible content
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = spacing.medium)
-                        .padding(bottom = spacing.medium)
-                ) {
-                    content()
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun GenderChip(

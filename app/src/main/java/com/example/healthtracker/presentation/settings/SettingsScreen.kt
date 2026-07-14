@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
 import androidx.compose.foundation.Canvas
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 
@@ -119,10 +120,24 @@ fun SettingsContent(
                     onClick = onSaveProfile,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(spacing.medium)
-                        .height(spacing.buttonHeight),
-                    shape = RoundedCornerShape(spacing.cornerMedium)
+                        .padding(horizontal = spacing.medium, vertical = spacing.small)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 6.dp,
+                        pressedElevation = 2.dp
+                    )
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Save,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(spacing.small))
                     Text(
                         stringResource(R.string.settings_save_btn),
                         style = MaterialTheme.typography.titleMedium,
