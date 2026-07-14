@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.MonitorWeight
 import androidx.compose.material.icons.outlined.Wc
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +59,10 @@ fun ProfileSection(
 ) {
     val spacing = LocalSpacing.current
 
+    var personalInfoExpanded by rememberSaveable { mutableStateOf(false) }
+    var genderExpanded by rememberSaveable { mutableStateOf(false) }
+    var lifestyleExpanded by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
@@ -70,7 +75,9 @@ fun ProfileSection(
         // ── Personal Info Section ──
         ProfileGroupCard(
             title = stringResource(R.string.settings_edit_profile),
-            icon = Icons.Default.Person
+            icon = Icons.Default.Person,
+            isExpanded = personalInfoExpanded,
+            onExpandedChange = { personalInfoExpanded = it }
         ) {
             OutlinedTextField(
                 value = uiState.name,
@@ -174,7 +181,9 @@ fun ProfileSection(
         // ── Gender Section ──
         ProfileGroupCard(
             title = stringResource(R.string.settings_gender),
-            icon = Icons.Outlined.Wc
+            icon = Icons.Outlined.Wc,
+            isExpanded = genderExpanded,
+            onExpandedChange = { genderExpanded = it }
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -200,7 +209,9 @@ fun ProfileSection(
         // ── Activity Level & Goal (compact) ──
         ProfileGroupCard(
             title = stringResource(R.string.lifestyle_goals),
-            icon = Icons.Outlined.FitnessCenter
+            icon = Icons.Outlined.FitnessCenter,
+            isExpanded = lifestyleExpanded,
+            onExpandedChange = { lifestyleExpanded = it }
         ) {
             // Activity Level
             Text(
@@ -319,11 +330,11 @@ fun ProfileSection(
 private fun ProfileGroupCard(
     title: String,
     icon: ImageVector,
-    initialExpanded: Boolean = false,
+    isExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val spacing = LocalSpacing.current
-    var isExpanded by remember { mutableStateOf(initialExpanded) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -337,7 +348,7 @@ private fun ProfileGroupCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { isExpanded = !isExpanded }
+                    .clickable { onExpandedChange(!isExpanded) }
                     .padding(spacing.medium)
             ) {
                 Box(

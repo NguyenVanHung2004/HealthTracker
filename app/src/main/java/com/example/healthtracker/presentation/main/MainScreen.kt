@@ -22,7 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +43,7 @@ import com.example.healthtracker.presentation.dashboard.DashboardScreen
 
 @Composable
 fun MainScreen(navController: NavController) {
-    var selectedItem by remember { mutableIntStateOf(0) }
+    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
     val items = listOf(
         Pair(R.string.tab_dashboard, Icons.Filled.Home),
         Pair(R.string.tab_meal, Icons.Filled.RestaurantMenu),
@@ -51,6 +53,38 @@ fun MainScreen(navController: NavController) {
 
     val configuration = LocalConfiguration.current
     val isTablet = configuration.screenWidthDp > 600
+
+    val screenContent = remember(selectedItem) {
+        movableContentOf {
+            if (selectedItem == 0) {
+                DashboardScreen(
+                    onNavigateToMeal = { selectedItem = 1 },
+                    onNavigateToActivity = { selectedItem = 2 }
+                )
+            }
+            if (selectedItem == 1) {
+                MealScreen()
+            }
+            if (selectedItem == 2) {
+                val activityNavController = rememberNavController()
+                NavHost(navController = activityNavController, startDestination = "activity_list") {
+                    composable("activity_list") {
+                        ActivityScreen(
+                            onNavigateToAdd = { activityNavController.navigate("add_exercise") }
+                        )
+                    }
+                    composable("add_exercise") {
+                        AddExerciseScreen(
+                            onNavigateBack = { activityNavController.popBackStack() }
+                        )
+                    }
+                }
+            }
+            if (selectedItem == 3) {
+                SettingsScreen()
+            }
+        }
+    }
 
     if (isTablet) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -74,36 +108,8 @@ fun MainScreen(navController: NavController) {
                     )
                 }
             }
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                if (selectedItem == 0) {
-                    DashboardScreen(
-                        onNavigateToMeal = { selectedItem = 1 },
-                        onNavigateToActivity = { selectedItem = 2 }
-                    )
-                }
-                if (selectedItem == 1) {
-                    MealScreen()
-                }
-                if (selectedItem == 2) {
-                    val activityNavController = rememberNavController()
-                    NavHost(navController = activityNavController, startDestination = "activity_list") {
-                        composable("activity_list") {
-                            com.example.healthtracker.presentation.activity.ActivityScreen(
-                                onNavigateToAdd = { activityNavController.navigate("add_exercise") }
-                            )
-                        }
-                        composable("add_exercise") {
-                            AddExerciseScreen(
-                                onNavigateBack = { activityNavController.popBackStack() }
-                            )
-                        }
-                    }
-                }
-                if (selectedItem == 3) {
-                    SettingsScreen()
-                }
+            Box(modifier = Modifier.fillMaxSize()) {
+                screenContent()
             }
         }
     } else {
@@ -136,33 +142,7 @@ fun MainScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding())
             ) {
-                if (selectedItem == 0) {
-                    DashboardScreen(
-                        onNavigateToMeal = { selectedItem = 1 },
-                        onNavigateToActivity = { selectedItem = 2 }
-                    )
-                }
-                if (selectedItem == 1) {
-                    MealScreen()
-                }
-                if (selectedItem == 2) {
-                    val activityNavController = rememberNavController()
-                    NavHost(navController = activityNavController, startDestination = "activity_list") {
-                        composable("activity_list") {
-                            ActivityScreen(
-                                onNavigateToAdd = { activityNavController.navigate("add_exercise") }
-                            )
-                        }
-                        composable("add_exercise") {
-                            AddExerciseScreen(
-                                onNavigateBack = { activityNavController.popBackStack() }
-                            )
-                        }
-                    }
-                }
-                if (selectedItem == 3) {
-                    SettingsScreen()
-                }
+                screenContent()
             }
         }
     }

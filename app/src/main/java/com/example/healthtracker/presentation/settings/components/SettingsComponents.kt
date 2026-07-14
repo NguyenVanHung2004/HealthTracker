@@ -20,8 +20,10 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,11 +37,11 @@ import com.example.healthtracker.ui.theme.LocalSpacing
 @Composable
 fun SettingsCard(
     title: String,
-    initialExpanded: Boolean = false,
+    isExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val spacing = LocalSpacing.current
-    var isExpanded by remember { mutableStateOf(initialExpanded) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -55,7 +57,7 @@ fun SettingsCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { isExpanded = !isExpanded }
+                    .clickable { onExpandedChange(!isExpanded) }
                     .padding(spacing.medium)
             ) {
                 Text(
