@@ -87,6 +87,10 @@
     <string name="settings_theme_blue_light">Xanh dương sáng</string>
     <string name="settings_theme_blue_dark">Xanh dương tối</string>
     <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_font_size">Kích thước chữ</string>
+    <string name="font_size_small">Nhỏ</string>
+    <string name="font_size_medium">Vừa</string>
+    <string name="font_size_large">Lớn</string>
     <string name="loading">Đang tải...</string>
     <string name="settings_edit_profile">Chỉnh sửa hồ sơ</string>
     <string name="settings_name">Tên</string>

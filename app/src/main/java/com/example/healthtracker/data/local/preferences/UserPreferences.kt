@@ -18,6 +18,7 @@ class UserPreferences(
         val IS_ONBOARDING_COMPLETED = booleanPreferencesKey("is_onboarding_completed")
         val THEME_PREFERENCE = stringPreferencesKey("theme_preference") // "system", "light", "dark"
         val LANGUAGE_PREFERENCE = stringPreferencesKey("language_preference") // "vi", "en"
+        val FONT_SIZE_PREFERENCE = stringPreferencesKey("font_size_preference") // "small", "medium", "large"
     }
 
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data
@@ -50,6 +51,17 @@ class UserPreferences(
     suspend fun setLanguagePreference(language: String) {
         context.dataStore.edit { preferences ->
             preferences[LANGUAGE_PREFERENCE] = language
+        }
+    }
+
+    val fontSizePreference: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[FONT_SIZE_PREFERENCE] ?: "medium"
+        }
+
+    suspend fun setFontSizePreference(size: String) {
+        context.dataStore.edit { preferences ->
+            preferences[FONT_SIZE_PREFERENCE] = size
         }
     }
 }

@@ -49,6 +49,7 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val themePreference by viewModel.themePreference.collectAsState()
     val languagePreference by viewModel.languagePreference.collectAsState()
+    val fontSizePreference by viewModel.fontSizePreference.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -64,8 +65,10 @@ fun SettingsScreen(
         uiState = uiState,
         themePreference = themePreference,
         languagePreference = languagePreference,
+        fontSizePreference = fontSizePreference,
         onThemeChange = viewModel::updateTheme,
         onLanguageChange = viewModel::updateLanguage,
+        onFontSizeChange = viewModel::updateFontSize,
         onNameChange = viewModel::onNameChange,
         onDateOfBirthChange = viewModel::onDateOfBirthChange,
         onWeightChange = viewModel::onWeightChange,
@@ -83,8 +86,10 @@ fun SettingsContent(
     uiState: SettingsUiState,
     themePreference: String,
     languagePreference: String,
+    fontSizePreference: String,
     onThemeChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
+    onFontSizeChange: (String) -> Unit,
     onNameChange: (String) -> Unit,
     onDateOfBirthChange: (String) -> Unit,
     onWeightChange: (String) -> Unit,
@@ -121,26 +126,25 @@ fun SettingsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = spacing.medium, vertical = spacing.small)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .height(spacing.buttonHeight),
+                    shape = RoundedCornerShape(spacing.cornerMedium),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 6.dp,
-                        pressedElevation = 2.dp
+                        defaultElevation = spacing.small,
+                        pressedElevation = spacing.extraSmall / 2
                     )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Save,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(spacing.small))
                     Text(
                         stringResource(R.string.settings_save_btn),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -175,8 +179,10 @@ fun SettingsContent(
             PreferencesSection(
                 themePreference = themePreference,
                 languagePreference = languagePreference,
+                fontSizePreference = fontSizePreference,
                 onThemeChange = onThemeChange,
-                onLanguageChange = onLanguageChange
+                onLanguageChange = onLanguageChange,
+                onFontSizeChange = onFontSizeChange
             )
 
             Spacer(modifier = Modifier.height(spacing.extraLarge))

@@ -63,6 +63,12 @@ class SettingsViewModel(
         "vi"
     )
 
+    val fontSizePreference: StateFlow<String> = userPreferences.fontSizePreference.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        "medium"
+    )
+
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
     
@@ -158,6 +164,12 @@ class SettingsViewModel(
     fun updateLanguage(language: String) {
         viewModelScope.launch {
             userPreferences.setLanguagePreference(language)
+        }
+    }
+
+    fun updateFontSize(size: String) {
+        viewModelScope.launch {
+            userPreferences.setFontSizePreference(size)
         }
     }
 }

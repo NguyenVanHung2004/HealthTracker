@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themePref by userPreferences.themePreference.collectAsState(initial = "system")
             val languagePref by userPreferences.languagePreference.collectAsState(initial = "vi")
+            val fontSizePref by userPreferences.fontSizePreference.collectAsState(initial = "medium")
             val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsState(initial = null)
 
             val darkTheme = when (themePref) {
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                 resources.updateConfiguration(configuration, resources.displayMetrics)
             }
 
-            HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme) {
+            HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme, fontSizePref = fontSizePref) {
                 val configuration = Configuration(LocalConfiguration.current).apply {
                     setLocale(locale)
                 }

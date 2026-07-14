@@ -99,6 +99,7 @@ private val LightBlueColorScheme = lightColorScheme(
 @Composable
 fun HealthTrackerTheme(
     themePref: String = "system",
+    fontSizePref: String = "medium",
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
@@ -115,12 +116,18 @@ fun HealthTrackerTheme(
         else -> if (darkTheme) DarkColorScheme else LightColorScheme
     }
 
+    val fontScale = when (fontSizePref) {
+        "small" -> 0.85f
+        "large" -> 1.15f
+        else -> 1f
+    }
+
     androidx.compose.runtime.CompositionLocalProvider(
         LocalSpacing provides Spacing()
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
+            typography = getTypography(fontScale),
             content = content
         )
     }

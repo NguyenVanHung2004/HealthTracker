@@ -87,6 +87,10 @@
     <string name="settings_theme_blue_light">Blue Light</string>
     <string name="settings_theme_blue_dark">Blue Dark</string>
     <string name="settings_language">Language</string>
+    <string name="settings_font_size">Font Size</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_medium">Medium</string>
+    <string name="font_size_large">Large</string>
     <string name="loading">Loading...</string>
     <string name="settings_edit_profile">Edit Profile</string>
     <string name="settings_name">Name</string>

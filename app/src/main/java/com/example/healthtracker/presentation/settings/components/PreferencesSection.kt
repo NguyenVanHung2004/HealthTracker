@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.SettingsSuggest
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,8 +22,10 @@ import com.example.healthtracker.ui.theme.*
 fun PreferencesSection(
     themePreference: String,
     languagePreference: String,
+    fontSizePreference: String,
     onThemeChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
+    onFontSizeChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -108,6 +111,24 @@ fun PreferencesSection(
             ),
             selectedValue = languagePreference,
             onValueChange = onLanguageChange
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = spacing.small),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+
+        // Font Size
+        SettingsSegmentedControl(
+            title = stringResource(R.string.settings_font_size),
+            icon = Icons.Default.TextFields,
+            items = listOf(
+                stringResource(R.string.font_size_small) to "small",
+                stringResource(R.string.font_size_medium) to "medium",
+                stringResource(R.string.font_size_large) to "large"
+            ),
+            selectedValue = fontSizePreference,
+            onValueChange = onFontSizeChange
         )
     }
 }
