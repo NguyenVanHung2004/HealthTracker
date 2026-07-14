@@ -21,6 +21,7 @@ import com.example.healthtracker.presentation.activity.ActivityViewModel
 import com.example.healthtracker.presentation.onboarding.OnboardingViewModel
 import com.example.healthtracker.presentation.settings.SettingsViewModel
 import com.example.healthtracker.presentation.meal.MealViewModel
+import com.example.healthtracker.presentation.dashboard.DashboardViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -59,4 +60,5 @@ val appModule = module {
     viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ActivityViewModel(get(), get(), get(), get()) }
     viewModel { MealViewModel(get(), get()) }
+    viewModel { DashboardViewModel(get(), get(), get()) }
 }

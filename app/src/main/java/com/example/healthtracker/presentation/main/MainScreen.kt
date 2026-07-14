@@ -37,6 +37,7 @@ import com.example.healthtracker.presentation.activity.ActivityScreen
 import com.example.healthtracker.presentation.activity.AddExerciseScreen
 import com.example.healthtracker.presentation.settings.SettingsScreen
 import com.example.healthtracker.presentation.meal.MealScreen
+import com.example.healthtracker.presentation.dashboard.DashboardScreen
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -77,9 +78,10 @@ fun MainScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 if (selectedItem == 0) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Dashboard")
-                    }
+                    DashboardScreen(
+                        onNavigateToMeal = { selectedItem = 1 },
+                        onNavigateToActivity = { selectedItem = 2 }
+                    )
                 }
                 if (selectedItem == 1) {
                     MealScreen()
@@ -135,9 +137,10 @@ fun MainScreen(navController: NavController) {
                     .padding(bottom = innerPadding.calculateBottomPadding())
             ) {
                 if (selectedItem == 0) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Dashboard")
-                    }
+                    DashboardScreen(
+                        onNavigateToMeal = { selectedItem = 1 },
+                        onNavigateToActivity = { selectedItem = 2 }
+                    )
                 }
                 if (selectedItem == 1) {
                     MealScreen()

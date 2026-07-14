@@ -166,4 +166,27 @@
     <string name="daily_nutrition">Daily Nutrition</string>
     <string name="food_serving_hint">Serving size (e.g. 100g, 1 bowl)</string>
     <string name="food_serving_label">Serving: %1$s</string>
+
+    <!-- Dashboard & Statistics Strings -->
+    <string name="dashboard_calories_remaining">Calories Left</string>
+    <string name="dashboard_calories_exceeded">Calories Exceeded</string>
+    <string name="dashboard_target">Target</string>
+    <string name="dashboard_consumed">Consumed</string>
+    <string name="dashboard_burned">Burned</string>
+    <string name="dashboard_summary">Today\'s Summary</string>
+    <string name="dashboard_net_calories">Net Calories</string>
+    <string name="dashboard_advice_under_target">You need %1$d more kcal</string>
+    <string name="dashboard_advice_target_met">You have met your calorie target today!</string>
+    <string name="dashboard_advice_over_target">You have exceeded by %1$d kcal</string>
+    <string name="dashboard_shortcut_title">Quick Shortcuts</string>
+    <string name="dashboard_add_meal">Add Meal</string>
+    <string name="dashboard_add_activity">Add Activity</string>
+    <string name="stats_title">Statistics &amp; Charts</string>
+    <string name="stats_last_7_days">Calories Consumed Last 7 Days</string>
+    <string name="stats_weekly_trend">Weekly Calorie Trend</string>
+    <string name="stats_weekly_summary">Weekly Summary</string>
+    <string name="stats_avg_consumed">Avg Consumed / day</string>
+    <string name="stats_avg_burned">Avg Burned / day</string>
+    <string name="stats_days_met">Days Target Met</string>
+    <string name="stats_days_unit">%1$d days</string>
 </resources>

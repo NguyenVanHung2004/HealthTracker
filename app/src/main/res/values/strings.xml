@@ -166,4 +166,27 @@
     <string name="daily_nutrition">Dinh dưỡng hàng ngày</string>
     <string name="food_serving_hint">Khẩu phần (VD: 100g, 1 bát)</string>
     <string name="food_serving_label">Khẩu phần: %1$s</string>
+
+    <!-- Dashboard & Statistics Strings -->
+    <string name="dashboard_calories_remaining">Calo còn lại</string>
+    <string name="dashboard_calories_exceeded">Calo vượt quá</string>
+    <string name="dashboard_target">Mục tiêu</string>
+    <string name="dashboard_consumed">Nạp vào</string>
+    <string name="dashboard_burned">Tiêu thụ</string>
+    <string name="dashboard_summary">Tóm tắt hôm nay</string>
+    <string name="dashboard_net_calories">Cân bằng calo</string>
+    <string name="dashboard_advice_under_target">Bạn còn thiếu %1$d kcal</string>
+    <string name="dashboard_advice_target_met">Bạn đã ăn đủ calo hôm nay!</string>
+    <string name="dashboard_advice_over_target">Bạn đã vượt quá %1$d kcal</string>
+    <string name="dashboard_shortcut_title">Lối tắt nhanh</string>
+    <string name="dashboard_add_meal">Thêm bữa ăn</string>
+    <string name="dashboard_add_activity">Thêm hoạt động</string>
+    <string name="stats_title">Thống kê &amp; Biểu đồ</string>
+    <string name="stats_last_7_days">Calo nạp vào 7 ngày gần nhất</string>
+    <string name="stats_weekly_trend">Xu hướng calo tuần</string>
+    <string name="stats_weekly_summary">Thống kê tuần</string>
+    <string name="stats_avg_consumed">Trung bình nạp vào / ngày</string>
+    <string name="stats_avg_burned">Trung bình tiêu thụ / ngày</string>
+    <string name="stats_days_met">Số ngày đạt mục tiêu</string>
+    <string name="stats_days_unit">%1$d ngày</string>
 </resources>
