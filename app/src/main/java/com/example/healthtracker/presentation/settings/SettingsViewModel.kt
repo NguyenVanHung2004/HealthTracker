@@ -1,0 +1,163 @@
+package com.example.healthtracker.presentation.settings
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.healthtracker.R
+import com.example.healthtracker.data.local.preferences.UserPreferences
+import com.example.healthtracker.domain.model.ActivityLevel
+import com.example.healthtracker.domain.model.Gender
+import com.example.healthtracker.domain.model.Goal
+import com.example.healthtracker.domain.model.User
+import com.example.healthtracker.domain.usecase.GetUserUseCase
+import com.example.healthtracker.domain.usecase.CalculateBMIUseCase
+import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
+import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
+import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import com.example.healthtracker.presentation.components.LoadingController
+import kotlinx.coroutines.delay
+
+data class SettingsUiState(
+    val user: User? = null,
+    val isLoading: Boolean = true,
+    val name: String = "",
+    val weight: String = "",
+    val height: String = "",
+    val dateOfBirth: String = "",
+    val bmi: Float = 0f,
+    val gender: Gender = Gender.MALE,
+    val activityLevel: ActivityLevel = ActivityLevel.SEDENTARY,
+    val goal: Goal = Goal.MAINTAIN_WEIGHT
+)
+
+class SettingsViewModel(
+    private val getUserUseCase: GetUserUseCase,
+    private val userPreferences: UserPreferences,
+    private val calculateBMRUseCase: CalculateBMRUseCase,
+    private val calculateTDEEUseCase: CalculateTDEEUseCase,
+    private val calculateBMIUseCase: CalculateBMIUseCase,
+    private val saveUserProfileUseCase: SaveUserProfileUseCase
+) : ViewModel() {
+
+    val themePreference: StateFlow<String> = userPreferences.themePreference.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        "system"
+    )
+
+    val languagePreference: StateFlow<String> = userPreferences.languagePreference.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        "vi"
+    )
+
+    private val _uiState = MutableStateFlow(SettingsUiState())
+    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser() {
+        viewModelScope.launch {
+            getUserUseCase().collect { user ->
+                if (user != null) {
+                    _uiState.update {
+                        it.copy(
+                            user = user,
+                            isLoading = false,
+                            name = user.name,
+                            weight = user.weightKg.toString(),
+                            height = user.heightCm.toInt().toString(),
+                            dateOfBirth = user.dateOfBirth.format(dateFormatter),
+                            bmi = user.bmi,
+                            gender = user.gender,
+                            activityLevel = user.activityLevel,
+                            goal = user.goal
+                        )
+                    }
+                } else {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+            }
+        }
+    }
+
+    fun onNameChange(name: String) { _uiState.update { it.copy(name = name) } }
+    fun onWeightChange(weight: String) { _uiState.update { it.copy(weight = weight) } }
+    fun onHeightChange(height: String) { _uiState.update { it.copy(height = height) } }
+    fun onDateOfBirthChange(dob: String) { _uiState.update { it.copy(dateOfBirth = dob) } }
+    fun onGenderChange(gender: Gender) { _uiState.update { it.copy(gender = gender) } }
+    fun onActivityLevelChange(level: ActivityLevel) { _uiState.update { it.copy(activityLevel = level) } }
+    fun onGoalChange(goal: Goal) { _uiState.update { it.copy(goal = goal) } }
+
+    private val _snackbarEvent = MutableSharedFlow<Int>()
+    val snackbarEvent = _snackbarEvent.asSharedFlow()
+
+    fun saveProfile() {
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            val currentUser = currentState.user
+            
+            val birthDate = try {
+                LocalDate.parse(currentState.dateOfBirth, dateFormatter)
+            } catch (e: DateTimeParseException) {
+                currentUser?.dateOfBirth ?: LocalDate.now().minusYears(25)
+            }
+            val newWeight = currentState.weight.toFloatOrNull() ?: 60f
+            val newHeight = currentState.height.toFloatOrNull() ?: 170f
+
+            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate)
+            val tdee = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
+            val bmi = calculateBMIUseCase(newWeight, newHeight)
+
+            val updatedUser = User(
+                name = currentState.name,
+                dateOfBirth = birthDate,
+                gender = currentState.gender,
+                weightKg = newWeight,
+                heightCm = newHeight,
+                activityLevel = currentState.activityLevel,
+                goal = currentState.goal,
+                targetCalories = tdee,
+                bmi = bmi
+            )
+
+            try {
+                LoadingController.withLoading {
+                    delay(1000)
+                    saveUserProfileUseCase(updatedUser)
+                }
+                _snackbarEvent.emit(R.string.profile_saved_successfully)
+            } catch (e: Exception) {
+                _snackbarEvent.emit(R.string.error_occurred)
+            }
+        }
+    }
+
+    fun updateTheme(theme: String) {
+        viewModelScope.launch {
+            userPreferences.setThemePreference(theme)
+        }
+    }
+
+    fun updateLanguage(language: String) {
+        viewModelScope.launch {
+            userPreferences.setLanguagePreference(language)
+        }
+    }
+}
