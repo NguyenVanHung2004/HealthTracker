@@ -8,6 +8,7 @@ import java.util.Locale
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -84,7 +85,8 @@ class MainActivity : ComponentActivity() {
 
                 CompositionLocalProvider(
                     LocalContext provides localizedContext,
-                    LocalConfiguration provides configuration
+                    LocalConfiguration provides configuration,
+                    LocalActivityResultRegistryOwner provides this
                 ) {
                     if (isOnboardingCompleted != null) {
                         Box(modifier = Modifier.fillMaxSize()) {

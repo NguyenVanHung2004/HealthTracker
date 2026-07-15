@@ -19,6 +19,7 @@ class UserPreferences(
         val THEME_PREFERENCE = stringPreferencesKey("theme_preference") // "system", "light", "dark"
         val LANGUAGE_PREFERENCE = stringPreferencesKey("language_preference") // "vi", "en"
         val FONT_SIZE_PREFERENCE = stringPreferencesKey("font_size_preference") // "small", "medium", "large"
+        val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     }
 
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data
@@ -62,6 +63,17 @@ class UserPreferences(
     suspend fun setFontSizePreference(size: String) {
         context.dataStore.edit { preferences ->
             preferences[FONT_SIZE_PREFERENCE] = size
+        }
+    }
+
+    val notificationsEnabled: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[NOTIFICATIONS_ENABLED] ?: false
+        }
+
+    suspend fun setNotificationsEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[NOTIFICATIONS_ENABLED] = enabled
         }
     }
 }

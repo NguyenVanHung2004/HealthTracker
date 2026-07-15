@@ -54,6 +54,7 @@ val appModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<ExerciseRepository> { ExerciseRepositoryImpl(get()) }
     single<MealRepository> { MealRepositoryImpl(get(), get()) }
+    single<com.example.healthtracker.domain.alarm.AlarmScheduler> { com.example.healthtracker.data.alarm.AlarmSchedulerImpl(androidContext()) }
 
     factory { CalculateBMRUseCase() }
     factory { CalculateTDEEUseCase() }
@@ -73,7 +74,7 @@ val appModule = module {
     factory { DeleteMealUseCase(get()) }
 
     viewModel { OnboardingViewModel(get(), get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ActivityViewModel(get(), get(), get(), get()) }
     viewModel { MealViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { DashboardViewModel(get()) }

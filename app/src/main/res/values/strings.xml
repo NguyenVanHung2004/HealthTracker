@@ -69,6 +69,15 @@
     <string name="unit_kg">kg</string>
     <string name="unit_cm">cm</string>
     <string name="hint_age">VD: 25</string>
+    
+    <!-- Notifications -->
+    <string name="notification_title">HealthTracker</string>
+    <string name="notification_morning">Buổi sáng tốt lành! Đừng quên ghi lại bữa sáng và chuẩn bị năng lượng cho ngày mới nhé.</string>
+    <string name="notification_noon">Đã trưa rồi! Bạn đã ghi lại bữa trưa hôm nay chưa?</string>
+    <string name="notification_evening">Chào buổi tối! Hôm nay bạn đã ăn %1$d kcal và đốt cháy %2$d kcal. Cùng tổng kết ngày nhé!</string>
+    <string name="notification_evening_empty">Chào buổi tối! Đừng quên ghi lại bữa tối và các hoạt động trong ngày của bạn nhé.</string>
+    <string name="notification_default">Đừng quên ghi lại nhật ký sức khoẻ của bạn nhé!</string>
+
     <string name="hint_weight">VD: 65.0</string>
     <string name="hint_height">VD: 170</string>
     
@@ -88,6 +97,8 @@
     <string name="settings_theme_blue_dark">Xanh dương tối</string>
     <string name="settings_language">Ngôn ngữ</string>
     <string name="settings_font_size">Kích thước chữ</string>
+    <string name="settings_daily_reminders">Nhắc nhở hàng ngày</string>
+    <string name="settings_test_notification">Test thông báo ngay</string>
     <string name="font_size_small">Nhỏ</string>
     <string name="font_size_medium">Vừa</string>
     <string name="font_size_large">Lớn</string>

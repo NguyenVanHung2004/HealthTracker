@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
+import com.example.healthtracker.domain.alarm.AlarmScheduler
 
 data class SettingsUiState(
     val user: User? = null,
@@ -48,7 +49,8 @@ class SettingsViewModel(
     private val calculateBMRUseCase: CalculateBMRUseCase,
     private val calculateTDEEUseCase: CalculateTDEEUseCase,
     private val calculateBMIUseCase: CalculateBMIUseCase,
-    private val saveUserProfileUseCase: SaveUserProfileUseCase
+    private val saveUserProfileUseCase: SaveUserProfileUseCase,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     val themePreference: StateFlow<String> = userPreferences.themePreference.stateIn(
@@ -67,6 +69,12 @@ class SettingsViewModel(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         "medium"
+    )
+
+    val notificationsEnabled: StateFlow<Boolean> = userPreferences.notificationsEnabled.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
     )
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -171,5 +179,20 @@ class SettingsViewModel(
         viewModelScope.launch {
             userPreferences.setFontSizePreference(size)
         }
+    }
+
+    fun toggleNotifications(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferences.setNotificationsEnabled(enabled)
+            if (enabled) {
+                alarmScheduler.scheduleDailyReminders()
+            } else {
+                alarmScheduler.cancelReminders()
+            }
+        }
+    }
+
+    fun testNotification() {
+        alarmScheduler.testNotification()
     }
 }

@@ -72,6 +72,14 @@
     <string name="hint_weight">e.g., 65.0</string>
     <string name="hint_height">e.g., 170</string>
     
+    <!-- Notifications -->
+    <string name="notification_title">HealthTracker</string>
+    <string name="notification_morning">Good morning! Don\'t forget to log your breakfast and prepare energy for the new day.</string>
+    <string name="notification_noon">It\'s noon! Have you logged your lunch today?</string>
+    <string name="notification_evening">Good evening! Today you consumed %1$d kcal and burned %2$d kcal. Let\'s review your day!</string>
+    <string name="notification_evening_empty">Good evening! Don\'t forget to log your dinner and activities today.</string>
+    <string name="notification_default">Don\'t forget to log your health journal!</string>
+    
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_meal">Meals</string>
     <string name="tab_activity">Activity</string>
@@ -88,6 +96,8 @@
     <string name="settings_theme_blue_dark">Blue Dark</string>
     <string name="settings_language">Language</string>
     <string name="settings_font_size">Font Size</string>
+    <string name="settings_daily_reminders">Daily Reminders</string>
+    <string name="settings_test_notification">Test notification now</string>
     <string name="font_size_small">Small</string>
     <string name="font_size_medium">Medium</string>
     <string name="font_size_large">Large</string>
