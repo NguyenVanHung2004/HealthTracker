@@ -1,5 +1,6 @@
 package com.example.healthtracker
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
@@ -43,19 +44,26 @@ import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
+import com.example.healthtracker.presentation.splash.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     private val userPreferences: UserPreferences by inject()
 
+    @SuppressLint("LocalContextConfigurationRead")
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsState(initial = null)
+            splashScreen.setKeepOnScreenCondition { isOnboardingCompleted == null }
+            splashScreen.setOnExitAnimationListener { it.remove() }
+
             val themePref by userPreferences.themePreference.collectAsState(initial = "system")
             val languagePref by userPreferences.languagePreference.collectAsState(initial = "vi")
             val fontSizePref by userPreferences.fontSizePreference.collectAsState(initial = "medium")
-            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsState(initial = null)
 
             val darkTheme = when (themePref) {
                 "light" -> false
@@ -67,12 +75,12 @@ class MainActivity : ComponentActivity() {
                 else -> isSystemInDarkTheme()
             }
             val context = LocalContext.current
-            val locale = java.util.Locale(languagePref)
+            val locale = Locale(languagePref)
 
             LaunchedEffect(languagePref) {
                 val resources = context.resources
                 val configuration = resources.configuration
-                java.util.Locale.setDefault(locale)
+                Locale.setDefault(locale)
                 configuration.setLocale(locale)
                 resources.updateConfiguration(configuration, resources.displayMetrics)
             }
@@ -91,11 +99,26 @@ class MainActivity : ComponentActivity() {
                     if (isOnboardingCompleted != null) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             val navController = rememberNavController()
-                            val startDestination = if (isOnboardingCompleted == true) "main" else "onboarding"
+                            val startDestination = "splash"
                             NavHost(
                                 navController = navController,
                                 startDestination = startDestination
                             ) {
+                                composable("splash") {
+                                    SplashScreen(
+                                        isOnboardingCompleted = isOnboardingCompleted == true,
+                                        onNavigateToOnboarding = {
+                                            navController.navigate("onboarding") {
+                                                popUpTo("splash") { inclusive = true }
+                                            }
+                                        },
+                                        onNavigateToDashboard = {
+                                            navController.navigate("main") {
+                                                popUpTo("splash") { inclusive = true }
+                                            }
+                                        }
+                                    )
+                                }
                                 composable("onboarding") {
                                     OnboardingRoute(
                                         onNavigateToDashboard = {
