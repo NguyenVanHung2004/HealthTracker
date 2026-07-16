@@ -95,6 +95,12 @@
     <string name="settings_theme_green_dark">Xanh lá tối</string>
     <string name="settings_theme_blue_light">Xanh dương sáng</string>
     <string name="settings_theme_blue_dark">Xanh dương tối</string>
+    <string name="settings_theme_purple_light">Tím sáng</string>
+    <string name="settings_theme_purple_dark">Tím tối</string>
+    <string name="settings_theme_rose_light">Hồng sáng</string>
+    <string name="settings_theme_rose_dark">Hồng tối</string>
+    <string name="settings_theme_teal_light">Xanh ngọc sáng</string>
+    <string name="settings_theme_teal_dark">Xanh ngọc tối</string>
     <string name="settings_language">Ngôn ngữ</string>
     <string name="settings_font_size">Kích thước chữ</string>
     <string name="settings_daily_reminders">Nhắc nhở hàng ngày</string>

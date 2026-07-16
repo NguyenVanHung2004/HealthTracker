@@ -32,7 +32,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.healthtracker.R
+import com.example.healthtracker.ui.theme.BackgroundLight
 import com.example.healthtracker.ui.theme.LocalSpacing
+import com.example.healthtracker.ui.theme.SurfaceDark
 
 @Composable
 fun SettingsCard(
@@ -269,3 +272,103 @@ data class ThemeOption(
     val lightBg: Color,
     val darkBg: Color
 )
+
+@Composable
+fun rememberThemeOptions(): List<ThemeOption> {
+    val systemPrimary = MaterialTheme.colorScheme.primary
+    return remember(systemPrimary) {
+        listOf(
+            ThemeOption(
+                "system",
+                R.string.settings_theme_system,
+                systemPrimary,
+                BackgroundLight,
+                SurfaceDark
+            ),
+            ThemeOption(
+                "light",
+                R.string.settings_theme_light,
+                com.example.healthtracker.ui.theme.PrimaryOrange,
+                com.example.healthtracker.ui.theme.BackgroundLight,
+                com.example.healthtracker.ui.theme.PrimaryOrangeLight
+            ),
+            ThemeOption(
+                "dark",
+                R.string.settings_theme_dark,
+                com.example.healthtracker.ui.theme.PrimaryOrange,
+                com.example.healthtracker.ui.theme.SurfaceDark,
+                com.example.healthtracker.ui.theme.PrimaryOrangeDark
+            ),
+            ThemeOption(
+                "green_light",
+                R.string.settings_theme_green_light,
+                com.example.healthtracker.ui.theme.PrimaryGreen,
+                com.example.healthtracker.ui.theme.BackgroundLight,
+                com.example.healthtracker.ui.theme.PrimaryGreenLight
+            ),
+            ThemeOption(
+                "green_dark",
+                R.string.settings_theme_green_dark,
+                com.example.healthtracker.ui.theme.PrimaryGreen,
+                com.example.healthtracker.ui.theme.SurfaceDark,
+                com.example.healthtracker.ui.theme.PrimaryGreenDark
+            ),
+            ThemeOption(
+                "blue_light",
+                R.string.settings_theme_blue_light,
+                com.example.healthtracker.ui.theme.PrimaryBlue,
+                com.example.healthtracker.ui.theme.BackgroundLight,
+                com.example.healthtracker.ui.theme.PrimaryBlueLight
+            ),
+            ThemeOption(
+                "blue_dark",
+                R.string.settings_theme_blue_dark,
+                com.example.healthtracker.ui.theme.PrimaryBlue,
+                com.example.healthtracker.ui.theme.SurfaceDark,
+                com.example.healthtracker.ui.theme.PrimaryBlueDark
+            ),
+            ThemeOption(
+                "purple_light",
+                R.string.settings_theme_purple_light,
+                com.example.healthtracker.ui.theme.PrimaryPurple,
+                com.example.healthtracker.ui.theme.BackgroundLight,
+                com.example.healthtracker.ui.theme.PrimaryPurpleLight
+            ),
+            ThemeOption(
+                "purple_dark",
+                R.string.settings_theme_purple_dark,
+                com.example.healthtracker.ui.theme.PrimaryPurple,
+                com.example.healthtracker.ui.theme.SurfaceDark,
+                com.example.healthtracker.ui.theme.PrimaryPurpleDark
+            ),
+            ThemeOption(
+                "rose_light",
+                R.string.settings_theme_rose_light,
+                com.example.healthtracker.ui.theme.PrimaryRose,
+                com.example.healthtracker.ui.theme.BackgroundLight,
+                com.example.healthtracker.ui.theme.PrimaryRoseLight
+            ),
+            ThemeOption(
+                "rose_dark",
+                R.string.settings_theme_rose_dark,
+                com.example.healthtracker.ui.theme.PrimaryRose,
+                com.example.healthtracker.ui.theme.SurfaceDark,
+                com.example.healthtracker.ui.theme.PrimaryRoseDark
+            ),
+            ThemeOption(
+                "teal_light",
+                R.string.settings_theme_teal_light,
+                com.example.healthtracker.ui.theme.PrimaryTeal,
+                com.example.healthtracker.ui.theme.BackgroundLight,
+                com.example.healthtracker.ui.theme.PrimaryTealLight
+            ),
+            ThemeOption(
+                "teal_dark",
+                R.string.settings_theme_teal_dark,
+                com.example.healthtracker.ui.theme.PrimaryTeal,
+                com.example.healthtracker.ui.theme.SurfaceDark,
+                com.example.healthtracker.ui.theme.PrimaryTealDark
+            )
+        )
+    }
+}

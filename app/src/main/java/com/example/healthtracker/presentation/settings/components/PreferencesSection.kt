@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
@@ -40,7 +41,7 @@ fun PreferencesSection(
 ) {
     val spacing = LocalSpacing.current
     var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
 
     SettingsCard(
         title = stringResource(R.string.settings_preferences),
@@ -68,57 +69,7 @@ fun PreferencesSection(
                 )
             }
 
-            val themeOptions = listOf(
-                ThemeOption(
-                    "system",
-                    R.string.settings_theme_system,
-                    MaterialTheme.colorScheme.primary,
-                    BackgroundLight,
-                    SurfaceDark
-                ),
-                ThemeOption(
-                    "light",
-                    R.string.settings_theme_light,
-                    PrimaryOrange,
-                    BackgroundLight,
-                    PrimaryOrangeLight
-                ),
-                ThemeOption(
-                    "dark",
-                    R.string.settings_theme_dark,
-                    PrimaryOrange,
-                    SurfaceDark,
-                    PrimaryOrangeDark
-                ),
-                ThemeOption(
-                    "green_light",
-                    R.string.settings_theme_green_light,
-                    PrimaryGreen,
-                    BackgroundLight,
-                    PrimaryGreenLight
-                ),
-                ThemeOption(
-                    "green_dark",
-                    R.string.settings_theme_green_dark,
-                    PrimaryGreen,
-                    SurfaceDark,
-                    PrimaryGreenDark
-                ),
-                ThemeOption(
-                    "blue_light",
-                    R.string.settings_theme_blue_light,
-                    PrimaryBlue,
-                    BackgroundLight,
-                    PrimaryBlueLight
-                ),
-                ThemeOption(
-                    "blue_dark",
-                    R.string.settings_theme_blue_dark,
-                    PrimaryBlue,
-                    SurfaceDark,
-                    PrimaryBlueDark
-                )
-            )
+            val themeOptions = rememberThemeOptions()
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(spacing.small)

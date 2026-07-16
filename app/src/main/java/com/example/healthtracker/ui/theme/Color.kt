@@ -18,6 +18,21 @@ val PrimaryBlue = Color(0xFF1565C0)
 val PrimaryBlueDark = Color(0xFF0D47A1)
 val PrimaryBlueLight = Color(0xFF90CAF9)
 
+// Purple Theme Colors
+val PrimaryPurple = Color(0xFF673AB7)
+val PrimaryPurpleDark = Color(0xFF4527A0)
+val PrimaryPurpleLight = Color(0xFFB39DDB)
+
+// Rose/Pink Theme Colors
+val PrimaryRose = Color(0xFFE91E63)
+val PrimaryRoseDark = Color(0xFFC2185B)
+val PrimaryRoseLight = Color(0xFFF48FB1)
+
+// Teal/Ocean Theme Colors
+val PrimaryTeal = Color(0xFF009688)
+val PrimaryTealDark = Color(0xFF00796B)
+val PrimaryTealLight = Color(0xFF80CBC4)
+
 val BackgroundLight = Color(0xFFFFFFFF)
 val SurfaceLight = Color(0xFFF5F6F8)
 val TextPrimaryLight = Color(0xFF1E1E1E)

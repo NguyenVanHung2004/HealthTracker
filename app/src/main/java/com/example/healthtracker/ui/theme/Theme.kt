@@ -96,6 +96,90 @@ private val LightBlueColorScheme = lightColorScheme(
     onPrimaryContainer = PrimaryBlueDark
 )
 
+private val DarkPurpleColorScheme = darkColorScheme(
+    primary = PrimaryPurpleLight,
+    secondary = PrimaryPurple,
+    tertiary = PrimaryPurpleDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+    primaryContainer = PrimaryPurpleDark,
+    onPrimaryContainer = Color.White
+)
+
+private val LightPurpleColorScheme = lightColorScheme(
+    primary = PrimaryPurple,
+    secondary = PrimaryPurpleLight,
+    tertiary = PrimaryPurpleDark,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+    primaryContainer = PrimaryPurpleLight,
+    onPrimaryContainer = PrimaryPurpleDark
+)
+
+private val DarkRoseColorScheme = darkColorScheme(
+    primary = PrimaryRoseLight,
+    secondary = PrimaryRose,
+    tertiary = PrimaryRoseDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+    primaryContainer = PrimaryRoseDark,
+    onPrimaryContainer = Color.White
+)
+
+private val LightRoseColorScheme = lightColorScheme(
+    primary = PrimaryRose,
+    secondary = PrimaryRoseLight,
+    tertiary = PrimaryRoseDark,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+    primaryContainer = PrimaryRoseLight,
+    onPrimaryContainer = PrimaryRoseDark
+)
+
+private val DarkTealColorScheme = darkColorScheme(
+    primary = PrimaryTealLight,
+    secondary = PrimaryTeal,
+    tertiary = PrimaryTealDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+    primaryContainer = PrimaryTealDark,
+    onPrimaryContainer = Color.White
+)
+
+private val LightTealColorScheme = lightColorScheme(
+    primary = PrimaryTeal,
+    secondary = PrimaryTealLight,
+    tertiary = PrimaryTealDark,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+    primaryContainer = PrimaryTealLight,
+    onPrimaryContainer = PrimaryTealDark
+)
+
 @Composable
 fun HealthTrackerTheme(
     themePref: String = "system",
@@ -111,6 +195,15 @@ fun HealthTrackerTheme(
         "blue_light" -> LightBlueColorScheme
         "blue_dark" -> DarkBlueColorScheme
         "blue" -> if (darkTheme) DarkBlueColorScheme else LightBlueColorScheme
+        "purple_light" -> LightPurpleColorScheme
+        "purple_dark" -> DarkPurpleColorScheme
+        "purple" -> if (darkTheme) DarkPurpleColorScheme else LightPurpleColorScheme
+        "rose_light" -> LightRoseColorScheme
+        "rose_dark" -> DarkRoseColorScheme
+        "rose" -> if (darkTheme) DarkRoseColorScheme else LightRoseColorScheme
+        "teal_light" -> LightTealColorScheme
+        "teal_dark" -> DarkTealColorScheme
+        "teal" -> if (darkTheme) DarkTealColorScheme else LightTealColorScheme
         "dark" -> DarkColorScheme
         "light" -> LightColorScheme
         else -> if (darkTheme) DarkColorScheme else LightColorScheme

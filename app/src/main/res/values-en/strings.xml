@@ -94,6 +94,12 @@
     <string name="settings_theme_green_dark">Green Dark</string>
     <string name="settings_theme_blue_light">Blue Light</string>
     <string name="settings_theme_blue_dark">Blue Dark</string>
+    <string name="settings_theme_purple_light">Purple Light</string>
+    <string name="settings_theme_purple_dark">Purple Dark</string>
+    <string name="settings_theme_rose_light">Rose Light</string>
+    <string name="settings_theme_rose_dark">Rose Dark</string>
+    <string name="settings_theme_teal_light">Teal Light</string>
+    <string name="settings_theme_teal_dark">Teal Dark</string>
     <string name="settings_language">Language</string>
     <string name="settings_font_size">Font Size</string>
     <string name="settings_daily_reminders">Daily Reminders</string>
