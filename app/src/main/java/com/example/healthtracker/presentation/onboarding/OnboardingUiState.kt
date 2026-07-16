@@ -16,5 +16,6 @@ data class OnboardingUiState(
     val goal: Goal = Goal.MAINTAIN_WEIGHT,
     val calculatedBmi: Float = 0f,
     val calculatedTdee: Int = 0,
+    val targetCalories: Int = 0,
     val currentStep: Int = 1 // 1: Basic Info, 2: Body, 3: Goal, 4: Result
 )

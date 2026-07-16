@@ -37,14 +37,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.healthtracker.R
 import com.example.healthtracker.presentation.dashboard.components.BarChart
-import com.example.healthtracker.presentation.dashboard.components.CalorieCircularProgress
 import com.example.healthtracker.presentation.dashboard.components.CalorieStatItem
+import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.presentation.dashboard.components.DashboardCard
 import com.example.healthtracker.presentation.dashboard.components.LineChart
 import com.example.healthtracker.presentation.dashboard.components.ShortcutButton
 import com.example.healthtracker.presentation.dashboard.components.TodayExercisesCard
 import com.example.healthtracker.presentation.dashboard.components.TodayMealsCard
 import com.example.healthtracker.ui.theme.LocalSpacing
+import com.example.healthtracker.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -106,100 +107,17 @@ fun DashboardScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // 2. Circular Progress Card
+                // 2. Goal-Based Calorie Card
                 DashboardCard(title = stringResource(R.string.daily_nutrition)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CalorieCircularProgress(
-                            target = uiState.targetCalories,
-                            consumed = uiState.consumedCaloriesToday,
-                            burned = uiState.burnedCaloriesToday,
-                            remaining = uiState.remainingCaloriesToday,
-                            isExceeded = uiState.isRemainingExceeded,
-                            modifier = Modifier.weight(1.2f)
-                        )
-
-                        Spacer(modifier = Modifier.width(spacing.medium))
-
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(spacing.small)
-                        ) {
-                            CalorieStatItem(
-                                label = stringResource(R.string.dashboard_target),
-                                calories = uiState.targetCalories,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            CalorieStatItem(
-                                label = stringResource(R.string.dashboard_consumed),
-                                calories = uiState.consumedCaloriesToday,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            CalorieStatItem(
-                                label = stringResource(R.string.dashboard_burned),
-                                calories = uiState.burnedCaloriesToday,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
+                    GoalBasedCalorieContent(
+                        goal = uiState.goal,
+                        targetCalories = uiState.targetCalories,
+                        tdee = uiState.tdee,
+                        consumed = uiState.consumedCaloriesToday,
+                        burned = uiState.burnedCaloriesToday,
+                        spacing = spacing
+                    )
                 }
-
-                // 3. Summary & Advice Card
-                DashboardCard(title = stringResource(R.string.dashboard_summary)) {
-                    val netCalories = uiState.consumedCaloriesToday - uiState.burnedCaloriesToday
-                    
-                    Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = stringResource(R.string.dashboard_net_calories),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = "$netCalories ${stringResource(R.string.kcal)}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        val adviceText = when (uiState.adviceType) {
-                            AdviceType.UNDER_TARGET -> stringResource(
-                                R.string.dashboard_advice_under_target,
-                                uiState.adviceDiffCalories
-                            )
-                            AdviceType.TARGET_MET -> stringResource(R.string.dashboard_advice_target_met)
-                            AdviceType.OVER_TARGET -> stringResource(
-                                R.string.dashboard_advice_over_target,
-                                uiState.adviceDiffCalories
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                                    shape = RoundedCornerShape(spacing.cornerSmall)
-                                )
-                                .padding(spacing.medium)
-                        ) {
-                            Text(
-                                text = adviceText,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                }
-
                 // 4. Quick Shortcuts
                 Column {
                     Text(
@@ -344,6 +262,127 @@ fun DashboardScreen(
                 }
 
                 Spacer(modifier = Modifier.height(spacing.extraLarge))
+            }
+        }
+    }
+}
+
+@Composable
+fun GoalBasedCalorieContent(
+    goal: Goal,
+    targetCalories: Int,
+    tdee: Int,
+    consumed: Int,
+    burned: Int,
+    spacing: Spacing
+) {
+    val netCalories = consumed - burned
+    val isOver = netCalories > targetCalories
+    val isUnder = netCalories < targetCalories
+
+    val progress = if (targetCalories > 0) {
+        minOf(1f, netCalories.toFloat() / targetCalories.toFloat()).coerceAtLeast(0f)
+    } else 0f
+
+    val color = when (goal) {
+        Goal.LOSE_WEIGHT, Goal.MAINTAIN_WEIGHT -> {
+            if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+        }
+        Goal.GAIN_WEIGHT, Goal.BUILD_MUSCLE -> {
+            if (isUnder) androidx.compose.ui.graphics.Color(0xFFFFA000) // Orange
+            else MaterialTheme.colorScheme.primary
+        }
+    }
+
+    val message = when (goal) {
+        Goal.LOSE_WEIGHT -> {
+            if (isOver) stringResource(R.string.dash_msg_lose_bad, netCalories - targetCalories)
+            else stringResource(R.string.dash_msg_lose_good)
+        }
+        Goal.MAINTAIN_WEIGHT -> {
+            if (netCalories > targetCalories + 100) stringResource(R.string.dash_msg_maintain_bad)
+            else stringResource(R.string.dash_msg_maintain_good)
+        }
+        Goal.GAIN_WEIGHT -> {
+            if (isUnder) stringResource(R.string.dash_msg_gain_bad, targetCalories - netCalories)
+            else stringResource(R.string.dash_msg_gain_good)
+        }
+        Goal.BUILD_MUSCLE -> {
+            if (isUnder) stringResource(R.string.dash_msg_gain_bad, targetCalories - netCalories)
+            else stringResource(R.string.dash_msg_muscle_good)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "$netCalories / $targetCalories kcal",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Black,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = color,
+            fontWeight = FontWeight.Medium
+        )
+        
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        androidx.compose.material3.LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(spacing.small),
+            color = color,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+        )
+
+        Spacer(modifier = Modifier.height(spacing.large))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "$consumed",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.dashboard_consumed),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "$burned",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Text(
+                    text = stringResource(R.string.dashboard_burned),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "$tdee",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = stringResource(R.string.dash_label_tdee),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

@@ -10,6 +10,7 @@ data class User(
     val heightCm: Float,
     val activityLevel: ActivityLevel,
     val goal: Goal,
+    val tdee: Int = 0,
     val targetCalories: Int = 0,
     val bmi: Float = 0f
 )

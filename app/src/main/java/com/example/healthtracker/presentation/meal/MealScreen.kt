@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.FoodItem
+import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
 import com.example.healthtracker.presentation.components.SnackbarController
@@ -230,6 +231,7 @@ fun MealScreenContent(
             CalorieSummaryCard(
                 totalCalories = uiState.totalCalories,
                 targetCalories = uiState.targetCalories,
+                goal = uiState.goal,
                 modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
             )
 
@@ -269,11 +271,27 @@ fun MealScreenContent(
 fun CalorieSummaryCard(
     totalCalories: Int,
     targetCalories: Int,
+    goal: Goal,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     val progress = if (targetCalories > 0) minOf(1f, totalCalories.toFloat() / targetCalories.toFloat()) else 0f
     val remainingCalories = targetCalories - totalCalories
+    
+    val isOver = totalCalories > targetCalories
+    val isUnder = totalCalories < targetCalories
+
+    val statusColor = when (goal) {
+        Goal.LOSE_WEIGHT,
+        Goal.MAINTAIN_WEIGHT -> {
+            if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+        }
+        Goal.GAIN_WEIGHT,
+        Goal.BUILD_MUSCLE -> {
+            if (isUnder) Color(0xFFFFA000) // Orange
+            else MaterialTheme.colorScheme.primary // Green/Primary
+        }
+    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -317,7 +335,7 @@ fun CalorieSummaryCard(
                         text = if (remainingCalories >= 0) "$remainingCalories" else "${-remainingCalories}",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Black,
-                        color = if (remainingCalories >= 0) MaterialTheme.colorScheme.primary else CalorieRed
+                        color = statusColor
                     )
                     Text(
                         text = if (remainingCalories >= 0) "kcal còn lại" else "kcal vượt quá",
@@ -334,8 +352,8 @@ fun CalorieSummaryCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(spacing.small),
-                color = if (progress >= 1f) CalorieRed else MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                color = statusColor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 strokeCap = StrokeCap.Round
             )
 

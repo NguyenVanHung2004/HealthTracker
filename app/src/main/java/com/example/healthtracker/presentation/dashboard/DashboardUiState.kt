@@ -2,6 +2,7 @@ package com.example.healthtracker.presentation.dashboard
 
 import com.example.healthtracker.domain.model.ExerciseLog
 import com.example.healthtracker.domain.model.MealLog
+import com.example.healthtracker.domain.model.Goal
 import java.time.LocalDate
 
 data class BarChartData(
@@ -23,6 +24,8 @@ enum class AdviceType {
 
 data class DashboardUiState(
     val selectedDate: LocalDate = LocalDate.now(),
+    val goal: Goal = Goal.MAINTAIN_WEIGHT,
+    val tdee: Int = 2000,
     val targetCalories: Int = 2000,
     val consumedCaloriesToday: Int = 0,
     val burnedCaloriesToday: Int = 0,

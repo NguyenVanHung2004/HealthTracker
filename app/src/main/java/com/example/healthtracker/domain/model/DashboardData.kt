@@ -21,6 +21,8 @@ data class WeeklyCalorieTrendPoint(
 
 data class DashboardData(
     val selectedDate: LocalDate,
+    val goal: Goal,
+    val tdee: Int,
     val targetCalories: Int,
     val consumedCaloriesToday: Int,
     val burnedCaloriesToday: Int,

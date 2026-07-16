@@ -209,7 +209,7 @@ fun OnboardingScreen(
                             2 -> Step2Body(uiState, onWeightChange, onHeightChange)
                             3 -> Step3Activity(uiState, onActivityLevelChange)
                             4 -> Step4Goals(uiState, onGoalChange)
-                            else -> ResultSection(bmi = uiState.calculatedBmi, tdee = uiState.calculatedTdee, name = uiState.name)
+                            else -> ResultSection(bmi = uiState.calculatedBmi, tdee = uiState.calculatedTdee, targetCalories = uiState.targetCalories, goal = uiState.goal, name = uiState.name)
                         }
                         Spacer(modifier = Modifier.height(100.dp))
                     }
@@ -510,7 +510,8 @@ fun PillSelection(text: String, isSelected: Boolean, onClick: () -> Unit, modifi
 }
 
 @Composable
-fun ResultSection(bmi: Float, tdee: Int, name: String) {
+fun ResultSection(bmi: Float, tdee: Int, targetCalories: Int, goal: Goal, name: String) {
+    val spacing = com.example.healthtracker.ui.theme.LocalSpacing.current
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -522,22 +523,42 @@ fun ResultSection(bmi: Float, tdee: Int, name: String) {
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(spacing.small))
         Text(
             text = stringResource(R.string.result_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = spacing.medium)
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(spacing.large))
         Icon(
             Icons.Default.CheckCircle,
             contentDescription = "Success",
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(80.dp).padding(bottom = 24.dp)
+            modifier = Modifier.size(80.dp).padding(bottom = spacing.large)
         )
-        Text(text = "BMI: ${String.format(Locale.US, "%.1f", bmi)}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-        Text(text = "Calo: $tdee kcal", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = stringResource(R.string.bmi_result, bmi), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+        Spacer(modifier = Modifier.height(spacing.medium))
+        
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = spacing.medium),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(spacing.medium).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = stringResource(R.string.result_tdee, tdee), style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(spacing.small))
+                Text(text = stringResource(R.string.result_target, targetCalories), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                
+                val advice = when (goal) {
+                    Goal.LOSE_WEIGHT -> stringResource(R.string.advice_lose_weight)
+                    Goal.MAINTAIN_WEIGHT -> stringResource(R.string.advice_maintain_weight)
+                    Goal.GAIN_WEIGHT -> stringResource(R.string.advice_gain_weight)
+                    Goal.BUILD_MUSCLE -> stringResource(R.string.advice_build_muscle)
+                }
+                Spacer(modifier = Modifier.height(spacing.small))
+                Text(text = advice, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            }
+        }
     }
 }

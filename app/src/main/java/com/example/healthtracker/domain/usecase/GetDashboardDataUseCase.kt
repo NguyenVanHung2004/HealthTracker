@@ -32,6 +32,7 @@ class GetDashboardDataUseCase(
         ) { user, todayMeals, todayExercises, rangeMeals, rangeExercises ->
             
             val target = if (user != null && user.targetCalories > 0) user.targetCalories else 2000
+            val tdee = if (user != null && user.tdee > 0) user.tdee else 2000
             val goal = user?.goal ?: Goal.MAINTAIN_WEIGHT
 
             val consumedToday = todayMeals.sumOf { it.totalCalories }
@@ -97,6 +98,8 @@ class GetDashboardDataUseCase(
 
             DashboardData(
                 selectedDate = today,
+                goal = goal,
+                tdee = tdee,
                 targetCalories = target,
                 consumedCaloriesToday = consumedToday,
                 burnedCaloriesToday = burnedToday,

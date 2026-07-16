@@ -164,7 +164,7 @@ class SettingsViewModel(
             }
 
             val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate!!)
-            val tdee = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
+            val tdeeResult = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
             val bmi = calculateBMIUseCase(newWeight, newHeight)
 
             val updatedUser = User(
@@ -175,7 +175,8 @@ class SettingsViewModel(
                 heightCm = newHeight,
                 activityLevel = currentState.activityLevel,
                 goal = currentState.goal,
-                targetCalories = tdee,
+                tdee = tdeeResult.maintenance,
+                targetCalories = tdeeResult.target,
                 bmi = bmi
             )
 

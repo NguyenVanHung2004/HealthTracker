@@ -126,12 +126,13 @@ class OnboardingViewModel(
         val dob = state.dateOfBirth ?: java.time.LocalDate.now().minusYears(state.age.toLong())
 
         val bmr = calculateBMRUseCase(weight, height, state.gender, dob)
-        val tdee = calculateTDEEUseCase(bmr, state.activityLevel, state.goal)
+        val tdeeResult = calculateTDEEUseCase(bmr, state.activityLevel, state.goal)
         val bmi = calculateBMIUseCase(weight, height)
 
         _uiState.update {
             it.copy(
-                calculatedTdee = tdee,
+                calculatedTdee = tdeeResult.maintenance,
+                targetCalories = tdeeResult.target,
                 calculatedBmi = bmi
             )
         }
@@ -149,7 +150,8 @@ class OnboardingViewModel(
             heightCm = height,
             activityLevel = state.activityLevel,
             goal = state.goal,
-            targetCalories = state.calculatedTdee,
+            tdee = state.calculatedTdee,
+            targetCalories = state.targetCalories,
             bmi = state.calculatedBmi
         )
         viewModelScope.launch {

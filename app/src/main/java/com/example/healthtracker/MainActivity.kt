@@ -3,6 +3,7 @@ package com.example.healthtracker
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
@@ -45,12 +46,10 @@ import java.util.Locale
 class MainActivity : ComponentActivity() {
     private val userPreferences: UserPreferences by inject()
 
-    /**
-     * Apply the user's saved locale at the Activity level.
-     * This is the Android best practice: the Activity itself carries the correct
-     * locale, so LocalContext.current always returns a real Activity context
-     * with a valid window token — no ContextWrapper issues for Dialogs.
-     */
+    companion object {
+        private var appliedLanguage: String? = null
+    }
+
     override fun attachBaseContext(newBase: Context) {
         val prefs = newBase.getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
         val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, null)
@@ -61,9 +60,22 @@ class MainActivity : ComponentActivity() {
             val config = Configuration(newBase.resources.configuration).apply {
                 setLocale(locale)
             }
+            appliedLanguage = locale.language // remember what we applied
             super.attachBaseContext(newBase.createConfigurationContext(config))
         } else {
             super.attachBaseContext(newBase)
+        }
+    }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val prefs = getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, null) ?: return
+        val savedLocale = Locale.forLanguageTag(langTag)
+        val currentLang = newConfig.locales[0].language
+        if (currentLang != savedLocale.language) {
+            val config = Configuration(newConfig).apply { setLocale(savedLocale) }
+            val ctx = createConfigurationContext(config)
+            resources.updateConfiguration(ctx.resources.configuration, ctx.resources.displayMetrics)
         }
     }
 
@@ -77,7 +89,9 @@ class MainActivity : ComponentActivity() {
             splashScreen.setOnExitAnimationListener { it.remove() }
 
             val themePref by userPreferences.themePreference.collectAsState(initial = "system")
-            val languagePref by userPreferences.languagePreference.collectAsState(initial = "vi")
+    
+            val languagePref by userPreferences.languagePreference
+                .collectAsState(initial = appliedLanguage ?: "vi")
             val fontSizePref by userPreferences.fontSizePreference.collectAsState(initial = "medium")
 
             val darkTheme = when (themePref) {
@@ -89,13 +103,10 @@ class MainActivity : ComponentActivity() {
                 "blue_dark" -> true
                 else -> isSystemInDarkTheme()
             }
-
-            // When user changes language in Settings, recreate the Activity
-            // so attachBaseContext applies the new locale cleanly.
             LaunchedEffect(languagePref) {
-                val locale = Locale.forLanguageTag(languagePref)
-                val currentLocale = resources.configuration.locales[0]
-                if (currentLocale.language != locale.language) {
+                val newLanguage = Locale.forLanguageTag(languagePref).language
+                if (appliedLanguage != null && appliedLanguage != newLanguage) {
+                    appliedLanguage = newLanguage
                     recreate()
                 }
             }

@@ -217,4 +217,22 @@
     <string name="splash_welcome">Chào mừng đến với FitHealth, nơi hành trình rèn luyện sức khỏe và thể chất của bạn bắt đầu!</string>
     <string name="splash_get_started">BẮT ĐẦU NGAY</string>
     <string name="logo_content_description">Logo FitHealth</string>
+
+    <!-- New Goal-based strings -->
+    <string name="result_tdee">TDEE (Mức duy trì): %1$d kcal</string>
+    <string name="result_target">Mục tiêu mỗi ngày: %1$d kcal</string>
+    
+    <string name="advice_lose_weight">Để giảm cân an toàn, hãy duy trì mức thâm hụt calo nhẹ so với TDEE của bạn.</string>
+    <string name="advice_maintain_weight">Tuyệt vời! Hãy giữ mức ăn uống quanh mức TDEE để duy trì vóc dáng.</string>
+    <string name="advice_gain_weight">Để tăng cân, hãy cố gắng ăn dư lượng calo mục tiêu mỗi ngày bằng thực phẩm giàu dinh dưỡng.</string>
+    <string name="advice_build_muscle">Tập trung vào các bữa ăn giàu protein kết hợp tập luyện kháng lực để xây dựng cơ bắp hiệu quả.</string>
+
+    <string name="dash_msg_lose_good">Bạn đang duy trì thâm hụt calo rất tốt!</string>
+    <string name="dash_msg_lose_bad">Đã vượt mức calo giảm cân! Cần đốt thêm %1$d kcal.</string>
+    <string name="dash_msg_maintain_bad">Đã nạp quá mức duy trì! Cần vận động thêm.</string>
+    <string name="dash_msg_maintain_good">Bạn đang duy trì lượng calo rất tốt!</string>
+    <string name="dash_msg_gain_bad">Bạn cần ăn thêm %1$d kcal nữa để đạt mục tiêu.</string>
+    <string name="dash_msg_gain_good">Đã hoàn thành mục tiêu tăng cân hôm nay!</string>
+    <string name="dash_msg_muscle_good">Đã hoàn thành mục tiêu calo hôm nay!</string>
+    <string name="dash_label_tdee">TDEE</string>
 </resources>

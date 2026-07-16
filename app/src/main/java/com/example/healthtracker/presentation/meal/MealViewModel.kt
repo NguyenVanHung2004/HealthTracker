@@ -58,7 +58,8 @@ class MealViewModel(
         viewModelScope.launch {
             getUserUseCase().collect { user ->
                 val target = if (user != null && user.targetCalories > 0) user.targetCalories else 2000
-                _uiState.update { it.copy(targetCalories = target) }
+                val goal = user?.goal ?: com.example.healthtracker.domain.model.Goal.MAINTAIN_WEIGHT
+                _uiState.update { it.copy(targetCalories = target, goal = goal) }
             }
         }
     }

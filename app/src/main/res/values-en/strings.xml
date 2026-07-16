@@ -216,4 +216,22 @@
     <string name="splash_welcome">Welcome to FitHealth, where your journey to fitness and well-being begins now!</string>
     <string name="splash_get_started">GET STARTED</string>
     <string name="logo_content_description">FitHealth Logo</string>
+
+    <!-- New Goal-based strings -->
+    <string name="result_tdee">TDEE (Maintenance): %1$d kcal</string>
+    <string name="result_target">Daily Target: %1$d kcal</string>
+    
+    <string name="advice_lose_weight">To lose weight safely, maintain a slight calorie deficit compared to your TDEE.</string>
+    <string name="advice_maintain_weight">Great! Keep your calorie intake around your TDEE to maintain your shape.</string>
+    <string name="advice_gain_weight">To gain weight, aim to reach your target calorie surplus daily with nutrient-dense foods.</string>
+    <string name="advice_build_muscle">Focus on protein-rich meals and resistance training to build muscle effectively.</string>
+
+    <string name="dash_msg_lose_good">You are maintaining a great calorie deficit!</string>
+    <string name="dash_msg_lose_bad">Weight loss target exceeded! Need to burn %1$d more kcal.</string>
+    <string name="dash_msg_maintain_bad">Maintenance level exceeded! Need more activity.</string>
+    <string name="dash_msg_maintain_good">You are maintaining your calorie level perfectly!</string>
+    <string name="dash_msg_gain_bad">You need to eat %1$d more kcal to reach your goal.</string>
+    <string name="dash_msg_gain_good">Weight gain goal reached for today!</string>
+    <string name="dash_msg_muscle_good">Calorie goal reached for today!</string>
+    <string name="dash_label_tdee">TDEE</string>
 </resources>

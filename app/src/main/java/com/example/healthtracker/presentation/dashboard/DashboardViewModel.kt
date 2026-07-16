@@ -50,6 +50,8 @@ class DashboardViewModel(
                 _uiState.update {
                     it.copy(
                         selectedDate = data.selectedDate,
+                        goal = data.goal,
+                        tdee = data.tdee,
                         targetCalories = data.targetCalories,
                         consumedCaloriesToday = data.consumedCaloriesToday,
                         burnedCaloriesToday = data.burnedCaloriesToday,

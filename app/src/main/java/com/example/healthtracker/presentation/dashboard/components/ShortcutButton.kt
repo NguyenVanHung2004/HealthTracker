@@ -1,8 +1,9 @@
 package com.example.healthtracker.presentation.dashboard.components
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -11,32 +12,44 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
 import com.example.healthtracker.ui.theme.LocalSpacing
 
 @Composable
 fun ShortcutButton(
     label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.height(spacing.buttonHeight),
+        modifier = modifier.defaultMinSize(minHeight = spacing.buttonHeight),
         shape = RoundedCornerShape(spacing.cornerMedium),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.primary
-        )
+        ),
+        contentPadding = PaddingValues(horizontal = spacing.small, vertical = spacing.extraSmall)
     ) {
-        Icon(icon, contentDescription = label)
-        Spacer(modifier = Modifier.width(spacing.small))
+        Icon(
+            icon, 
+            contentDescription = label,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(modifier = Modifier.width(spacing.extraSmall))
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 1
+            maxLines = 2,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
