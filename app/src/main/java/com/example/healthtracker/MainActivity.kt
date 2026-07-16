@@ -37,11 +37,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.animation.*
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import com.example.healthtracker.presentation.components.CustomSnackbar
-import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
 import com.example.healthtracker.presentation.splash.SplashScreen
@@ -75,13 +72,14 @@ class MainActivity : ComponentActivity() {
                 else -> isSystemInDarkTheme()
             }
             val context = LocalContext.current
-            val locale = Locale(languagePref)
+            val locale = Locale.forLanguageTag(languagePref)
 
             LaunchedEffect(languagePref) {
                 val resources = context.resources
                 val configuration = resources.configuration
                 Locale.setDefault(locale)
                 configuration.setLocale(locale)
+                @Suppress("DEPRECATION")
                 resources.updateConfiguration(configuration, resources.displayMetrics)
             }
 
@@ -129,7 +127,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                                 composable("main") {
-                                    MainScreen(navController)
+                                    MainScreen()
                                 }
                             }
 

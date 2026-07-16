@@ -214,4 +214,6 @@
     <string name="dashboard_no_meals_today">Chưa có món ăn nào được thêm hôm nay.</string>
     <string name="dashboard_no_exercises_today">Chưa có hoạt động nào được thêm hôm nay.</string>
     <string name="dashboard_serving">khẩu phần</string>
+    <string name="splash_welcome">Chào mừng đến với FitHealth, nơi hành trình rèn luyện sức khỏe và thể chất của bạn bắt đầu!</string>
+    <string name="splash_get_started">BẮT ĐẦU NGAY</string>
 </resources>

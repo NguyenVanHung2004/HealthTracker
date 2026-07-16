@@ -1,7 +1,17 @@
 package com.example.healthtracker.presentation.dashboard
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +19,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,9 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
-import com.example.healthtracker.presentation.dashboard.components.*
+import com.example.healthtracker.presentation.dashboard.components.BarChart
+import com.example.healthtracker.presentation.dashboard.components.CalorieCircularProgress
+import com.example.healthtracker.presentation.dashboard.components.CalorieStatItem
+import com.example.healthtracker.presentation.dashboard.components.DashboardCard
+import com.example.healthtracker.presentation.dashboard.components.LineChart
+import com.example.healthtracker.presentation.dashboard.components.ShortcutButton
+import com.example.healthtracker.presentation.dashboard.components.TodayExercisesCard
+import com.example.healthtracker.presentation.dashboard.components.TodayMealsCard
 import com.example.healthtracker.ui.theme.LocalSpacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
@@ -31,7 +54,6 @@ import java.util.Locale
 fun DashboardScreen(
     onNavigateToMeal: () -> Unit,
     onNavigateToActivity: () -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()

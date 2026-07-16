@@ -1,8 +1,5 @@
 package com.example.healthtracker.presentation.splash
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,10 +26,8 @@ fun SplashScreen(
     onNavigateToDashboard: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    var startAnimation by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        startAnimation = true
         if (isOnboardingCompleted) {
             delay(1000)
             onNavigateToDashboard()
@@ -82,7 +78,7 @@ fun SplashScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Welcome to FitHealth, where your journey to fitness and well-being begins now!",
+                    text = stringResource(R.string.splash_welcome),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onBackground
@@ -112,7 +108,7 @@ fun SplashScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "GET STARTED",
+                            text = stringResource(R.string.splash_get_started),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.White

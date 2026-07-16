@@ -36,6 +36,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -109,22 +111,63 @@ fun ProfileSection(
 
             Spacer(modifier = Modifier.height(spacing.small))
 
-            OutlinedTextField(
-                value = uiState.dateOfBirth,
-                onValueChange = onDateOfBirthChange,
-                label = { Text(stringResource(R.string.settings_dob)) },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val dateFormatter = remember { java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy") }
+            val calendar = remember { java.util.Calendar.getInstance() }
+            
+            LaunchedEffect(uiState.dateOfBirth) {
+                try {
+                    val parsed = java.time.LocalDate.parse(uiState.dateOfBirth, dateFormatter)
+                    calendar.set(parsed.year, parsed.monthValue - 1, parsed.dayOfMonth)
+                } catch (e: Exception) {
+                    // Ignore parsing error
+                }
+            }
+            
+            val datePickerDialog = remember {
+                android.app.DatePickerDialog(
+                    context,
+                    { _, year, month, dayOfMonth ->
+                        val selectedDate = java.time.LocalDate.of(year, month + 1, dayOfMonth)
+                        onDateOfBirthChange(selectedDate.format(dateFormatter))
+                    },
+                    calendar.get(java.util.Calendar.YEAR),
+                    calendar.get(java.util.Calendar.MONTH),
+                    calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                ).apply {
+                    datePicker.maxDate = System.currentTimeMillis()
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { datePickerDialog.show() }
+            ) {
+                OutlinedTextField(
+                    value = uiState.dateOfBirth,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.settings_dob)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = false,
+                    shape = RoundedCornerShape(spacing.cornerSmall),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                        disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                        disabledLabelColor = MaterialTheme.colorScheme.primary,
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.primary
                     )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(spacing.cornerSmall),
-                singleLine = true,
-                colors = profileTextFieldColors()
-            )
+                )
+            }
 
             Spacer(modifier = Modifier.height(spacing.small))
 
@@ -486,7 +529,7 @@ fun BmiGaugeCard(bmi: Float, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(start = spacing.extraSmall)
             ) {
                 Text(
-                    text = String.format("%.1f", bmi),
+                    text = String.format(java.util.Locale.US, "%.1f", bmi),
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     color = statusColor

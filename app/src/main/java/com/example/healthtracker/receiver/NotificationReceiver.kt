@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
@@ -35,17 +34,15 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
             try {
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 val channelId = "daily_reminders_channel"
-                
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(
-                        channelId,
-                        "Nhắc nhở hàng ngày",
-                        NotificationManager.IMPORTANCE_HIGH
-                    ).apply {
-                        description = "Kênh thông báo nhắc nhở ghi lại sức khoẻ hàng ngày"
-                    }
-                    notificationManager.createNotificationChannel(channel)
+
+                val channel = NotificationChannel(
+                    channelId,
+                    "Nhắc nhở hàng ngày",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Kênh thông báo nhắc nhở ghi lại sức khoẻ hàng ngày"
                 }
+                notificationManager.createNotificationChannel(channel)
 
                 val activityIntent = Intent(context, MainActivity::class.java)
                 val pendingIntent = PendingIntent.getActivity(
@@ -58,7 +55,7 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
                 val typeStr = intent.getStringExtra("NOTIFICATION_TYPE")
                 val reminderType = try {
                     ReminderType.valueOf(typeStr ?: "")
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     null
                 }
                 

@@ -213,4 +213,6 @@
     <string name="dashboard_no_meals_today">No meals added yet today.</string>
     <string name="dashboard_no_exercises_today">No exercises added yet today.</string>
     <string name="dashboard_serving">serving</string>
+    <string name="splash_welcome">Welcome to FitHealth, where your journey to fitness and well-being begins now!</string>
+    <string name="splash_get_started">GET STARTED</string>
 </resources>

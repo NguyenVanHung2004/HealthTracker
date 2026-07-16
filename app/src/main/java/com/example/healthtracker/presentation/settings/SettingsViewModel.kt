@@ -13,6 +13,7 @@ import com.example.healthtracker.domain.usecase.CalculateBMIUseCase
 import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,7 +51,8 @@ class SettingsViewModel(
     private val calculateTDEEUseCase: CalculateTDEEUseCase,
     private val calculateBMIUseCase: CalculateBMIUseCase,
     private val saveUserProfileUseCase: SaveUserProfileUseCase,
-    private val alarmScheduler: AlarmScheduler
+    private val alarmScheduler: AlarmScheduler,
+    private val validateUserProfileUseCase: ValidateUserProfileUseCase
 ) : ViewModel() {
 
     val themePreference: StateFlow<String> = userPreferences.themePreference.stateIn(
@@ -125,17 +127,43 @@ class SettingsViewModel(
     fun saveProfile() {
         viewModelScope.launch {
             val currentState = _uiState.value
-            val currentUser = currentState.user
             
+            // Validate name
+            val nameResult = validateUserProfileUseCase.validateName(currentState.name)
+            if (!nameResult.successful) {
+                nameResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                return@launch
+            }
+
+            // Validate dateOfBirth
             val birthDate = try {
                 LocalDate.parse(currentState.dateOfBirth, dateFormatter)
             } catch (e: DateTimeParseException) {
-                currentUser?.dateOfBirth ?: LocalDate.now().minusYears(25)
+                null
             }
-            val newWeight = currentState.weight.toFloatOrNull() ?: 60f
-            val newHeight = currentState.height.toFloatOrNull() ?: 170f
+            val dobResult = validateUserProfileUseCase.validateDateOfBirth(birthDate)
+            if (!dobResult.successful) {
+                dobResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                return@launch
+            }
 
-            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate)
+            // Validate weight
+            val newWeight = currentState.weight.replace(",", ".").toFloatOrNull() ?: -1f
+            val weightResult = validateUserProfileUseCase.validateWeight(newWeight)
+            if (!weightResult.successful) {
+                weightResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                return@launch
+            }
+
+            // Validate height
+            val newHeight = currentState.height.replace(",", ".").toFloatOrNull() ?: -1f
+            val heightResult = validateUserProfileUseCase.validateHeight(newHeight)
+            if (!heightResult.successful) {
+                heightResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                return@launch
+            }
+
+            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate!!)
             val tdee = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
             val bmi = calculateBMIUseCase(newWeight, newHeight)
 

@@ -25,6 +25,7 @@ import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
 import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
 import com.example.healthtracker.domain.usecase.AddMealUseCase
 import com.example.healthtracker.domain.usecase.DeleteMealUseCase
+import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
 import com.example.healthtracker.presentation.activity.ActivityViewModel
 import com.example.healthtracker.presentation.onboarding.OnboardingViewModel
 import com.example.healthtracker.presentation.settings.SettingsViewModel
@@ -59,7 +60,8 @@ val appModule = module {
     factory { CalculateBMRUseCase() }
     factory { CalculateTDEEUseCase() }
     factory { CalculateBMIUseCase() }
-    factory { SaveUserProfileUseCase(get(), get()) }
+    factory { SaveUserProfileUseCase(get(), get(), get()) }
+    factory { ValidateUserProfileUseCase() }
     factory { AddExerciseUseCase(get(), get()) }
     factory { GetExercisesByDateUseCase(get()) }
     factory { GetExercisesByDateRangeUseCase(get()) }
@@ -73,8 +75,8 @@ val appModule = module {
     factory { AddMealUseCase(get()) }
     factory { DeleteMealUseCase(get()) }
 
-    viewModel { OnboardingViewModel(get(), get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { OnboardingViewModel(get(), get(), get(), get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ActivityViewModel(get(), get(), get(), get()) }
     viewModel { MealViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { DashboardViewModel(get()) }
