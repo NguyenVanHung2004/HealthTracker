@@ -20,6 +20,10 @@ class UserPreferences(
         val LANGUAGE_PREFERENCE = stringPreferencesKey("language_preference") // "vi", "en"
         val FONT_SIZE_PREFERENCE = stringPreferencesKey("font_size_preference") // "small", "medium", "large"
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+
+        // SharedPreferences constants for synchronous locale access in attachBaseContext()
+        const val SHARED_PREFS_NAME = "health_tracker_prefs"
+        const val LANGUAGE_PREF_KEY = "language_pref_key"
     }
 
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data
@@ -53,6 +57,11 @@ class UserPreferences(
         context.dataStore.edit { preferences ->
             preferences[LANGUAGE_PREFERENCE] = language
         }
+        // Also write to SharedPreferences for synchronous access in attachBaseContext()
+        context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(LANGUAGE_PREF_KEY, language)
+            .apply()
     }
 
     val fontSizePreference: Flow<String> = context.dataStore.data

@@ -49,7 +49,7 @@ fun SplashScreen(
                     .systemBarsPadding()
             ) {
                 Text(
-                    text = "SKIP >",
+                    text = stringResource(R.string.skip),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
@@ -60,7 +60,7 @@ fun SplashScreen(
         // Logo - matches splash_background.xml: 160dp centered
         Image(
             painter = painterResource(id = R.drawable.ic_splash_logo),
-            contentDescription = "FitHealth Logo",
+            contentDescription = stringResource(R.string.logo_content_description),
             modifier = Modifier
                 .size(160.dp)
                 .align(Alignment.Center)

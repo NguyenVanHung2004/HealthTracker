@@ -35,6 +35,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,6 +60,8 @@ import com.example.healthtracker.domain.model.Gender
 import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.presentation.settings.SettingsUiState
 import com.example.healthtracker.ui.theme.LocalSpacing
+import java.time.Instant
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,36 +117,48 @@ fun ProfileSection(
 
             val context = androidx.compose.ui.platform.LocalContext.current
             val dateFormatter = remember { java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy") }
-            val calendar = remember { java.util.Calendar.getInstance() }
+            var showDatePicker by remember { mutableStateOf(false) }
             
-            LaunchedEffect(uiState.dateOfBirth) {
+            if (showDatePicker) {
+                var initialMillis: Long? = null
                 try {
                     val parsed = java.time.LocalDate.parse(uiState.dateOfBirth, dateFormatter)
-                    calendar.set(parsed.year, parsed.monthValue - 1, parsed.dayOfMonth)
+                    initialMillis = parsed.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 } catch (e: Exception) {
-                    // Ignore parsing error
+                    // Ignore
                 }
-            }
-            
-            val datePickerDialog = remember {
-                android.app.DatePickerDialog(
-                    context,
-                    { _, year, month, dayOfMonth ->
-                        val selectedDate = java.time.LocalDate.of(year, month + 1, dayOfMonth)
-                        onDateOfBirthChange(selectedDate.format(dateFormatter))
+                
+                val datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = initialMillis
+                )
+                
+                androidx.compose.material3.DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
+                                onDateOfBirthChange(date.format(dateFormatter))
+                            }
+                            showDatePicker = false
+                        }) {
+                            Text(stringResource(R.string.proceed)) // Or confirm
+                        }
                     },
-                    calendar.get(java.util.Calendar.YEAR),
-                    calendar.get(java.util.Calendar.MONTH),
-                    calendar.get(java.util.Calendar.DAY_OF_MONTH)
-                ).apply {
-                    datePicker.maxDate = System.currentTimeMillis()
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text(stringResource(R.string.skip))
+                        }
+                    }
+                ) {
+                    androidx.compose.material3.DatePicker(state = datePickerState)
                 }
             }
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { datePickerDialog.show() }
+                    .clickable { showDatePicker = true }
             ) {
                 OutlinedTextField(
                     value = uiState.dateOfBirth,

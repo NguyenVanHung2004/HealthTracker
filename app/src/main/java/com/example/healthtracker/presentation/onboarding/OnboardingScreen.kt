@@ -41,10 +41,12 @@ import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.LocalSpacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
-import android.app.DatePickerDialog
 import androidx.compose.ui.platform.LocalContext
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingRoute(
     viewModel: OnboardingViewModel = koinViewModel(),
@@ -237,6 +239,7 @@ fun StepDot(step: Int, currentStep: Int) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step1Profile(
     uiState: OnboardingUiState,
@@ -273,32 +276,42 @@ fun Step1Profile(
         val context = LocalContext.current
         val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
         val dobText = uiState.dateOfBirth?.format(dateFormatter) ?: ""
+        var showDatePicker by remember { mutableStateOf(false) }
         
-        val calendar = remember { java.util.Calendar.getInstance() }
-        LaunchedEffect(uiState.dateOfBirth) {
-            uiState.dateOfBirth?.let { dob ->
-                calendar.set(dob.year, dob.monthValue - 1, dob.dayOfMonth)
-            }
-        }
-        
-        val datePickerDialog = remember {
-         DatePickerDialog(
-                context,
-                { _, year, month, dayOfMonth ->
-                    onDateOfBirthChange(java.time.LocalDate.of(year, month + 1, dayOfMonth))
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = uiState.dateOfBirth
+                    ?.atStartOfDay(ZoneId.systemDefault())
+                    ?.toInstant()
+                    ?.toEpochMilli()
+            )
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
+                            onDateOfBirthChange(date)
+                        }
+                        showDatePicker = false
+                    }) {
+                        Text(stringResource(R.string.proceed)) // or confirm if it exists
+                    }
                 },
-                calendar.get(java.util.Calendar.YEAR),
-                calendar.get(java.util.Calendar.MONTH),
-                calendar.get(java.util.Calendar.DAY_OF_MONTH)
-            ).apply {
-                datePicker.maxDate = System.currentTimeMillis()
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text(stringResource(R.string.skip)) // fallback for cancel if needed
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
             }
         }
         
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { datePickerDialog.show() }
+                .clickable { showDatePicker = true }
         ) {
             OutlinedTextField(
                 value = dobText,

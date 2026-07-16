@@ -119,34 +119,28 @@ fun MealScreenContent(
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                CompositionLocalProvider(LocalContext provides context) {
-                    TextButton(
-                        onClick = {
-                            val millis = datePickerState.selectedDateMillis
-                            if (millis != null) {
-                                val date = Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-                                onDateChange(date)
-                            }
-                            showDatePicker = false
+                TextButton(
+                    onClick = {
+                        val millis = datePickerState.selectedDateMillis
+                        if (millis != null) {
+                            val date = Instant.ofEpochMilli(millis)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            onDateChange(date)
                         }
-                    ) {
-                        Text(stringResource(R.string.confirm))
+                        showDatePicker = false
                     }
+                ) {
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
-                CompositionLocalProvider(LocalContext provides context) {
-                    TextButton(onClick = { showDatePicker = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
-            CompositionLocalProvider(LocalContext provides context) {
-                DatePicker(state = datePickerState)
-            }
+            DatePicker(state = datePickerState)
         }
     }
 
