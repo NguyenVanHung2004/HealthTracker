@@ -39,10 +39,10 @@ val exerciseMeta = mapOf(
 )
 
 val exerciseGradients = listOf(
-    Brush.linearGradient(listOf(Gradient1Start, Gradient1End)),
-    Brush.linearGradient(listOf(Gradient2Start, Gradient2End)),
-    Brush.linearGradient(listOf(Gradient3Start, Gradient3End)),
-    Brush.linearGradient(listOf(Gradient4Start, Gradient4End)),
-    Brush.linearGradient(listOf(Gradient5Start, Gradient5End)),
-    Brush.linearGradient(listOf(Gradient6Start, Gradient6End))
+    Brush.linearGradient(listOf(GradientOrangeStart, GradientOrangeEnd)),
+    Brush.linearGradient(listOf(GradientGreenStart, GradientGreenEnd)),
+    Brush.linearGradient(listOf(GradientBlueStart, GradientBlueEnd)),
+    Brush.linearGradient(listOf(GradientPurpleStart, GradientPurpleEnd)),
+    Brush.linearGradient(listOf(GradientRoseStart, GradientRoseEnd)),
+    Brush.linearGradient(listOf(GradientTealStart, GradientTealEnd))
 )

@@ -3,12 +3,15 @@ package com.example.healthtracker
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +54,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        val prefs = newBase.getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = newBase.getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, MODE_PRIVATE)
         val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, null)
 
         if (langTag != null) {
@@ -68,13 +71,14 @@ class MainActivity : ComponentActivity() {
     }
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        val prefs = getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, MODE_PRIVATE)
         val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, null) ?: return
         val savedLocale = Locale.forLanguageTag(langTag)
         val currentLang = newConfig.locales[0].language
         if (currentLang != savedLocale.language) {
             val config = Configuration(newConfig).apply { setLocale(savedLocale) }
             val ctx = createConfigurationContext(config)
+            @Suppress("DEPRECATION")
             resources.updateConfiguration(ctx.resources.configuration, ctx.resources.displayMetrics)
         }
     }

@@ -43,23 +43,45 @@ val SurfaceDark = Color(0xFF1E1E1E)
 val TextPrimaryDark = Color(0xFFF5F5F5)
 val TextSecondaryDark = Color(0xFFAAAAAA)
 
+val SurfaceVariantLight = Color(0xFFEDEEF2)
+val OnSurfaceVariantLight = Color(0xFF44474A)
+val OutlineLight = Color(0xFF9A9CA0)
+val OutlineVariantLight = Color(0xFFC4C6CA)
 
-// Gradient pairs for exercise cards (6 pairs)
-val Gradient1Start = Color(0xFFa18cd1)
-val Gradient1End   = Color(0xFFfbc2eb)
-val Gradient2Start = Color(0xFF84fab0)
-val Gradient2End   = Color(0xFF8fd3f4)
-val Gradient3Start = Color(0xFFff9a9e)
-val Gradient3End   = Color(0xFFfecfef)
-val Gradient4Start = Color(0xFFe0c3fc)
-val Gradient4End   = Color(0xFF8ec5fc)
-val Gradient5Start = Color(0xFFfccb90)
-val Gradient5End   = Color(0xFFd57eeb)
-val Gradient6Start = Color(0xFFa6c0fe)
-val Gradient6End   = Color(0xFFf68084)
+val SurfaceVariantDark = Color(0xFF2B2C30)
+val OnSurfaceVariantDark = Color(0xFFC4C6CA)
+val OutlineDark = Color(0xFF8E9094)
+val OutlineVariantDark = Color(0xFF44474A)
 
-// Calorie accent
-val CalorieRed = Color(0xFFFF7675)
+val ErrorLight = Color(0xFFBA1A1A)
+val OnErrorLight = Color(0xFFFFFFFF)
+val ErrorContainerLight = Color(0xFFFFDAD6)
+val OnErrorContainerLight = Color(0xFF410002)
+
+val ErrorDark = Color(0xFFFFB4AB)
+val OnErrorDark = Color(0xFF690005)
+val ErrorContainerDark = Color(0xFF93000A)
+val OnErrorContainerDark = Color(0xFFFFDAD6)
+
+val GradientOrangeStart = PrimaryOrange
+val GradientOrangeEnd = PrimaryOrangeLight
+
+val GradientGreenStart = PrimaryGreen
+val GradientGreenEnd = PrimaryGreenLight
+
+val GradientBlueStart = PrimaryBlue
+val GradientBlueEnd = PrimaryBlueLight
+
+val GradientPurpleStart = PrimaryPurple
+val GradientPurpleEnd = PrimaryPurpleLight
+
+val GradientRoseStart = PrimaryRose
+val GradientRoseEnd = PrimaryRoseLight
+
+val GradientTealStart = PrimaryTeal
+val GradientTealEnd = PrimaryTealLight
+
+val CalorieRed = Color(0xFFE53935)
 
 // Success state
 val SuccessGreen = Color(0xFF4CAF50)

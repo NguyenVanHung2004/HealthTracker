@@ -12,18 +12,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 
+// NOTE on onPrimary choices below: all five saturated theme families
+// (Green/Blue/Purple/Rose/Teal) put the *dark* variant as `primary` in
+// light mode (dark enough for White text, ~4.5–7.5:1) and the *light*
+// variant as `primary` in dark mode (light enough for Black text).
+// Orange is the exception: its base hue (FF6D00) is bright regardless
+// of mode, so it needs Black text in BOTH modes — using White there
+// was the main contrast bug (~2.8:1, fails WCAG AA).
+
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryOrange,
-    secondary = PrimaryOrangeLight,
+    primary = PrimaryOrangeLight,
+    secondary = PrimaryOrange,
     tertiary = PrimaryOrangeDark,
     background = BackgroundDark,
     surface = SurfaceDark,
-    onPrimary = Color.White,
+    onPrimary = Color.Black,
     onSecondary = Color.Black,
     onBackground = TextPrimaryDark,
     onSurface = TextPrimaryDark,
     primaryContainer = PrimaryOrangeDark,
-    onPrimaryContainer = Color.White
+    onPrimaryContainer = Color.White,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -32,12 +48,20 @@ private val LightColorScheme = lightColorScheme(
     tertiary = PrimaryOrangeDark,
     background = BackgroundLight,
     surface = SurfaceLight,
-    onPrimary = Color.White,
+    onPrimary = Color.Black,
     onSecondary = Color.Black,
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     primaryContainer = PrimaryOrangeLight,
-    onPrimaryContainer = PrimaryOrangeDark
+    onPrimaryContainer = PrimaryOrangeDark,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 private val DarkGreenColorScheme = darkColorScheme(
@@ -51,7 +75,15 @@ private val DarkGreenColorScheme = darkColorScheme(
     onBackground = TextPrimaryDark,
     onSurface = TextPrimaryDark,
     primaryContainer = PrimaryGreenDark,
-    onPrimaryContainer = Color.White
+    onPrimaryContainer = Color.White,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightGreenColorScheme = lightColorScheme(
@@ -65,7 +97,15 @@ private val LightGreenColorScheme = lightColorScheme(
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     primaryContainer = PrimaryGreenLight,
-    onPrimaryContainer = PrimaryGreenDark
+    onPrimaryContainer = PrimaryGreenDark,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 private val DarkBlueColorScheme = darkColorScheme(
@@ -79,7 +119,15 @@ private val DarkBlueColorScheme = darkColorScheme(
     onBackground = TextPrimaryDark,
     onSurface = TextPrimaryDark,
     primaryContainer = PrimaryBlueDark,
-    onPrimaryContainer = Color.White
+    onPrimaryContainer = Color.White,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightBlueColorScheme = lightColorScheme(
@@ -93,7 +141,15 @@ private val LightBlueColorScheme = lightColorScheme(
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     primaryContainer = PrimaryBlueLight,
-    onPrimaryContainer = PrimaryBlueDark
+    onPrimaryContainer = PrimaryBlueDark,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 private val DarkPurpleColorScheme = darkColorScheme(
@@ -107,7 +163,15 @@ private val DarkPurpleColorScheme = darkColorScheme(
     onBackground = TextPrimaryDark,
     onSurface = TextPrimaryDark,
     primaryContainer = PrimaryPurpleDark,
-    onPrimaryContainer = Color.White
+    onPrimaryContainer = Color.White,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightPurpleColorScheme = lightColorScheme(
@@ -121,7 +185,15 @@ private val LightPurpleColorScheme = lightColorScheme(
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     primaryContainer = PrimaryPurpleLight,
-    onPrimaryContainer = PrimaryPurpleDark
+    onPrimaryContainer = PrimaryPurpleDark,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 private val DarkRoseColorScheme = darkColorScheme(
@@ -135,7 +207,15 @@ private val DarkRoseColorScheme = darkColorScheme(
     onBackground = TextPrimaryDark,
     onSurface = TextPrimaryDark,
     primaryContainer = PrimaryRoseDark,
-    onPrimaryContainer = Color.White
+    onPrimaryContainer = Color.White,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightRoseColorScheme = lightColorScheme(
@@ -149,7 +229,15 @@ private val LightRoseColorScheme = lightColorScheme(
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     primaryContainer = PrimaryRoseLight,
-    onPrimaryContainer = PrimaryRoseDark
+    onPrimaryContainer = PrimaryRoseDark,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 private val DarkTealColorScheme = darkColorScheme(
@@ -163,7 +251,15 @@ private val DarkTealColorScheme = darkColorScheme(
     onBackground = TextPrimaryDark,
     onSurface = TextPrimaryDark,
     primaryContainer = PrimaryTealDark,
-    onPrimaryContainer = Color.White
+    onPrimaryContainer = Color.White,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
 
 private val LightTealColorScheme = lightColorScheme(
@@ -177,7 +273,15 @@ private val LightTealColorScheme = lightColorScheme(
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     primaryContainer = PrimaryTealLight,
-    onPrimaryContainer = PrimaryTealDark
+    onPrimaryContainer = PrimaryTealDark,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
 @Composable
