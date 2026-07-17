@@ -51,7 +51,6 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onNavigateToMeal: () -> Unit,
@@ -59,6 +58,21 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    
+    DashboardScreenContent(
+        uiState = uiState,
+        onNavigateToMeal = onNavigateToMeal,
+        onNavigateToActivity = onNavigateToActivity
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DashboardScreenContent(
+    uiState: DashboardUiState,
+    onNavigateToMeal: () -> Unit,
+    onNavigateToActivity: () -> Unit
+) {
     val spacing = LocalSpacing.current
     val scrollState = rememberScrollState()
 
