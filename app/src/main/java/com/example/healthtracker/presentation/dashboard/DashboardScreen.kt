@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import com.example.healthtracker.presentation.dashboard.components.BarChart
 import com.example.healthtracker.presentation.dashboard.components.CalorieStatItem
@@ -313,33 +314,57 @@ fun GoalBasedCalorieContent(
         }
     }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "$netCalories / $targetCalories kcal",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Black,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
             color = color,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(horizontal = spacing.medium)
         )
         
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        androidx.compose.material3.LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(spacing.small),
-            color = color,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
-        )
-
         Spacer(modifier = Modifier.height(spacing.large))
+
+        Box(
+            contentAlignment = Alignment.Center, 
+            modifier = Modifier.size(spacing.circularProgressSize)
+        ) {
+            // Background track
+            androidx.compose.material3.CircularProgressIndicator(
+                progress = { 1f },
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                strokeWidth = spacing.circularProgressStroke
+            )
+            // Actual progress
+            androidx.compose.material3.CircularProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxSize(),
+                color = color,
+                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                strokeWidth = spacing.circularProgressStroke
+            )
+            
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "$netCalories",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "/ $targetCalories kcal",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(spacing.extraLarge))
         
         Row(
             modifier = Modifier.fillMaxWidth(),

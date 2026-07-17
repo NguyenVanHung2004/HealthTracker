@@ -215,13 +215,18 @@ class SettingsViewModel(
             userPreferences.setNotificationsEnabled(enabled)
             if (enabled) {
                 alarmScheduler.scheduleDailyReminders()
+                _snackbarEvent.emit(R.string.toast_notifications_enabled)
             } else {
                 alarmScheduler.cancelReminders()
+                _snackbarEvent.emit(R.string.toast_notifications_disabled)
             }
         }
     }
 
     fun testNotification() {
         alarmScheduler.testNotification()
+        viewModelScope.launch {
+            _snackbarEvent.emit(R.string.toast_test_notification_sent)
+        }
     }
 }

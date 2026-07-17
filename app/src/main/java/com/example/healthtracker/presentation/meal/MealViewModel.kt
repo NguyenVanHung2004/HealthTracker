@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.healthtracker.data.local.FoodItemSeedData
 import java.time.LocalDate
+import com.example.healthtracker.presentation.components.LoadingController
+import kotlinx.coroutines.delay
 
 class MealViewModel(
     private val getUserUseCase: GetUserUseCase,
@@ -218,7 +220,10 @@ class MealViewModel(
 
         viewModelScope.launch {
             try {
-                addMealUseCase(newLog)
+                LoadingController.withLoading {
+                    delay(600)
+                    addMealUseCase(newLog)
+                }
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
                 closeAddFoodDialog()
             } catch (e: Exception) {
@@ -230,7 +235,10 @@ class MealViewModel(
     fun deleteMealLog(mealLog: MealLog) {
         viewModelScope.launch {
             try {
-                deleteMealUseCase(mealLog)
+                LoadingController.withLoading {
+                    delay(500)
+                    deleteMealUseCase(mealLog)
+                }
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
             } catch (e: Exception) {
                 emitEvent(MealUiEvent.ShowError(R.string.error_occurred))

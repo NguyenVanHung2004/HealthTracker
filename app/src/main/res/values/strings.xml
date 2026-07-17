@@ -118,6 +118,9 @@
     <string name="settings_gender_female">Nữ</string>
     <string name="settings_save_btn">Lưu hồ sơ &amp; Tính lại TDEE</string>
     <string name="profile_saved_successfully">Lưu hồ sơ thành công!</string>
+    <string name="toast_notifications_enabled">Đã bật nhắc nhở hàng ngày</string>
+    <string name="toast_notifications_disabled">Đã tắt nhắc nhở hàng ngày</string>
+    <string name="toast_test_notification_sent">Đã gửi thông báo thử nghiệm</string>
     <string name="total_calories_burned">Tổng calo tiêu thụ</string>
     <string name="today_activities">Hoạt động hôm nay</string>
     <string name="no_activities_yet">Chưa có hoạt động nào trong ngày</string>

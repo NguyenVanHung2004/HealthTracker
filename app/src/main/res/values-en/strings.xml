@@ -117,6 +117,9 @@
     <string name="settings_gender_female">Female</string>
     <string name="settings_save_btn">Save Profile &amp; Recalculate TDEE</string>
     <string name="profile_saved_successfully">Profile saved successfully!</string>
+    <string name="toast_notifications_enabled">Daily reminders enabled</string>
+    <string name="toast_notifications_disabled">Daily reminders disabled</string>
+    <string name="toast_test_notification_sent">Test notification sent</string>
     <string name="total_calories_burned">Total calories burned</string>
     <string name="today_activities">Today\'s Activities</string>
     <string name="no_activities_yet">No activities yet today</string>
