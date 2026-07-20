@@ -29,7 +29,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,11 +51,11 @@ import org.koin.androidx.compose.koinViewModel
 fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val themePreference by viewModel.themePreference.collectAsState()
-    val languagePreference by viewModel.languagePreference.collectAsState()
-    val fontSizePreference by viewModel.fontSizePreference.collectAsState()
-    val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val themePreference by viewModel.themePreference.collectAsStateWithLifecycle()
+    val languagePreference by viewModel.languagePreference.collectAsStateWithLifecycle()
+    val fontSizePreference by viewModel.fontSizePreference.collectAsStateWithLifecycle()
+    val notificationsEnabled by viewModel.notificationsEnabled.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
