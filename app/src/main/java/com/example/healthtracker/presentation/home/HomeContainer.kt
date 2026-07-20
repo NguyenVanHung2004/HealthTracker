@@ -1,4 +1,4 @@
-package com.example.healthtracker.presentation.main
+package com.example.healthtracker.presentation.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
@@ -43,7 +43,7 @@ import com.example.healthtracker.presentation.meal.MealScreen
 import com.example.healthtracker.presentation.settings.SettingsScreen
 
 @Composable
-fun MainScreen() {
+fun HomeContainer() {
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
     val items = listOf(
         Pair(R.string.tab_dashboard, Icons.Filled.Home),

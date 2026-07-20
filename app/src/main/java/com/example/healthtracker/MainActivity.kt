@@ -38,13 +38,14 @@ import com.example.healthtracker.data.local.preferences.UserPreferences
 import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
 import com.example.healthtracker.presentation.components.SnackbarController
-import com.example.healthtracker.presentation.main.MainScreen
-import com.example.healthtracker.presentation.onboarding.OnboardingRoute
-import com.example.healthtracker.presentation.splash.SplashScreen
+import com.example.healthtracker.presentation.navigation.AppNavigation
 import com.example.healthtracker.ui.theme.HealthTrackerTheme
 import com.example.healthtracker.ui.theme.LocalSpacing
 import org.koin.android.ext.android.inject
 import java.util.Locale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val userPreferences: UserPreferences by inject()
@@ -59,7 +60,6 @@ class MainActivity : ComponentActivity() {
 
         if (langTag != null) {
             val locale = Locale.forLanguageTag(langTag)
-            Locale.setDefault(locale)
             val config = Configuration(newBase.resources.configuration).apply {
                 setLocale(locale)
             }
@@ -69,34 +69,28 @@ class MainActivity : ComponentActivity() {
             super.attachBaseContext(newBase)
         }
     }
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        val prefs = getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, MODE_PRIVATE)
-        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, "vi") ?: return
-        val savedLocale = Locale.forLanguageTag(langTag)
-        val currentLang = newConfig.locales[0].language
-        if (currentLang != savedLocale.language) {
-            val config = Configuration(newConfig).apply { setLocale(savedLocale) }
-            val ctx = createConfigurationContext(config)
-            @Suppress("DEPRECATION")
-            resources.updateConfiguration(ctx.resources.configuration, ctx.resources.displayMetrics)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        
+        var keepSplashScreen = true
+        lifecycleScope.launch {
+            userPreferences.isOnboardingCompleted.collect {
+                keepSplashScreen = false
+            }
+        }
+        
+        splashScreen.setKeepOnScreenCondition { keepSplashScreen }
+        
         enableEdgeToEdge()
         setContent {
-            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsState(initial = null)
-            splashScreen.setKeepOnScreenCondition { isOnboardingCompleted == null }
             splashScreen.setOnExitAnimationListener { it.remove() }
 
-            val themePref by userPreferences.themePreference.collectAsState(initial = "system")
-    
-            val languagePref by userPreferences.languagePreference
-                .collectAsState(initial = appliedLanguage ?: "vi")
-            val fontSizePref by userPreferences.fontSizePreference.collectAsState(initial = "medium")
+            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsStateWithLifecycle(initialValue = null)
+            val themePref by userPreferences.themePreference.collectAsStateWithLifecycle(initialValue = "system")
+            val languagePref by userPreferences.languagePreference.collectAsStateWithLifecycle(initialValue = appliedLanguage ?: "vi")
+            val fontSizePref by userPreferences.fontSizePreference.collectAsStateWithLifecycle(initialValue = "medium")
 
             val darkTheme = when (themePref) {
                 "light" -> false
@@ -119,44 +113,10 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalActivityResultRegistryOwner provides this
                 ) {
-                    if (isOnboardingCompleted != null) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            val navController = rememberNavController()
-                            val startDestination = "splash"
-                            NavHost(
-                                navController = navController,
-                                startDestination = startDestination
-                            ) {
-                                composable("splash") {
-                                    SplashScreen(
-                                        isOnboardingCompleted = isOnboardingCompleted == true,
-                                        onNavigateToOnboarding = {
-                                            navController.navigate("onboarding") {
-                                                popUpTo("splash") { inclusive = true }
-                                            }
-                                        },
-                                        onNavigateToDashboard = {
-                                            navController.navigate("main") {
-                                                popUpTo("splash") { inclusive = true }
-                                            }
-                                        }
-                                    )
-                                }
-                                composable("onboarding") {
-                                    OnboardingRoute(
-                                        onNavigateToDashboard = {
-                                            navController.navigate("main") {
-                                                popUpTo("onboarding") { inclusive = true }
-                                            }
-                                        }
-                                    )
-                                }
-                                composable("main") {
-                                    MainScreen()
-                                }
-                            }
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        AppNavigation(isOnboardingCompleted = isOnboardingCompleted)
 
-                            // Stacked Toast Overlay
+                        // Stacked Toast Overlay
                             val activeMessages = SnackbarController.activeMessages
                             Column(
                                 modifier = Modifier
@@ -186,9 +146,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            // Global Loading Overlay
-                            GlobalLoadingOverlay()
-                        }
+                        // Global Loading Overlay
+                        GlobalLoadingOverlay()
                     }
                 }
             }
