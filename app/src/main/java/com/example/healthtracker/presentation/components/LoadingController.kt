@@ -16,6 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
@@ -23,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.healthtracker.R
 import com.example.healthtracker.ui.theme.LocalSpacing
 
@@ -119,53 +123,70 @@ fun GlobalLoadingOverlay(
 ) {
     val spacing = LocalSpacing.current
     
-    AnimatedVisibility(
-        visible = isLoading,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = BackgroundDimAlpha))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = {}
-                ),
-            contentAlignment = Alignment.Center
+    val visibleState = remember { MutableTransitionState(false) }
+    visibleState.targetState = isLoading
+
+    if (visibleState.currentState || visibleState.targetState) {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false
+            )
         ) {
-            Card(
-                shape = RoundedCornerShape(spacing.cornerMedium),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = GlassmorphicSurfaceAlpha)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = spacing.small),
-                modifier = Modifier
-                    .width(spacing.loadingCardSize)
-                    .height(spacing.loadingCardSize)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = BorderAlpha),
-                        shape = RoundedCornerShape(spacing.cornerMedium)
-                    )
+            val dialogWindowProvider = LocalView.current.parent as? DialogWindowProvider
+            dialogWindowProvider?.window?.setDimAmount(0f)
+
+            AnimatedVisibility(
+                visibleState = visibleState,
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = BackgroundDimAlpha))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {}
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
-                    PremiumSpinner(
-                        modifier = Modifier.size(spacing.loadingSpinnerSize)
-                    )
-                    Spacer(modifier = Modifier.height(spacing.medium))
-                    Text(
-                        text = stringResource(R.string.loading),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
-                    )
+                    Card(
+                        shape = RoundedCornerShape(spacing.cornerMedium),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = GlassmorphicSurfaceAlpha)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = spacing.small),
+                        modifier = Modifier
+                            .width(spacing.loadingCardSize)
+                            .height(spacing.loadingCardSize)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = BorderAlpha),
+                                shape = RoundedCornerShape(spacing.cornerMedium)
+                            )
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            PremiumSpinner(
+                                modifier = Modifier.size(spacing.loadingSpinnerSize)
+                            )
+                            Spacer(modifier = Modifier.height(spacing.medium))
+                            Text(
+                                text = stringResource(R.string.loading),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
+                    }
                 }
             }
         }
