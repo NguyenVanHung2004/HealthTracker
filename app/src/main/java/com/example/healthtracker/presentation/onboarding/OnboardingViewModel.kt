@@ -22,6 +22,7 @@ import com.example.healthtracker.R
 import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import java.time.LocalDate
 import androidx.annotation.StringRes
 
@@ -123,7 +124,7 @@ class OnboardingViewModel(
         val state = _uiState.value
         val weight = state.weight.replace(",", ".").toFloatOrNull() ?: 0f
         val height = state.height.replace(",", ".").toFloatOrNull() ?: 0f
-        val dob = state.dateOfBirth ?: java.time.LocalDate.now().minusYears(state.age.toLong())
+        val dob = requireNotNull(state.dateOfBirth) { "DateOfBirth must not be null when calculating results" }
 
         val bmr = calculateBMRUseCase(weight, height, state.gender, dob)
         val tdeeResult = calculateTDEEUseCase(bmr, state.activityLevel, state.goal)
@@ -144,7 +145,7 @@ class OnboardingViewModel(
         val height = state.height.replace(",", ".").toFloatOrNull() ?: 0f
         val user = User(
             name = state.name,
-            dateOfBirth = state.dateOfBirth ?: java.time.LocalDate.now().minusYears(state.age.toLong()),
+            dateOfBirth = requireNotNull(state.dateOfBirth) { "DateOfBirth must not be null when saving user" },
             gender = state.gender,
             weightKg = weight,
             heightCm = height,
@@ -162,6 +163,7 @@ class OnboardingViewModel(
                 }
                 _uiEvent.emit(OnboardingUiEvent.NavigateToDashboard)
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 _uiEvent.emit(OnboardingUiEvent.ShowError(R.string.error_occurred))
             }
         }

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import com.example.healthtracker.data.local.FoodItemSeedData
 import java.time.LocalDate
 import com.example.healthtracker.presentation.components.LoadingController
@@ -227,6 +228,7 @@ class MealViewModel(
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
                 closeAddFoodDialog()
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
             }
         }
@@ -241,6 +243,7 @@ class MealViewModel(
                 }
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
             }
         }

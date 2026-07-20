@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import java.time.LocalDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
@@ -149,6 +150,7 @@ class ActivityViewModel(
                 _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_added))
                 _uiEvent.emit(ActivityUiEvent.NavigateBack)
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 _uiEvent.emit(ActivityUiEvent.ShowError(R.string.error_occurred))
             }
         }
@@ -163,6 +165,7 @@ class ActivityViewModel(
                 }
                 _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_deleted))
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 _uiEvent.emit(ActivityUiEvent.ShowError(R.string.error_occurred))
             }
         }

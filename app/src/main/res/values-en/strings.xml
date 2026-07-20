@@ -74,6 +74,8 @@
     
     <!-- Notifications -->
     <string name="notification_title">HealthTracker</string>
+    <string name="notification_channel_name">Daily Reminders</string>
+    <string name="notification_channel_description">Channel for daily health logging reminders</string>
     <string name="notification_morning">Good morning! Don\'t forget to log your breakfast and prepare energy for the new day.</string>
     <string name="notification_noon">It\'s noon! Have you logged your lunch today?</string>
     <string name="notification_evening">Good evening! Today you consumed %1$d kcal and burned %2$d kcal. Let\'s review your day!</string>

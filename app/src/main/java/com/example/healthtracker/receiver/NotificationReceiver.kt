@@ -37,10 +37,10 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
 
                 val channel = NotificationChannel(
                     channelId,
-                    "Nhắc nhở hàng ngày",
+                    context.getString(R.string.notification_channel_name),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Kênh thông báo nhắc nhở ghi lại sức khoẻ hàng ngày"
+                    description = context.getString(R.string.notification_channel_description)
                 }
                 notificationManager.createNotificationChannel(channel)
 

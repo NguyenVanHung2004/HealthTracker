@@ -72,6 +72,8 @@
     
     <!-- Notifications -->
     <string name="notification_title">HealthTracker</string>
+    <string name="notification_channel_name">Nhắc nhở hàng ngày</string>
+    <string name="notification_channel_description">Kênh thông báo nhắc nhở ghi lại sức khoẻ hàng ngày</string>
     <string name="notification_morning">Buổi sáng tốt lành! Đừng quên ghi lại bữa sáng và chuẩn bị năng lượng cho ngày mới nhé.</string>
     <string name="notification_noon">Đã trưa rồi! Bạn đã ghi lại bữa trưa hôm nay chưa?</string>
     <string name="notification_evening">Chào buổi tối! Hôm nay bạn đã ăn %1$d kcal và đốt cháy %2$d kcal. Cùng tổng kết ngày nhé!</string>

@@ -45,6 +45,7 @@ import com.example.healthtracker.presentation.settings.SettingsScreen
 @Composable
 fun HomeContainer() {
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
+    val activityNavController = rememberNavController()
     val items = listOf(
         Pair(R.string.tab_dashboard, Icons.Filled.Home),
         Pair(R.string.tab_meal, Icons.Filled.RestaurantMenu),
@@ -70,7 +71,6 @@ fun HomeContainer() {
                     )
                     1 -> MealScreen()
                     2 -> {
-                        val activityNavController = rememberNavController()
                         NavHost(navController = activityNavController, startDestination = "activity_list") {
                             composable("activity_list") {
                                 ActivityScreen(
