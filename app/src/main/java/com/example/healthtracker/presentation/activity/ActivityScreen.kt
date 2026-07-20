@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseLog
+import com.example.healthtracker.presentation.activity.nameRes
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
@@ -397,7 +398,8 @@ fun ExerciseItem(
     onDelete: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    val bgGradient = exerciseGradients[exercise.type.ordinal % exerciseGradients.size]
+    val themeGradients = getThemeExerciseGradients()
+    val bgGradient = themeGradients[exercise.type.ordinal % themeGradients.size]
     val progress = minOf(1f, exercise.durationMinutes / 60f)
 
     Card(

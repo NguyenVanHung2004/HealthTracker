@@ -14,6 +14,7 @@ import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
 import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidationError
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -131,7 +132,7 @@ class SettingsViewModel(
             // Validate name
             val nameResult = validateUserProfileUseCase.validateName(currentState.name)
             if (!nameResult.successful) {
-                nameResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                nameResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
                 return@launch
             }
 
@@ -143,7 +144,7 @@ class SettingsViewModel(
             }
             val dobResult = validateUserProfileUseCase.validateDateOfBirth(birthDate)
             if (!dobResult.successful) {
-                dobResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                dobResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
                 return@launch
             }
 
@@ -151,7 +152,7 @@ class SettingsViewModel(
             val newWeight = currentState.weight.replace(",", ".").toFloatOrNull() ?: -1f
             val weightResult = validateUserProfileUseCase.validateWeight(newWeight)
             if (!weightResult.successful) {
-                weightResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                weightResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
                 return@launch
             }
 
@@ -159,7 +160,7 @@ class SettingsViewModel(
             val newHeight = currentState.height.replace(",", ".").toFloatOrNull() ?: -1f
             val heightResult = validateUserProfileUseCase.validateHeight(newHeight)
             if (!heightResult.successful) {
-                heightResult.errorMessageId?.let { _snackbarEvent.emit(it) }
+                heightResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
                 return@launch
             }
 
@@ -229,4 +230,11 @@ class SettingsViewModel(
             _snackbarEvent.emit(R.string.toast_test_notification_sent)
         }
     }
+}
+
+private fun ValidationError.toErrorMessageId(): Int = when(this) {
+    ValidationError.EMPTY_NAME -> R.string.error_empty_name
+    ValidationError.INVALID_DOB -> R.string.error_invalid_dob
+    ValidationError.INVALID_WEIGHT -> R.string.error_invalid_weight
+    ValidationError.INVALID_HEIGHT -> R.string.error_invalid_height
 }

@@ -9,7 +9,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.healthtracker.domain.model.ExerciseType
 import com.example.healthtracker.ui.theme.*
-
+import com.example.healthtracker.R
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 data class ExerciseUiMeta(
     val icon: ImageVector,
     val gradientIndex: Int
@@ -38,11 +40,42 @@ val exerciseMeta = mapOf(
     ExerciseType.MARTIAL_ARTS to ExerciseUiMeta(Icons.Default.SportsMartialArts, 4)
 )
 
-val exerciseGradients = listOf(
-    Brush.linearGradient(listOf(GradientOrangeStart, GradientOrangeEnd)),
-    Brush.linearGradient(listOf(GradientGreenStart, GradientGreenEnd)),
-    Brush.linearGradient(listOf(GradientBlueStart, GradientBlueEnd)),
-    Brush.linearGradient(listOf(GradientPurpleStart, GradientPurpleEnd)),
-    Brush.linearGradient(listOf(GradientRoseStart, GradientRoseEnd)),
-    Brush.linearGradient(listOf(GradientTealStart, GradientTealEnd))
-)
+val ExerciseType.nameRes: Int
+    get() = when (this) {
+        ExerciseType.WALKING -> R.string.exercise_walking
+        ExerciseType.RUNNING -> R.string.exercise_running
+        ExerciseType.CYCLING -> R.string.exercise_cycling
+        ExerciseType.SWIMMING -> R.string.exercise_swimming
+        ExerciseType.YOGA -> R.string.exercise_yoga
+        ExerciseType.GYM -> R.string.exercise_gym
+        ExerciseType.STAIRS -> R.string.exercise_stairs
+        ExerciseType.JUMP_ROPE -> R.string.exercise_jump_rope
+        ExerciseType.BADMINTON -> R.string.exercise_badminton
+        ExerciseType.FOOTBALL -> R.string.exercise_football
+        ExerciseType.BASKETBALL -> R.string.exercise_basketball
+        ExerciseType.TENNIS -> R.string.exercise_tennis
+        ExerciseType.VOLLEYBALL -> R.string.exercise_volleyball
+        ExerciseType.DANCING -> R.string.exercise_dancing
+        ExerciseType.AEROBICS -> R.string.exercise_aerobics
+        ExerciseType.HIKING -> R.string.exercise_hiking
+        ExerciseType.PILATES -> R.string.exercise_pilates
+        ExerciseType.BOXING -> R.string.exercise_boxing
+        ExerciseType.SKATEBOARDING -> R.string.exercise_skateboarding
+        ExerciseType.MARTIAL_ARTS -> R.string.exercise_martial_arts
+    }
+
+@Composable
+fun getThemeExerciseGradients(): List<Brush> {
+    val primary = MaterialTheme.colorScheme.primary
+    val secondary = MaterialTheme.colorScheme.secondary
+    val tertiary = MaterialTheme.colorScheme.tertiary
+    
+    return listOf(
+        Brush.linearGradient(listOf(primary, primary.copy(alpha = 0.7f))),
+        Brush.linearGradient(listOf(secondary, secondary.copy(alpha = 0.7f))),
+        Brush.linearGradient(listOf(tertiary, tertiary.copy(alpha = 0.7f))),
+        Brush.linearGradient(listOf(primary.copy(alpha = 0.8f), secondary.copy(alpha = 0.8f))),
+        Brush.linearGradient(listOf(secondary.copy(alpha = 0.8f), tertiary.copy(alpha = 0.8f))),
+        Brush.linearGradient(listOf(tertiary.copy(alpha = 0.8f), primary.copy(alpha = 0.8f)))
+    )
+}

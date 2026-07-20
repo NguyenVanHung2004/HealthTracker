@@ -11,6 +11,7 @@ import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
 import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidationError
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -76,12 +77,12 @@ class OnboardingViewModel(
             1 -> {
                 val nameResult = validateUserProfileUseCase.validateName(_uiState.value.name)
                 if (!nameResult.successful) {
-                    nameResult.errorMessageId?.let { emitError(it) }
+                    nameResult.error?.let { emitError(it.toErrorMessageId()) }
                     return
                 }
                 val dobResult = validateUserProfileUseCase.validateDateOfBirth(_uiState.value.dateOfBirth)
                 if (!dobResult.successful) {
-                    dobResult.errorMessageId?.let { emitError(it) }
+                    dobResult.error?.let { emitError(it.toErrorMessageId()) }
                     return
                 }
                 _uiState.update { it.copy(currentStep = 2) }
@@ -91,12 +92,12 @@ class OnboardingViewModel(
                 val height = _uiState.value.height.replace(",", ".").toFloatOrNull() ?: 0f
                 val weightResult = validateUserProfileUseCase.validateWeight(weight)
                 if (!weightResult.successful) {
-                    weightResult.errorMessageId?.let { emitError(it) }
+                    weightResult.error?.let { emitError(it.toErrorMessageId()) }
                     return
                 }
                 val heightResult = validateUserProfileUseCase.validateHeight(height)
                 if (!heightResult.successful) {
-                    heightResult.errorMessageId?.let { emitError(it) }
+                    heightResult.error?.let { emitError(it.toErrorMessageId()) }
                     return
                 }
                 _uiState.update { it.copy(currentStep = 3) }
@@ -176,4 +177,11 @@ class OnboardingViewModel(
             _uiEvent.emit(OnboardingUiEvent.ShowError(messageId))
         }
     }
+}
+
+private fun ValidationError.toErrorMessageId(): Int = when(this) {
+    ValidationError.EMPTY_NAME -> R.string.error_empty_name
+    ValidationError.INVALID_DOB -> R.string.error_invalid_dob
+    ValidationError.INVALID_WEIGHT -> R.string.error_invalid_weight
+    ValidationError.INVALID_HEIGHT -> R.string.error_invalid_height
 }

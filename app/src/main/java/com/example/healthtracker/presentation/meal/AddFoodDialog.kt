@@ -24,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.FoodItem
+import com.example.healthtracker.presentation.meal.nameRes
 import com.example.healthtracker.ui.theme.LocalSpacing
 
 @Composable
