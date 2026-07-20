@@ -30,6 +30,10 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -47,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -132,7 +137,7 @@ fun ProfileSection(
                     initialSelectedDateMillis = initialMillis
                 )
                 
-                androidx.compose.material3.DatePickerDialog(
+                DatePickerDialog(
                     onDismissRequest = { showDatePicker = false },
                     confirmButton = {
                         TextButton(onClick = {
@@ -190,7 +195,7 @@ fun ProfileSection(
             // Weight & Height side-by-side
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+                horizontalArrangement = Arrangement.spacedBy(spacing.medium)
             ) {
                 OutlinedTextField(
                     value = uiState.weight,
@@ -198,18 +203,13 @@ fun ProfileSection(
                         if (it.all { char -> char.isDigit() || char == '.' }) onWeightChange(it)
                     },
                     label = { Text(stringResource(R.string.settings_weight)) },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.MonitorWeight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    suffix = {
+                    trailingIcon = {
                         Text(
-                            stringResource(R.string.unit_kg),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = stringResource(R.string.unit_kg),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = spacing.small)
                         )
                     },
                     modifier = Modifier.weight(1f),
@@ -225,18 +225,13 @@ fun ProfileSection(
                         if (it.all { char -> char.isDigit() || char == '.' }) onHeightChange(it)
                     },
                     label = { Text(stringResource(R.string.settings_height)) },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Height,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    suffix = {
+                    trailingIcon = {
                         Text(
-                            stringResource(R.string.unit_cm),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = stringResource(R.string.unit_cm),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = spacing.small)
                         )
                     },
                     modifier = Modifier.weight(1f),
@@ -282,111 +277,52 @@ fun ProfileSection(
             isExpanded = lifestyleExpanded,
             onExpandedChange = { lifestyleExpanded = it }
         ) {
-            // Activity Level
-            Text(
-                stringResource(R.string.activity_level),
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = spacing.extraSmall)
-            )
-            var activityExpanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = activityExpanded,
-                onExpandedChange = { activityExpanded = it }
-            ) {
-                OutlinedTextField(
-                    value = when (uiState.activityLevel) {
+            val activityLevels = ActivityLevel.entries
+            val goals = Goal.entries
+
+            SettingDropdownItem(
+                title = stringResource(R.string.activity_level),
+                selectedValue = when (uiState.activityLevel) {
+                    ActivityLevel.SEDENTARY -> stringResource(R.string.activity_sedentary)
+                    ActivityLevel.LIGHTLY_ACTIVE -> stringResource(R.string.activity_lightly)
+                    ActivityLevel.MODERATELY_ACTIVE -> stringResource(R.string.activity_moderately)
+                    ActivityLevel.VERY_ACTIVE -> stringResource(R.string.activity_very)
+                    ActivityLevel.EXTRA_ACTIVE -> stringResource(R.string.activity_extra)
+                },
+                items = activityLevels,
+                itemText = { level ->
+                    when (level) {
                         ActivityLevel.SEDENTARY -> stringResource(R.string.activity_sedentary)
                         ActivityLevel.LIGHTLY_ACTIVE -> stringResource(R.string.activity_lightly)
                         ActivityLevel.MODERATELY_ACTIVE -> stringResource(R.string.activity_moderately)
                         ActivityLevel.VERY_ACTIVE -> stringResource(R.string.activity_very)
                         ActivityLevel.EXTRA_ACTIVE -> stringResource(R.string.activity_extra)
-                    },
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = activityExpanded) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
-                    shape = RoundedCornerShape(spacing.cornerSmall),
-                    colors = profileTextFieldColors()
-                )
-                ExposedDropdownMenu(
-                    expanded = activityExpanded,
-                    onDismissRequest = { activityExpanded = false }
-                ) {
-                    ActivityLevel.entries.forEach { level ->
-                        val text = when (level) {
-                            ActivityLevel.SEDENTARY -> stringResource(R.string.activity_sedentary)
-                            ActivityLevel.LIGHTLY_ACTIVE -> stringResource(R.string.activity_lightly)
-                            ActivityLevel.MODERATELY_ACTIVE -> stringResource(R.string.activity_moderately)
-                            ActivityLevel.VERY_ACTIVE -> stringResource(R.string.activity_very)
-                            ActivityLevel.EXTRA_ACTIVE -> stringResource(R.string.activity_extra)
-                        }
-                        DropdownMenuItem(
-                            text = { Text(text) },
-                            onClick = {
-                                onActivityLevelChange(level)
-                                activityExpanded = false
-                            }
-                        )
                     }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            // Goal
-            Text(
-                stringResource(R.string.goal),
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = spacing.extraSmall)
+                },
+                onItemSelected = onActivityLevelChange
             )
-            var goalExpanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = goalExpanded,
-                onExpandedChange = { goalExpanded = it }
-            ) {
-                OutlinedTextField(
-                    value = when (uiState.goal) {
+
+            Spacer(modifier = Modifier.height(spacing.medium))
+
+            SettingDropdownItem(
+                title = stringResource(R.string.goal),
+                selectedValue = when (uiState.goal) {
+                    Goal.LOSE_WEIGHT -> stringResource(R.string.goal_lose_weight)
+                    Goal.MAINTAIN_WEIGHT -> stringResource(R.string.goal_maintain)
+                    Goal.GAIN_WEIGHT -> stringResource(R.string.goal_gain_weight)
+                    Goal.BUILD_MUSCLE -> stringResource(R.string.goal_build_muscle)
+                },
+                items = goals,
+                itemText = { g ->
+                    when (g) {
                         Goal.LOSE_WEIGHT -> stringResource(R.string.goal_lose_weight)
                         Goal.MAINTAIN_WEIGHT -> stringResource(R.string.goal_maintain)
                         Goal.GAIN_WEIGHT -> stringResource(R.string.goal_gain_weight)
                         Goal.BUILD_MUSCLE -> stringResource(R.string.goal_build_muscle)
-                    },
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = goalExpanded) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
-                    shape = RoundedCornerShape(spacing.cornerSmall),
-                    colors = profileTextFieldColors()
-                )
-                ExposedDropdownMenu(
-                    expanded = goalExpanded,
-                    onDismissRequest = { goalExpanded = false }
-                ) {
-                    Goal.entries.forEach { goal ->
-                        val text = when (goal) {
-                            Goal.LOSE_WEIGHT -> stringResource(R.string.goal_lose_weight)
-                            Goal.MAINTAIN_WEIGHT -> stringResource(R.string.goal_maintain)
-                            Goal.GAIN_WEIGHT -> stringResource(R.string.goal_gain_weight)
-                            Goal.BUILD_MUSCLE -> stringResource(R.string.goal_build_muscle)
-                        }
-                        DropdownMenuItem(
-                            text = { Text(text) },
-                            onClick = {
-                                onGoalChange(goal)
-                                goalExpanded = false
-                            }
-                        )
                     }
-                }
-            }
+                },
+                onItemSelected = onGoalChange
+            )
         }
     }
 }
@@ -610,3 +546,91 @@ private fun profileTextFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
 )
+
+@Composable
+fun <T> SettingDropdownItem(
+    title: String,
+    selectedValue: String,
+    items: List<T>,
+    itemText: @Composable (T) -> String,
+    onItemSelected: (T) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val spacing = LocalSpacing.current
+
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = spacing.extraSmall)
+        )
+        Box {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = true },
+                shape = RoundedCornerShape(spacing.cornerSmall),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp, 
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.medium, vertical = spacing.medium),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedValue,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Expand",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                items.forEach { item ->
+                    val text = itemText(item)
+                    val isSelected = text == selectedValue
+                    DropdownMenuItem(
+                        text = { 
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            ) 
+                        },
+                        onClick = {
+                            onItemSelected(item)
+                            expanded = false
+                        },
+                        trailingIcon = if (isSelected) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        } else null
+                    )
+                }
+            }
+        }
+    }
+}

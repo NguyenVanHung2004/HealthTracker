@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         val prefs = newBase.getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, MODE_PRIVATE)
-        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, null)
+        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, "vi")
 
         if (langTag != null) {
             val locale = Locale.forLanguageTag(langTag)
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         val prefs = getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, MODE_PRIVATE)
-        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, null) ?: return
+        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, "vi") ?: return
         val savedLocale = Locale.forLanguageTag(langTag)
         val currentLang = newConfig.locales[0].language
         if (currentLang != savedLocale.language) {
