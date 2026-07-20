@@ -1,11 +1,13 @@
 package com.example.healthtracker.di
 
 import androidx.room.Room
+import com.example.healthtracker.data.alarm.AlarmSchedulerImpl
 import com.example.healthtracker.data.local.HealthDatabase
 import com.example.healthtracker.data.local.preferences.UserPreferences
 import com.example.healthtracker.data.repository.ExerciseRepositoryImpl
 import com.example.healthtracker.data.repository.MealRepositoryImpl
 import com.example.healthtracker.data.repository.UserRepositoryImpl
+import com.example.healthtracker.domain.alarm.AlarmScheduler
 import com.example.healthtracker.domain.repository.ExerciseRepository
 import com.example.healthtracker.domain.repository.MealRepository
 import com.example.healthtracker.domain.repository.UserRepository
@@ -31,6 +33,7 @@ import com.example.healthtracker.presentation.onboarding.OnboardingViewModel
 import com.example.healthtracker.presentation.settings.SettingsViewModel
 import com.example.healthtracker.presentation.meal.MealViewModel
 import com.example.healthtracker.presentation.dashboard.DashboardViewModel
+import com.example.healthtracker.presentation.widget.WidgetUpdater
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -55,7 +58,9 @@ val appModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<ExerciseRepository> { ExerciseRepositoryImpl(get()) }
     single<MealRepository> { MealRepositoryImpl(get(), get()) }
-    single<com.example.healthtracker.domain.alarm.AlarmScheduler> { com.example.healthtracker.data.alarm.AlarmSchedulerImpl(androidContext()) }
+    single<AlarmScheduler> { AlarmSchedulerImpl(androidContext()) }
+    
+    single { WidgetUpdater(androidContext()) }
 
     factory { CalculateBMRUseCase() }
     factory { CalculateTDEEUseCase() }
@@ -76,8 +81,8 @@ val appModule = module {
     factory { DeleteMealUseCase(get()) }
 
     viewModel { OnboardingViewModel(get(), get(), get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { ActivityViewModel(get(), get(), get(), get()) }
-    viewModel { MealViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { ActivityViewModel(get(), get(), get(), get(), get()) }
+    viewModel { MealViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { DashboardViewModel(get()) }
 }

@@ -13,6 +13,7 @@ import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
 import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
 import com.example.healthtracker.domain.usecase.AddMealUseCase
 import com.example.healthtracker.domain.usecase.DeleteMealUseCase
+import com.example.healthtracker.presentation.widget.WidgetUpdater
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +36,8 @@ class MealViewModel(
     private val getMealsByDateUseCase: GetMealsByDateUseCase,
     private val searchFoodItemsUseCase: SearchFoodItemsUseCase,
     private val addMealUseCase: AddMealUseCase,
-    private val deleteMealUseCase: DeleteMealUseCase
+    private val deleteMealUseCase: DeleteMealUseCase,
+    private val widgetUpdater: WidgetUpdater
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MealUiState())
@@ -225,6 +227,7 @@ class MealViewModel(
                     delay(600)
                     addMealUseCase(newLog)
                 }
+                widgetUpdater.updateWidget()
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
                 closeAddFoodDialog()
             } catch (e: Exception) {
@@ -241,6 +244,7 @@ class MealViewModel(
                     delay(500)
                     deleteMealUseCase(mealLog)
                 }
+                widgetUpdater.updateWidget()
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
             } catch (e: Exception) {
                 if (e is CancellationException) throw e

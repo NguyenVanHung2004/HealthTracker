@@ -9,6 +9,7 @@ import com.example.healthtracker.domain.usecase.GetUserUseCase
 import com.example.healthtracker.domain.usecase.AddExerciseUseCase
 import com.example.healthtracker.domain.usecase.DeleteExerciseUseCase
 import com.example.healthtracker.domain.usecase.GetExercisesByDateRangeUseCase
+import com.example.healthtracker.presentation.widget.WidgetUpdater
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -45,7 +46,8 @@ class ActivityViewModel(
     private val getUserUseCase: GetUserUseCase,
     private val addExerciseUseCase: AddExerciseUseCase,
     private val getExercisesByDateRangeUseCase: GetExercisesByDateRangeUseCase,
-    private val deleteExerciseUseCase: DeleteExerciseUseCase
+    private val deleteExerciseUseCase: DeleteExerciseUseCase,
+    private val widgetUpdater: WidgetUpdater
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ActivityUiState())
@@ -147,6 +149,7 @@ class ActivityViewModel(
                     delay(600)
                     addExerciseUseCase(state.selectedExerciseType, duration, state.selectedDate)
                 }
+                widgetUpdater.updateWidget()
                 _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_added))
                 _uiEvent.emit(ActivityUiEvent.NavigateBack)
             } catch (e: Exception) {
@@ -163,6 +166,7 @@ class ActivityViewModel(
                     delay(500)
                     deleteExerciseUseCase(exerciseLog)
                 }
+                widgetUpdater.updateWidget()
                 _uiEvent.emit(ActivityUiEvent.ShowSuccess(R.string.toast_activity_deleted))
             } catch (e: Exception) {
                 if (e is CancellationException) throw e

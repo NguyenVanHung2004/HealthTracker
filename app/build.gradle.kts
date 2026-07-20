@@ -71,6 +71,10 @@ dependencies {
     // Splash Screen
     implementation(libs.core.splashscreen)
 
+    // Glance Widget
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

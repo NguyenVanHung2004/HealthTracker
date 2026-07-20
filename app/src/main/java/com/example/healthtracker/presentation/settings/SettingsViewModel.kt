@@ -15,6 +15,7 @@ import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
 import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
 import com.example.healthtracker.domain.usecase.ValidationError
+import com.example.healthtracker.presentation.widget.WidgetUpdater
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -53,7 +54,8 @@ class SettingsViewModel(
     private val calculateBMIUseCase: CalculateBMIUseCase,
     private val saveUserProfileUseCase: SaveUserProfileUseCase,
     private val alarmScheduler: AlarmScheduler,
-    private val validateUserProfileUseCase: ValidateUserProfileUseCase
+    private val validateUserProfileUseCase: ValidateUserProfileUseCase,
+    private val widgetUpdater: WidgetUpdater
 ) : ViewModel() {
 
     val themePreference: StateFlow<String> = userPreferences.themePreference.stateIn(
@@ -186,6 +188,7 @@ class SettingsViewModel(
                     delay(1000)
                     saveUserProfileUseCase(updatedUser)
                 }
+                widgetUpdater.updateWidget()
                 _snackbarEvent.emit(R.string.profile_saved_successfully)
             } catch (e: Exception) {
                 _snackbarEvent.emit(R.string.error_occurred)
