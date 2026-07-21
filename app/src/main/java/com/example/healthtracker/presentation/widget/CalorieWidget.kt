@@ -43,8 +43,20 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import androidx.core.content.ContextCompat
-import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
+import java.time.LocalDate
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.Dp
+import com.example.healthtracker.MainActivity
+
+data class WidgetSizes(
+    val minWidthMedium: Dp,
+    val minHeightLarge: Dp,
+    val textSmall: TextUnit,
+    val textLarge: TextUnit,
+    val textXLarge: TextUnit,
+    val textXXLarge: TextUnit
+)
 
 class CalorieWidget : GlanceAppWidget() {
 
@@ -53,6 +65,7 @@ class CalorieWidget : GlanceAppWidget() {
         val CONSUMED_KEY = intPreferencesKey("consumedCalories")
         val BURNED_KEY = intPreferencesKey("burnedCalories")
         val TDEE_KEY = intPreferencesKey("tdee")
+        val DATE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("savedDate")
     }
 
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
@@ -66,40 +79,46 @@ class CalorieWidget : GlanceAppWidget() {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        fun getDp(resId: Int): Dp = (context.resources.getDimension(resId) / context.resources.displayMetrics.density).dp
+        fun getSp(resId: Int): TextUnit = (context.resources.getDimension(resId) / context.resources.displayMetrics.scaledDensity).sp
+
+        val sizes = WidgetSizes(
+            minWidthMedium = getDp(R.dimen.widget_breakpoint_width_medium),
+            minHeightLarge = getDp(R.dimen.widget_breakpoint_height_large),
+            textSmall = getSp(R.dimen.widget_text_small),
+            textLarge = getSp(R.dimen.widget_text_large),
+            textXLarge = getSp(R.dimen.widget_text_xlarge),
+            textXXLarge = getSp(R.dimen.widget_text_xxlarge)
+        )
+
         provideContent {
             val prefs = currentState<Preferences>()
+            val savedDateStr = prefs[DATE_KEY]
+            val todayStr = LocalDate.now().toString()
+
             val target = prefs[TARGET_KEY] ?: 2000
-            val consumed = prefs[CONSUMED_KEY] ?: 0
-            val burned = prefs[BURNED_KEY] ?: 0
             val tdee = prefs[TDEE_KEY] ?: 0
 
-            WidgetContent(target, consumed, burned, tdee)
+            // If the saved date is not today, display 0 for consumed and burned
+            val isToday = savedDateStr == todayStr
+            val consumed = if (isToday) prefs[CONSUMED_KEY] ?: 0 else 0
+            val burned = if (isToday) prefs[BURNED_KEY] ?: 0 else 0
+
+            WidgetContent(target, consumed, burned, tdee, sizes)
         }
     }
 
     @SuppressLint("RestrictedApi")
     @Composable
-    private fun WidgetContent(target: Int, consumed: Int, burned: Int, tdee: Int) {
+    private fun WidgetContent(target: Int, consumed: Int, burned: Int, tdee: Int, sizes: WidgetSizes) {
         val context = LocalContext.current
         val size = LocalSize.current
         
         val netCalories = consumed - burned
         val progress = if (target > 0) kotlin.math.min(1f, netCalories.toFloat() / target.toFloat()).coerceAtLeast(0f) else 0f
 
-        // Helper to convert dimension resource to DP and SP
-        fun getDp(resId: Int): androidx.compose.ui.unit.Dp {
-            return (context.resources.getDimension(resId) / context.resources.displayMetrics.density).dp
-        }
-        
-        fun getSp(resId: Int): androidx.compose.ui.unit.TextUnit {
-            return (context.resources.getDimension(resId) / context.resources.displayMetrics.scaledDensity).sp
-        }
-
-        val minWidthMedium = getDp(R.dimen.widget_breakpoint_width_medium)
-        val minHeightLarge = getDp(R.dimen.widget_breakpoint_height_large)
-
-        val isSmall = size.width < minWidthMedium
-        val isLarge = size.width >= minWidthMedium && size.height >= minHeightLarge
+        val isSmall = size.width < sizes.minWidthMedium
+        val isLarge = size.width >= sizes.minWidthMedium && size.height >= sizes.minHeightLarge
 
         Column(
             modifier = GlanceModifier
@@ -122,11 +141,11 @@ class CalorieWidget : GlanceAppWidget() {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = netCalories.toString(),
-                            style = TextStyle(color = ColorProvider(R.color.white), fontWeight = FontWeight.Bold, fontSize = getSp(R.dimen.widget_text_xlarge))
+                            style = TextStyle(color = ColorProvider(R.color.white), fontWeight = FontWeight.Bold, fontSize = sizes.textXLarge)
                         )
                         Text(
                             text = "/ $target kcal",
-                            style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = getSp(R.dimen.widget_text_small))
+                            style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = sizes.textSmall)
                         )
                     }
                 }
@@ -142,11 +161,11 @@ class CalorieWidget : GlanceAppWidget() {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = netCalories.toString(),
-                                style = TextStyle(color = ColorProvider(R.color.white), fontWeight = FontWeight.Bold, fontSize = getSp(R.dimen.widget_text_xxlarge))
+                                style = TextStyle(color = ColorProvider(R.color.white), fontWeight = FontWeight.Bold, fontSize = sizes.textXXLarge)
                             )
                             Text(
                                 text = "/ $target kcal",
-                                style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = getSp(R.dimen.widget_text_small))
+                                style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = sizes.textSmall)
                             )
                         }
                     }
@@ -156,22 +175,22 @@ class CalorieWidget : GlanceAppWidget() {
                     Column(modifier = GlanceModifier.defaultWeight()) {
                         Text(
                             text = context.getString(R.string.dashboard_consumed),
-                            style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = getSp(R.dimen.widget_text_small))
+                            style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = sizes.textSmall)
                         )
                         Text(
                             text = "$consumed",
-                            style = TextStyle(color = ColorProvider(R.color.widget_consumed), fontWeight = FontWeight.Bold, fontSize = getSp(R.dimen.widget_text_large))
+                            style = TextStyle(color = ColorProvider(R.color.widget_consumed), fontWeight = FontWeight.Bold, fontSize = sizes.textLarge)
                         )
 
                         Spacer(modifier = GlanceModifier.height(R.dimen.widget_spacing_small))
 
                         Text(
                             text = context.getString(R.string.dashboard_burned),
-                            style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = getSp(R.dimen.widget_text_small))
+                            style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = sizes.textSmall)
                         )
                         Text(
                             text = "$burned",
-                            style = TextStyle(color = ColorProvider(R.color.widget_burned), fontWeight = FontWeight.Bold, fontSize = getSp(R.dimen.widget_text_large))
+                            style = TextStyle(color = ColorProvider(R.color.widget_burned), fontWeight = FontWeight.Bold, fontSize = sizes.textLarge)
                         )
 
                         if (isLarge) {
@@ -179,11 +198,11 @@ class CalorieWidget : GlanceAppWidget() {
                             
                             Text(
                                 text = context.getString(R.string.dash_label_tdee),
-                                style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = getSp(R.dimen.widget_text_small))
+                                style = TextStyle(color = ColorProvider(R.color.widget_text_secondary), fontSize = sizes.textSmall)
                             )
                             Text(
                                 text = tdee.toString(),
-                                style = TextStyle(color = ColorProvider(R.color.widget_accent), fontWeight = FontWeight.Bold, fontSize = getSp(R.dimen.widget_text_large))
+                                style = TextStyle(color = ColorProvider(R.color.widget_accent), fontWeight = FontWeight.Bold, fontSize = sizes.textLarge)
                             )
                         }
                     }

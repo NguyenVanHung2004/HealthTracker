@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class WidgetUpdater(
     private val context: Context,
@@ -32,6 +33,7 @@ class WidgetUpdater(
                         prefs[CalorieWidget.CONSUMED_KEY] = data.consumedCaloriesToday
                         prefs[CalorieWidget.BURNED_KEY] = data.burnedCaloriesToday
                         prefs[CalorieWidget.TDEE_KEY] = data.tdee
+                        prefs[CalorieWidget.DATE_KEY] = LocalDate.now().toString()
                     }
                     widget.update(context, id)
                 }
