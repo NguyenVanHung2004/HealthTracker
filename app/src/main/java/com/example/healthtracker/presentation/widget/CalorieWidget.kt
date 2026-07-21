@@ -1,5 +1,6 @@
 package com.example.healthtracker.presentation.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -9,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -22,17 +25,19 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.state.GlanceStateDefinition
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -40,16 +45,17 @@ import androidx.glance.unit.ColorProvider
 import androidx.core.content.ContextCompat
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
-import com.example.healthtracker.domain.model.DashboardData
-import com.example.healthtracker.domain.usecase.GetDashboardDataUseCase
-import kotlinx.coroutines.flow.first
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import kotlin.math.max
 
-class CalorieWidget : GlanceAppWidget(), KoinComponent {
+class CalorieWidget : GlanceAppWidget() {
 
-    private val getDashboardDataUseCase: GetDashboardDataUseCase by inject()
+    companion object {
+        val TARGET_KEY = intPreferencesKey("targetCalories")
+        val CONSUMED_KEY = intPreferencesKey("consumedCalories")
+        val BURNED_KEY = intPreferencesKey("burnedCalories")
+        val TDEE_KEY = intPreferencesKey("tdee")
+    }
+
+    override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
     override val sizeMode = SizeMode.Responsive(
         setOf(
@@ -60,25 +66,23 @@ class CalorieWidget : GlanceAppWidget(), KoinComponent {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val dashboardData = try {
-            getDashboardDataUseCase().first()
-        } catch (e: Exception) {
-            null
-        }
-
         provideContent {
-            WidgetContent(dashboardData)
+            val prefs = currentState<Preferences>()
+            val target = prefs[TARGET_KEY] ?: 2000
+            val consumed = prefs[CONSUMED_KEY] ?: 0
+            val burned = prefs[BURNED_KEY] ?: 0
+            val tdee = prefs[TDEE_KEY] ?: 0
+
+            WidgetContent(target, consumed, burned, tdee)
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Composable
-    private fun WidgetContent(data: DashboardData?) {
+    private fun WidgetContent(target: Int, consumed: Int, burned: Int, tdee: Int) {
         val context = LocalContext.current
         val size = LocalSize.current
         
-        val target = data?.targetCalories ?: 2000
-        val consumed = data?.consumedCaloriesToday ?: 0
-        val burned = data?.burnedCaloriesToday ?: 0
         val netCalories = consumed - burned
         val progress = if (target > 0) kotlin.math.min(1f, netCalories.toFloat() / target.toFloat()).coerceAtLeast(0f) else 0f
 
@@ -96,7 +100,6 @@ class CalorieWidget : GlanceAppWidget(), KoinComponent {
 
         val isSmall = size.width < minWidthMedium
         val isLarge = size.width >= minWidthMedium && size.height >= minHeightLarge
-        val tdee = data?.tdee ?: 0
 
         Column(
             modifier = GlanceModifier

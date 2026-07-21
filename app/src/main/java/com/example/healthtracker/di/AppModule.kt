@@ -60,7 +60,7 @@ val appModule = module {
     single<MealRepository> { MealRepositoryImpl(get(), get()) }
     single<AlarmScheduler> { AlarmSchedulerImpl(androidContext()) }
     
-    single { WidgetUpdater(androidContext()) }
+    single { WidgetUpdater(androidContext(), get()) }
 
     factory { CalculateBMRUseCase() }
     factory { CalculateTDEEUseCase() }
