@@ -6,6 +6,10 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
 import com.example.healthtracker.MainActivity
 import com.example.healthtracker.R
@@ -20,6 +24,7 @@ import org.koin.core.component.inject
 import java.time.LocalDate
 
 import com.example.healthtracker.domain.alarm.ReminderType
+import androidx.core.graphics.createBitmap
 
 class NotificationReceiver : BroadcastReceiver(), KoinComponent {
 
@@ -33,7 +38,7 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                val channelId = "daily_reminders_channel"
+                val channelId = "daily_reminders_channel_2"
 
                 val channel = NotificationChannel(
                     channelId,
@@ -80,9 +85,13 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
                     }
                     else -> context.getString(R.string.notification_default)
                 }
-
+                val largeIcon = context.getBitmapFromVector(
+                    R.drawable.ic_splash_logo
+                )
                 val notification = NotificationCompat.Builder(context, channelId)
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setColor(0xFFFFA500.toInt())
+                    .setLargeIcon(largeIcon)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -101,4 +110,26 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
             }
         }
     }
+}
+
+fun Context.getBitmapFromVector(
+    drawableId: Int
+): Bitmap {
+    val drawable = AppCompatResources.getDrawable(
+        this,
+        drawableId
+    )!!
+
+    val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+
+    val canvas = Canvas(bitmap)
+    drawable.setBounds(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    )
+    drawable.draw(canvas)
+
+    return bitmap
 }
