@@ -37,6 +37,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
+import com.example.healthtracker.presentation.components.PremiumSpinner
+import com.example.healthtracker.presentation.dashboard.components.CalorieCircularProgress
 import com.example.healthtracker.presentation.dashboard.components.BarChart
 import com.example.healthtracker.presentation.dashboard.components.CalorieStatItem
 import com.example.healthtracker.domain.model.Goal
@@ -98,7 +100,7 @@ fun DashboardScreenContent(
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                PremiumSpinner(modifier = Modifier.size(48.dp))
             }
         } else {
             Column(
@@ -343,40 +345,13 @@ fun GoalBasedCalorieContent(
         
         Spacer(modifier = Modifier.height(spacing.large))
 
-        Box(
-            contentAlignment = Alignment.Center, 
+        CalorieCircularProgress(
+            progress = progress,
+            color = color,
+            netCalories = netCalories,
+            targetCalories = targetCalories,
             modifier = Modifier.size(spacing.circularProgressSize)
-        ) {
-            // Background track
-            androidx.compose.material3.CircularProgressIndicator(
-                progress = { 1f },
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                strokeWidth = spacing.circularProgressStroke
-            )
-            // Actual progress
-            androidx.compose.material3.CircularProgressIndicator(
-                progress = { progress },
-                modifier = Modifier.fillMaxSize(),
-                color = color,
-                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-                strokeWidth = spacing.circularProgressStroke
-            )
-            
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "$netCalories",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = "/ $targetCalories kcal",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
+        )
 
         Spacer(modifier = Modifier.height(spacing.extraLarge))
         

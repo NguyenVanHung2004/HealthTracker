@@ -245,4 +245,10 @@
     <string name="dash_msg_gain_good">Weight gain goal reached for today!</string>
     <string name="dash_msg_muscle_good">Calorie goal reached for today!</string>
     <string name="dash_label_tdee">TDEE</string>
+
+      
+    <string name="bmi_scale_18_5">18.5</string>
+    <string name="bmi_scale_25">25</string>
+    <string name="bmi_scale_30">30</string>
+    <string name="bmi_scale_40">40</string>
 </resources>

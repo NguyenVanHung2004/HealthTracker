@@ -16,17 +16,13 @@ import com.example.healthtracker.ui.theme.LocalSpacing
 
 @Composable
 fun CalorieCircularProgress(
-    target: Int,
-    consumed: Int,
-    burned: Int,
-    remaining: Int,
-    isExceeded: Boolean,
+    progress: Float,
+    color: androidx.compose.ui.graphics.Color,
+    netCalories: Int,
+    targetCalories: Int,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    val progress = if (target > 0) {
-        (consumed.toFloat() / target.toFloat()).coerceIn(0f, 2f)
-    } else 0f
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
@@ -48,11 +44,10 @@ fun CalorieCircularProgress(
             )
             
             // Draw progress arc
-            val arcColor = if (isExceeded) exceededColor else primaryColor
             val sweepAngle = (progress * 360f).coerceAtMost(360f)
             
             drawArc(
-                color = arcColor,
+                color = color,
                 startAngle = -90f,
                 sweepAngle = sweepAngle,
                 useCenter = false,
@@ -65,18 +60,14 @@ fun CalorieCircularProgress(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = remaining.toString(),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = if (isExceeded) exceededColor else MaterialTheme.colorScheme.onSurface
+                text = "$netCalories",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(modifier = Modifier.height(spacing.extraSmall / 2))
             Text(
-                text = stringResource(
-                    if (isExceeded) R.string.dashboard_calories_exceeded 
-                    else R.string.dashboard_calories_remaining
-                ),
-                style = MaterialTheme.typography.labelSmall,
+                text = "/ $targetCalories kcal",
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
