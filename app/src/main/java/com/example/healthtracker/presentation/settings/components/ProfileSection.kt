@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material.icons.outlined.Height
 import androidx.compose.material.icons.outlined.MonitorWeight
 import androidx.compose.material3.Card
@@ -181,12 +182,7 @@ fun ProfileSection(
                     enabled = false,
                     shape = RoundedCornerShape(spacing.cornerSmall),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
-                        disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
-                        disabledLabelColor = MaterialTheme.colorScheme.primary,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.primary
-                    )
+                    colors = profileTextFieldColors()
                 )
             }
 
@@ -202,7 +198,15 @@ fun ProfileSection(
                     onValueChange = {
                         if (it.all { char -> char.isDigit() || char == '.' }) onWeightChange(it)
                     },
-                    label = { Text(stringResource(R.string.settings_weight)) },
+                    label = { 
+                        Text(
+                            stringResource(R.string.settings_weight),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Visible,
+                            style = MaterialTheme.typography.labelSmall
+                        ) 
+                    },
                     trailingIcon = {
                         Text(
                             text = stringResource(R.string.unit_kg),
@@ -224,7 +228,15 @@ fun ProfileSection(
                     onValueChange = {
                         if (it.all { char -> char.isDigit() || char == '.' }) onHeightChange(it)
                     },
-                    label = { Text(stringResource(R.string.settings_height)) },
+                    label = { 
+                        Text(
+                            stringResource(R.string.settings_height),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Visible,
+                            style = MaterialTheme.typography.labelSmall
+                        ) 
+                    },
                     trailingIcon = {
                         Text(
                             text = stringResource(R.string.unit_cm),
@@ -544,7 +556,12 @@ private fun profileTextFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedContainerColor = Color.Transparent,
     unfocusedContainerColor = Color.Transparent,
     focusedBorderColor = MaterialTheme.colorScheme.primary,
-    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+    disabledContainerColor = Color.Transparent,
+    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    disabledLeadingIconColor = MaterialTheme.colorScheme.primary
 )
 
 @Composable
