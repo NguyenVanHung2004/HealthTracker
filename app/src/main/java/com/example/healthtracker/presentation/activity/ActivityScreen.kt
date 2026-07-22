@@ -18,12 +18,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseLog
-import com.example.healthtracker.presentation.activity.nameRes
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
-import java.time.format.TextStyle
 import java.util.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
@@ -68,9 +66,7 @@ fun ActivityScreen(
     ActivityScreenContent(
         uiState = uiState,
         onNavigateToAdd = onNavigateToAdd,
-        onDeleteExercise = viewModel::deleteExercise,
-        onFilterSelected = viewModel::setFilterType,
-        onDateRangeSelected = viewModel::setCustomRange
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -79,12 +75,9 @@ fun ActivityScreen(
 fun ActivityScreenContent(
     uiState: ActivityUiState,
     onNavigateToAdd: () -> Unit,
-    onDeleteExercise: (ExerciseLog) -> Unit,
-    onFilterSelected: (DateFilterType) -> Unit,
-    onDateRangeSelected: (LocalDate, LocalDate) -> Unit
+    onEvent: (ActivityEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
-    val context = LocalContext.current
     var showDatePicker by remember { mutableStateOf(false) }
 
     val dateRangeText = remember(uiState.filterType, uiState.selectedDate, uiState.customStartDate, uiState.customEndDate) {
@@ -145,7 +138,7 @@ fun ActivityScreenContent(
                             } else {
                                 startDate
                             }
-                            onDateRangeSelected(startDate, endDate)
+                            onEvent(ActivityEvent.OnCustomRangeSelected(startDate, endDate))
                         }
                         showDatePicker = false
                     }
@@ -163,24 +156,25 @@ fun ActivityScreenContent(
                 state = dateRangePickerState,
                 title = {
                     Text(
-                        text = stringResource(R.string.select_date_range),
-                        modifier = Modifier.padding(start = spacing.medium, top = spacing.medium),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
+                        text = stringResource(R.string.filter_custom),
+                        modifier = Modifier.padding(spacing.medium),
+                        fontWeight = FontWeight.Bold
                     )
                 },
                 headline = {
+                    val startStr = dateRangePickerState.selectedStartDateMillis?.let {
+                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    } ?: "..."
+                    val endStr = dateRangePickerState.selectedEndDateMillis?.let {
+                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    } ?: "..."
                     Text(
-                        text = stringResource(R.string.select_range_headline),
-                        modifier = Modifier.padding(start = spacing.medium, bottom = spacing.small),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "$startStr - $endStr",
+                        modifier = Modifier.padding(horizontal = spacing.medium),
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
-                showModeToggle = false,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -191,7 +185,7 @@ fun ActivityScreenContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.tab_activity),
+                        stringResource(R.string.tab_activity),
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -283,7 +277,7 @@ fun ActivityScreenContent(
                                 if (type == DateFilterType.CUSTOM) {
                                     showDatePicker = true
                                 } else {
-                                    onFilterSelected(type)
+                                    onEvent(ActivityEvent.OnFilterTypeChanged(type))
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -323,6 +317,9 @@ fun ActivityScreenContent(
                 )
             }
 
+            Spacer(modifier = Modifier.height(spacing.medium))
+
+            // Exercise List Content
             if (uiState.exercises.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -382,7 +379,7 @@ fun ActivityScreenContent(
                         items(exercisesForDate, key = { it.id }) { exercise ->
                             ExerciseItem(
                                 exercise = exercise,
-                                onDelete = { onDeleteExercise(exercise) }
+                                onDelete = { onEvent(ActivityEvent.OnDeleteExercise(exercise)) }
                             )
                         }
                     }

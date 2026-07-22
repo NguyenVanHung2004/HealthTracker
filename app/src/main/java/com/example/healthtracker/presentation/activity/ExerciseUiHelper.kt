@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.healthtracker.domain.model.ExerciseType
-import com.example.healthtracker.ui.theme.*
 import com.example.healthtracker.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
