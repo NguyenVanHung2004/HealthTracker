@@ -3,6 +3,7 @@ package com.example.healthtracker.presentation.meal
 import com.example.healthtracker.domain.model.FoodItem
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
+import com.example.healthtracker.domain.model.Goal
 import java.time.LocalDate
 
 data class MealUiState(
@@ -10,6 +11,7 @@ data class MealUiState(
     val loggedMeals: List<MealLog> = emptyList(),
     val totalCalories: Int = 0,
     val targetCalories: Int = 2000, // standard default
+    val goal: Goal = Goal.MAINTAIN_WEIGHT,
     val searchQuery: String = "",
     val availableFoods: List<FoodItem> = emptyList(),
     val filteredFoods: List<FoodItem> = emptyList(),

@@ -2,17 +2,15 @@ package com.example.healthtracker.presentation.meal
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,14 +19,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.FoodItem
+import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
+import com.example.healthtracker.presentation.meal.nameRes
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
@@ -42,7 +39,7 @@ import java.util.Locale
 fun MealScreen(
     viewModel: MealViewModel = koinViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -125,34 +122,28 @@ fun MealScreenContent(
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                CompositionLocalProvider(LocalContext provides context) {
-                    TextButton(
-                        onClick = {
-                            val millis = datePickerState.selectedDateMillis
-                            if (millis != null) {
-                                val date = Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-                                onDateChange(date)
-                            }
-                            showDatePicker = false
+                TextButton(
+                    onClick = {
+                        val millis = datePickerState.selectedDateMillis
+                        if (millis != null) {
+                            val date = Instant.ofEpochMilli(millis)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            onDateChange(date)
                         }
-                    ) {
-                        Text(stringResource(R.string.confirm))
+                        showDatePicker = false
                     }
+                ) {
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
-                CompositionLocalProvider(LocalContext provides context) {
-                    TextButton(onClick = { showDatePicker = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
-            CompositionLocalProvider(LocalContext provides context) {
-                DatePicker(state = datePickerState)
-            }
+            DatePicker(state = datePickerState)
         }
     }
 
@@ -242,6 +233,7 @@ fun MealScreenContent(
             CalorieSummaryCard(
                 totalCalories = uiState.totalCalories,
                 targetCalories = uiState.targetCalories,
+                goal = uiState.goal,
                 modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
             )
 
@@ -281,11 +273,27 @@ fun MealScreenContent(
 fun CalorieSummaryCard(
     totalCalories: Int,
     targetCalories: Int,
+    goal: Goal,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     val progress = if (targetCalories > 0) minOf(1f, totalCalories.toFloat() / targetCalories.toFloat()) else 0f
     val remainingCalories = targetCalories - totalCalories
+    
+    val isOver = totalCalories > targetCalories
+    val isUnder = totalCalories < targetCalories
+
+    val statusColor = when (goal) {
+        Goal.LOSE_WEIGHT,
+        Goal.MAINTAIN_WEIGHT -> {
+            if (isOver) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+        }
+        Goal.GAIN_WEIGHT,
+        Goal.BUILD_MUSCLE -> {
+            if (isUnder) Color(0xFFFFA000) // Orange
+            else MaterialTheme.colorScheme.primary // Green/Primary
+        }
+    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -329,7 +337,7 @@ fun CalorieSummaryCard(
                         text = if (remainingCalories >= 0) "$remainingCalories" else "${-remainingCalories}",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Black,
-                        color = if (remainingCalories >= 0) MaterialTheme.colorScheme.primary else CalorieRed
+                        color = statusColor
                     )
                     Text(
                         text = if (remainingCalories >= 0) "kcal còn lại" else "kcal vượt quá",
@@ -346,8 +354,8 @@ fun CalorieSummaryCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(spacing.small),
-                color = if (progress >= 1f) CalorieRed else MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                color = statusColor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 strokeCap = StrokeCap.Round
             )
 

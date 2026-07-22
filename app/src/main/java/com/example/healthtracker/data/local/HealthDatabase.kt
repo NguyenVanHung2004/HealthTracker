@@ -11,7 +11,7 @@ import com.example.healthtracker.data.local.entity.UserEntity
 import com.example.healthtracker.data.local.entity.MealEntity
 import com.example.healthtracker.data.local.entity.FoodItemEntity
 
-@Database(entities = [UserEntity::class, ExerciseEntity::class, MealEntity::class, FoodItemEntity::class], version = 4, exportSchema = false)
+@Database(entities = [UserEntity::class, ExerciseEntity::class, MealEntity::class, FoodItemEntity::class], version = 5, exportSchema = false)
 abstract class HealthDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun exerciseDao(): ExerciseDao

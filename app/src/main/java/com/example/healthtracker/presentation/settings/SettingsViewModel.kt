@@ -13,6 +13,9 @@ import com.example.healthtracker.domain.usecase.CalculateBMIUseCase
 import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidationError
+import com.example.healthtracker.presentation.widget.WidgetUpdater
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +31,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
+import com.example.healthtracker.domain.alarm.AlarmScheduler
 
 data class SettingsUiState(
     val user: User? = null,
@@ -48,7 +52,10 @@ class SettingsViewModel(
     private val calculateBMRUseCase: CalculateBMRUseCase,
     private val calculateTDEEUseCase: CalculateTDEEUseCase,
     private val calculateBMIUseCase: CalculateBMIUseCase,
-    private val saveUserProfileUseCase: SaveUserProfileUseCase
+    private val saveUserProfileUseCase: SaveUserProfileUseCase,
+    private val alarmScheduler: AlarmScheduler,
+    private val validateUserProfileUseCase: ValidateUserProfileUseCase,
+    private val widgetUpdater: WidgetUpdater
 ) : ViewModel() {
 
     val themePreference: StateFlow<String> = userPreferences.themePreference.stateIn(
@@ -61,6 +68,18 @@ class SettingsViewModel(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         "vi"
+    )
+
+    val fontSizePreference: StateFlow<String> = userPreferences.fontSizePreference.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        "medium"
+    )
+
+    val notificationsEnabled: StateFlow<Boolean> = userPreferences.notificationsEnabled.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
     )
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -111,18 +130,44 @@ class SettingsViewModel(
     fun saveProfile() {
         viewModelScope.launch {
             val currentState = _uiState.value
-            val currentUser = currentState.user
             
+            // Validate name
+            val nameResult = validateUserProfileUseCase.validateName(currentState.name)
+            if (!nameResult.successful) {
+                nameResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                return@launch
+            }
+
+            // Validate dateOfBirth
             val birthDate = try {
                 LocalDate.parse(currentState.dateOfBirth, dateFormatter)
             } catch (e: DateTimeParseException) {
-                currentUser?.dateOfBirth ?: LocalDate.now().minusYears(25)
+                null
             }
-            val newWeight = currentState.weight.toFloatOrNull() ?: 60f
-            val newHeight = currentState.height.toFloatOrNull() ?: 170f
+            val dobResult = validateUserProfileUseCase.validateDateOfBirth(birthDate)
+            if (!dobResult.successful) {
+                dobResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                return@launch
+            }
 
-            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate)
-            val tdee = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
+            // Validate weight
+            val newWeight = currentState.weight.replace(",", ".").toFloatOrNull() ?: -1f
+            val weightResult = validateUserProfileUseCase.validateWeight(newWeight)
+            if (!weightResult.successful) {
+                weightResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                return@launch
+            }
+
+            // Validate height
+            val newHeight = currentState.height.replace(",", ".").toFloatOrNull() ?: -1f
+            val heightResult = validateUserProfileUseCase.validateHeight(newHeight)
+            if (!heightResult.successful) {
+                heightResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                return@launch
+            }
+
+            val bmr = calculateBMRUseCase(newWeight, newHeight, currentState.gender, birthDate!!)
+            val tdeeResult = calculateTDEEUseCase(bmr, currentState.activityLevel, currentState.goal)
             val bmi = calculateBMIUseCase(newWeight, newHeight)
 
             val updatedUser = User(
@@ -133,7 +178,8 @@ class SettingsViewModel(
                 heightCm = newHeight,
                 activityLevel = currentState.activityLevel,
                 goal = currentState.goal,
-                targetCalories = tdee,
+                tdee = tdeeResult.maintenance,
+                targetCalories = tdeeResult.target,
                 bmi = bmi
             )
 
@@ -142,6 +188,7 @@ class SettingsViewModel(
                     delay(1000)
                     saveUserProfileUseCase(updatedUser)
                 }
+                widgetUpdater.updateWidget()
                 _snackbarEvent.emit(R.string.profile_saved_successfully)
             } catch (e: Exception) {
                 _snackbarEvent.emit(R.string.error_occurred)
@@ -160,4 +207,37 @@ class SettingsViewModel(
             userPreferences.setLanguagePreference(language)
         }
     }
+
+    fun updateFontSize(size: String) {
+        viewModelScope.launch {
+            userPreferences.setFontSizePreference(size)
+        }
+    }
+
+    fun toggleNotifications(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferences.setNotificationsEnabled(enabled)
+            if (enabled) {
+                alarmScheduler.scheduleDailyReminders()
+                _snackbarEvent.emit(R.string.toast_notifications_enabled)
+            } else {
+                alarmScheduler.cancelReminders()
+                _snackbarEvent.emit(R.string.toast_notifications_disabled)
+            }
+        }
+    }
+
+    fun testNotification() {
+        alarmScheduler.testNotification()
+        viewModelScope.launch {
+            _snackbarEvent.emit(R.string.toast_test_notification_sent)
+        }
+    }
+}
+
+private fun ValidationError.toErrorMessageId(): Int = when(this) {
+    ValidationError.EMPTY_NAME -> R.string.error_empty_name
+    ValidationError.INVALID_DOB -> R.string.error_invalid_dob
+    ValidationError.INVALID_WEIGHT -> R.string.error_invalid_weight
+    ValidationError.INVALID_HEIGHT -> R.string.error_invalid_height
 }

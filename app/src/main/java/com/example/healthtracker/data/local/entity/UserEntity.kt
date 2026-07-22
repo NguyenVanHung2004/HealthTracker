@@ -18,6 +18,7 @@ data class UserEntity(
     val heightCm: Float,
     val activityLevel: String, // Enum name
     val goal: String, // Enum name
+    val tdee: Int,
     val targetCalories: Int,
     val bmi: Float
 ) {
@@ -30,6 +31,7 @@ data class UserEntity(
             heightCm = heightCm,
             activityLevel = ActivityLevel.valueOf(activityLevel),
             goal = Goal.valueOf(goal),
+            tdee = tdee,
             targetCalories = targetCalories,
             bmi = bmi
         )
@@ -45,6 +47,7 @@ fun User.toEntity(): UserEntity {
         heightCm = heightCm,
         activityLevel = activityLevel.name,
         goal = goal.name,
+        tdee = tdee,
         targetCalories = targetCalories,
         bmi = bmi
     )

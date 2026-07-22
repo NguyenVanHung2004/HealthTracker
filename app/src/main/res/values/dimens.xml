@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget Dimensions -->
+    <dimen name="widget_padding">16dp</dimen>
+    <dimen name="widget_corner_radius">24dp</dimen>
+    <dimen name="widget_progress_size_small">100dp</dimen>
+    <dimen name="widget_progress_size_large">120dp</dimen>
+    <dimen name="widget_spacing_small">4dp</dimen>
+    <dimen name="widget_spacing_normal">8dp</dimen>
+    <dimen name="widget_spacing_medium">16dp</dimen>
+    <dimen name="widget_spacing_large">24dp</dimen>
+    
+    <dimen name="widget_text_small">12sp</dimen>
+    <dimen name="widget_text_medium">14sp</dimen>
+    <dimen name="widget_text_large">18sp</dimen>
+    <dimen name="widget_text_xlarge">24sp</dimen>
+    <dimen name="widget_text_xxlarge">28sp</dimen>
+    
+    <!-- Widget Breakpoints -->
+    <dimen name="widget_breakpoint_width_medium">200dp</dimen>
+    <dimen name="widget_breakpoint_height_large">180dp</dimen>
+</resources>

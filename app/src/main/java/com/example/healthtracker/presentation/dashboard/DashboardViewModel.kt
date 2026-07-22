@@ -16,7 +16,6 @@ class DashboardViewModel(
 
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
-
     init {
         loadDashboardData()
     }
@@ -50,6 +49,8 @@ class DashboardViewModel(
                 _uiState.update {
                     it.copy(
                         selectedDate = data.selectedDate,
+                        goal = data.goal,
+                        tdee = data.tdee,
                         targetCalories = data.targetCalories,
                         consumedCaloriesToday = data.consumedCaloriesToday,
                         burnedCaloriesToday = data.burnedCaloriesToday,

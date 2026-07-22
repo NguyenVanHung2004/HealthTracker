@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseLog
+import com.example.healthtracker.presentation.activity.nameRes
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
@@ -40,7 +42,7 @@ fun ActivityScreen(
     viewModel: ActivityViewModel = koinViewModel(),
     onNavigateToAdd: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -128,64 +130,58 @@ fun ActivityScreenContent(
             modifier = Modifier.padding(horizontal = spacing.medium),
 
             confirmButton = {
-                CompositionLocalProvider(LocalContext provides context) {
-                    TextButton(
-                        onClick = {
-                            val startMillis = dateRangePickerState.selectedStartDateMillis
-                            val endMillis = dateRangePickerState.selectedEndDateMillis
-                            if (startMillis != null) {
-                                val startDate = Instant.ofEpochMilli(startMillis)
+                TextButton(
+                    onClick = {
+                        val startMillis = dateRangePickerState.selectedStartDateMillis
+                        val endMillis = dateRangePickerState.selectedEndDateMillis
+                        if (startMillis != null) {
+                            val startDate = Instant.ofEpochMilli(startMillis)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            val endDate = if (endMillis != null) {
+                                Instant.ofEpochMilli(endMillis)
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
-                                val endDate = if (endMillis != null) {
-                                    Instant.ofEpochMilli(endMillis)
-                                        .atZone(ZoneId.systemDefault())
-                                        .toLocalDate()
-                                } else {
-                                    startDate
-                                }
-                                onDateRangeSelected(startDate, endDate)
+                            } else {
+                                startDate
                             }
-                            showDatePicker = false
+                            onDateRangeSelected(startDate, endDate)
                         }
-                    ) {
-                        Text(stringResource(R.string.confirm))
+                        showDatePicker = false
                     }
+                ) {
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
-                CompositionLocalProvider(LocalContext provides context) {
-                    TextButton(onClick = { showDatePicker = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
-            CompositionLocalProvider(LocalContext provides context) {
-                DateRangePicker(
-                    state = dateRangePickerState,
-                    title = {
-                        Text(
-                            text = stringResource(R.string.select_date_range),
-                            modifier = Modifier.padding(start = spacing.medium, top = spacing.medium),
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    },
-                    headline = {
-                        Text(
-                            text = stringResource(R.string.select_range_headline),
-                            modifier = Modifier.padding(start = spacing.medium, bottom = spacing.small),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    showModeToggle = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
+            DateRangePicker(
+                state = dateRangePickerState,
+                title = {
+                    Text(
+                        text = stringResource(R.string.select_date_range),
+                        modifier = Modifier.padding(start = spacing.medium, top = spacing.medium),
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                headline = {
+                    Text(
+                        text = stringResource(R.string.select_range_headline),
+                        modifier = Modifier.padding(start = spacing.medium, bottom = spacing.small),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                showModeToggle = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
         }
     }
 
@@ -402,7 +398,8 @@ fun ExerciseItem(
     onDelete: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    val bgGradient = exerciseGradients[exercise.type.ordinal % exerciseGradients.size]
+    val themeGradients = getThemeExerciseGradients()
+    val bgGradient = themeGradients[exercise.type.ordinal % themeGradients.size]
     val progress = minOf(1f, exercise.durationMinutes / 60f)
 
     Card(

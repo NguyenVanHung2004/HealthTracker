@@ -69,6 +69,17 @@
     <string name="unit_kg">kg</string>
     <string name="unit_cm">cm</string>
     <string name="hint_age">VD: 25</string>
+    
+    <!-- Notifications -->
+    <string name="notification_title">HealthTracker</string>
+    <string name="notification_channel_name">Nhắc nhở hàng ngày</string>
+    <string name="notification_channel_description">Kênh thông báo nhắc nhở ghi lại sức khoẻ hàng ngày</string>
+    <string name="notification_morning">Buổi sáng tốt lành! Đừng quên ghi lại bữa sáng và chuẩn bị năng lượng cho ngày mới nhé.</string>
+    <string name="notification_noon">Đã trưa rồi! Bạn đã ghi lại bữa trưa hôm nay chưa?</string>
+    <string name="notification_evening">Chào buổi tối! Hôm nay bạn đã ăn %1$d kcal và đốt cháy %2$d kcal. Cùng tổng kết ngày nhé!</string>
+    <string name="notification_evening_empty">Chào buổi tối! Đừng quên ghi lại bữa tối và các hoạt động trong ngày của bạn nhé.</string>
+    <string name="notification_default">Đừng quên ghi lại nhật ký sức khoẻ của bạn nhé!</string>
+
     <string name="hint_weight">VD: 65.0</string>
     <string name="hint_height">VD: 170</string>
     
@@ -86,7 +97,19 @@
     <string name="settings_theme_green_dark">Xanh lá tối</string>
     <string name="settings_theme_blue_light">Xanh dương sáng</string>
     <string name="settings_theme_blue_dark">Xanh dương tối</string>
+    <string name="settings_theme_purple_light">Tím sáng</string>
+    <string name="settings_theme_purple_dark">Tím tối</string>
+    <string name="settings_theme_rose_light">Hồng sáng</string>
+    <string name="settings_theme_rose_dark">Hồng tối</string>
+    <string name="settings_theme_teal_light">Xanh ngọc sáng</string>
+    <string name="settings_theme_teal_dark">Xanh ngọc tối</string>
     <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_font_size">Kích thước chữ</string>
+    <string name="settings_daily_reminders">Nhắc nhở hàng ngày</string>
+    <string name="settings_test_notification">Test thông báo ngay</string>
+    <string name="font_size_small">Nhỏ</string>
+    <string name="font_size_medium">Vừa</string>
+    <string name="font_size_large">Lớn</string>
     <string name="loading">Đang tải...</string>
     <string name="settings_edit_profile">Chỉnh sửa hồ sơ</string>
     <string name="settings_name">Tên</string>
@@ -97,6 +120,9 @@
     <string name="settings_gender_female">Nữ</string>
     <string name="settings_save_btn">Lưu hồ sơ &amp; Tính lại TDEE</string>
     <string name="profile_saved_successfully">Lưu hồ sơ thành công!</string>
+    <string name="toast_notifications_enabled">Đã bật nhắc nhở hàng ngày</string>
+    <string name="toast_notifications_disabled">Đã tắt nhắc nhở hàng ngày</string>
+    <string name="toast_test_notification_sent">Đã gửi thông báo thử nghiệm</string>
     <string name="total_calories_burned">Tổng calo tiêu thụ</string>
     <string name="today_activities">Hoạt động hôm nay</string>
     <string name="no_activities_yet">Chưa có hoạt động nào trong ngày</string>
@@ -199,4 +225,30 @@
     <string name="dashboard_no_meals_today">Chưa có món ăn nào được thêm hôm nay.</string>
     <string name="dashboard_no_exercises_today">Chưa có hoạt động nào được thêm hôm nay.</string>
     <string name="dashboard_serving">khẩu phần</string>
+    <string name="splash_welcome">Chào mừng đến với FitHealth, nơi hành trình rèn luyện sức khỏe và thể chất của bạn bắt đầu!</string>
+    <string name="splash_get_started">BẮT ĐẦU NGAY</string>
+    <string name="logo_content_description">Logo FitHealth</string>
+
+    <!-- New Goal-based strings -->
+    <string name="result_tdee">TDEE (Mức duy trì): %1$d kcal</string>
+    <string name="result_target">Mục tiêu mỗi ngày: %1$d kcal</string>
+    
+    <string name="advice_lose_weight">Để giảm cân an toàn, hãy duy trì mức thâm hụt calo nhẹ so với TDEE của bạn.</string>
+    <string name="advice_maintain_weight">Tuyệt vời! Hãy giữ mức ăn uống quanh mức TDEE để duy trì vóc dáng.</string>
+    <string name="advice_gain_weight">Để tăng cân, hãy cố gắng ăn dư lượng calo mục tiêu mỗi ngày bằng thực phẩm giàu dinh dưỡng.</string>
+    <string name="advice_build_muscle">Tập trung vào các bữa ăn giàu protein kết hợp tập luyện kháng lực để xây dựng cơ bắp hiệu quả.</string>
+
+    <string name="dash_msg_lose_good">Bạn đang duy trì thâm hụt calo rất tốt!</string>
+    <string name="dash_msg_lose_bad">Đã vượt mức calo giảm cân! Cần đốt thêm %1$d kcal.</string>
+    <string name="dash_msg_maintain_bad">Đã nạp quá mức duy trì! Cần vận động thêm.</string>
+    <string name="dash_msg_maintain_good">Bạn đang duy trì lượng calo rất tốt!</string>
+    <string name="dash_msg_gain_bad">Bạn cần ăn thêm %1$d kcal nữa để đạt mục tiêu.</string>
+    <string name="dash_msg_gain_good">Đã hoàn thành mục tiêu tăng cân hôm nay!</string>
+    <string name="dash_msg_muscle_good">Đã hoàn thành mục tiêu calo hôm nay!</string>
+    <string name="dash_label_tdee">TDEE</string>
+    
+    <string name="bmi_scale_18_5">18.5</string>
+    <string name="bmi_scale_25">25</string>
+    <string name="bmi_scale_30">30</string>
+    <string name="bmi_scale_40">40</string>
 </resources>

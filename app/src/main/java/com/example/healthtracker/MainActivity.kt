@@ -1,59 +1,95 @@
 package com.example.healthtracker
 
+import android.content.Context
 import android.content.res.Configuration
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import java.util.Locale
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.healthtracker.data.local.preferences.UserPreferences
-import com.example.healthtracker.presentation.main.MainScreen
-import com.example.healthtracker.presentation.onboarding.OnboardingRoute
-import com.example.healthtracker.ui.theme.HealthTrackerTheme
-import com.example.healthtracker.ui.theme.LocalSpacing
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.animation.*
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.healthtracker.data.local.preferences.UserPreferences
 import com.example.healthtracker.presentation.components.CustomSnackbar
-import com.example.healthtracker.presentation.components.CustomSnackbarVisuals
-import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
+import com.example.healthtracker.presentation.components.SnackbarController
+import com.example.healthtracker.presentation.navigation.AppNavigation
+import com.example.healthtracker.ui.theme.HealthTrackerTheme
+import com.example.healthtracker.ui.theme.LocalSpacing
 import org.koin.android.ext.android.inject
+import java.util.Locale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val userPreferences: UserPreferences by inject()
 
+    companion object {
+        private var appliedLanguage: String? = null
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences(UserPreferences.SHARED_PREFS_NAME, MODE_PRIVATE)
+        val langTag = prefs.getString(UserPreferences.LANGUAGE_PREF_KEY, "vi")
+
+        if (langTag != null) {
+            val locale = Locale.forLanguageTag(langTag)
+            val config = Configuration(newBase.resources.configuration).apply {
+                setLocale(locale)
+            }
+            appliedLanguage = locale.language // remember what we applied
+            super.attachBaseContext(newBase.createConfigurationContext(config))
+        } else {
+            super.attachBaseContext(newBase)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        
+        var keepSplashScreen = true
+        lifecycleScope.launch {
+            userPreferences.isOnboardingCompleted.collect {
+                keepSplashScreen = false
+            }
+        }
+        
+        splashScreen.setKeepOnScreenCondition { keepSplashScreen }
+        
         enableEdgeToEdge()
         setContent {
-            val themePref by userPreferences.themePreference.collectAsState(initial = "system")
-            val languagePref by userPreferences.languagePreference.collectAsState(initial = "vi")
-            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsState(initial = null)
+            splashScreen.setOnExitAnimationListener { it.remove() }
+
+            val isOnboardingCompleted by userPreferences.isOnboardingCompleted.collectAsStateWithLifecycle(initialValue = null)
+            val themePref by userPreferences.themePreference.collectAsStateWithLifecycle(initialValue = "system")
+            val languagePref by userPreferences.languagePreference.collectAsStateWithLifecycle(initialValue = appliedLanguage ?: "vi")
+            val fontSizePref by userPreferences.fontSizePreference.collectAsStateWithLifecycle(initialValue = "medium")
 
             val darkTheme = when (themePref) {
                 "light" -> false
@@ -64,84 +100,55 @@ class MainActivity : ComponentActivity() {
                 "blue_dark" -> true
                 else -> isSystemInDarkTheme()
             }
-            val context = LocalContext.current
-            val locale = java.util.Locale(languagePref)
-
             LaunchedEffect(languagePref) {
-                val resources = context.resources
-                val configuration = resources.configuration
-                java.util.Locale.setDefault(locale)
-                configuration.setLocale(locale)
-                resources.updateConfiguration(configuration, resources.displayMetrics)
+                val newLanguage = Locale.forLanguageTag(languagePref).language
+                if (appliedLanguage != null && appliedLanguage != newLanguage) {
+                    appliedLanguage = newLanguage
+                    recreate()
+                }
             }
 
-            HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme) {
-                val configuration = Configuration(LocalConfiguration.current).apply {
-                    setLocale(locale)
-                }
-                val localizedContext = context.createConfigurationContext(configuration)
-
+            HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme, fontSizePref = fontSizePref) {
                 CompositionLocalProvider(
-                    LocalContext provides localizedContext,
-                    LocalConfiguration provides configuration
+                    LocalActivityResultRegistryOwner provides this
                 ) {
-                    if (isOnboardingCompleted != null) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            val navController = rememberNavController()
-                            val startDestination = if (isOnboardingCompleted == true) "main" else "onboarding"
-                            NavHost(
-                                navController = navController,
-                                startDestination = startDestination
-                            ) {
-                                composable("onboarding") {
-                                    OnboardingRoute(
-                                        onNavigateToDashboard = {
-                                            navController.navigate("main") {
-                                                popUpTo("onboarding") { inclusive = true }
-                                            }
-                                        }
-                                    )
-                                }
-                                composable("main") {
-                                    MainScreen(navController)
-                                }
-                            }
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        AppNavigation(isOnboardingCompleted = isOnboardingCompleted)
 
                         // Stacked Toast Overlay
-                        val activeMessages = SnackbarController.activeMessages
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .statusBarsPadding()
-                                .padding(top = LocalSpacing.current.medium)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            activeMessages.forEach { msg ->
-                                androidx.compose.runtime.key(msg.id) {
-                                    var visible by remember { mutableStateOf(false) }
-                                    LaunchedEffect(Unit) { visible = true }
+                            val activeMessages = SnackbarController.activeMessages
+                            Column(
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .statusBarsPadding()
+                                    .padding(top = LocalSpacing.current.medium)
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                activeMessages.forEach { msg ->
+                                    androidx.compose.runtime.key(msg.id) {
+                                        var visible by remember { mutableStateOf(false) }
+                                        LaunchedEffect(Unit) { visible = true }
 
-                                    AnimatedVisibility(
-                                        visible = visible,
-                                        enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                                        exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
-                                    ) {
-                                        CustomSnackbar(
-                                            message = msg.message,
-                                            isError = msg.isError
-                                        )
+                                        AnimatedVisibility(
+                                            visible = visible,
+                                            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                                            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+                                        ) {
+                                            CustomSnackbar(
+                                                message = msg.message,
+                                                isError = msg.isError
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
 
                         // Global Loading Overlay
                         GlobalLoadingOverlay()
                     }
                 }
-            }
             }
         }
     }

@@ -13,6 +13,8 @@ import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
 import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
 import com.example.healthtracker.domain.usecase.AddMealUseCase
 import com.example.healthtracker.domain.usecase.DeleteMealUseCase
+import com.example.healthtracker.domain.usecase.AddFoodItemUseCase
+import com.example.healthtracker.presentation.widget.WidgetUpdater
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +24,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import com.example.healthtracker.data.local.FoodItemSeedData
 import java.time.LocalDate
+import com.example.healthtracker.presentation.components.LoadingController
+import kotlinx.coroutines.delay
 
 class MealViewModel(
     private val getUserUseCase: GetUserUseCase,
@@ -32,7 +37,9 @@ class MealViewModel(
     private val getMealsByDateUseCase: GetMealsByDateUseCase,
     private val searchFoodItemsUseCase: SearchFoodItemsUseCase,
     private val addMealUseCase: AddMealUseCase,
-    private val deleteMealUseCase: DeleteMealUseCase
+    private val deleteMealUseCase: DeleteMealUseCase,
+    private val addFoodItemUseCase: AddFoodItemUseCase,
+    private val widgetUpdater: WidgetUpdater
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MealUiState())
@@ -58,7 +65,8 @@ class MealViewModel(
         viewModelScope.launch {
             getUserUseCase().collect { user ->
                 val target = if (user != null && user.targetCalories > 0) user.targetCalories else 2000
-                _uiState.update { it.copy(targetCalories = target) }
+                val goal = user?.goal ?: com.example.healthtracker.domain.model.Goal.MAINTAIN_WEIGHT
+                _uiState.update { it.copy(targetCalories = target, goal = goal) }
             }
         }
     }
@@ -191,6 +199,21 @@ class MealViewModel(
                 emitEvent(MealUiEvent.ShowError(R.string.toast_enter_calories))
                 return
             }
+            
+            viewModelScope.launch {
+                try {
+                    addFoodItemUseCase(
+                        FoodItem(
+                            name = state.customFoodName,
+                            calories = calories,
+                            servingInfo = state.customServingInfo
+                        )
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
             MealLog(
                 date = date,
                 mealType = state.selectedMealType,
@@ -217,10 +240,15 @@ class MealViewModel(
 
         viewModelScope.launch {
             try {
-                addMealUseCase(newLog)
+                LoadingController.withLoading {
+                    delay(600)
+                    addMealUseCase(newLog)
+                }
+                widgetUpdater.updateWidget()
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_added))
                 closeAddFoodDialog()
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
             }
         }
@@ -229,9 +257,14 @@ class MealViewModel(
     fun deleteMealLog(mealLog: MealLog) {
         viewModelScope.launch {
             try {
-                deleteMealUseCase(mealLog)
+                LoadingController.withLoading {
+                    delay(500)
+                    deleteMealUseCase(mealLog)
+                }
+                widgetUpdater.updateWidget()
                 emitEvent(MealUiEvent.ShowSuccess(R.string.toast_food_deleted))
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 emitEvent(MealUiEvent.ShowError(R.string.error_occurred))
             }
         }

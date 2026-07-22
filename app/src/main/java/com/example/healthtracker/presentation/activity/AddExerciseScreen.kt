@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseType
+import com.example.healthtracker.presentation.activity.nameRes
 import com.example.healthtracker.ui.theme.*
 import com.example.healthtracker.presentation.components.SnackbarController
 import org.koin.androidx.compose.koinViewModel
@@ -48,7 +50,7 @@ fun AddExerciseScreen(
     viewModel: ActivityViewModel = koinViewModel(),
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -216,7 +218,8 @@ private fun SelectedActivityBanner(
 ) {
     val spacing = LocalSpacing.current
     val meta = exerciseMeta[type]
-    val gradient = exerciseGradients[(meta?.gradientIndex ?: 0) % exerciseGradients.size]
+    val themeGradients = getThemeExerciseGradients()
+    val gradient = themeGradients[(meta?.gradientIndex ?: 0) % themeGradients.size]
     val displayName = stringResource(type.nameRes)
 
     Box(
@@ -255,7 +258,8 @@ private fun ActivityTypeCard(
 ) {
     val spacing = LocalSpacing.current
     val meta = exerciseMeta[type]
-    val gradient = exerciseGradients[(meta?.gradientIndex ?: 0) % exerciseGradients.size]
+    val themeGradients = getThemeExerciseGradients()
+    val gradient = themeGradients[(meta?.gradientIndex ?: 0) % themeGradients.size]
     val displayName = stringResource(type.nameRes)
 
     val scale by animateFloatAsState(

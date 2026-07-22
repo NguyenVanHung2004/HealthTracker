@@ -10,6 +10,8 @@ import com.example.healthtracker.domain.usecase.CalculateBMIUseCase
 import com.example.healthtracker.domain.usecase.CalculateBMRUseCase
 import com.example.healthtracker.domain.usecase.CalculateTDEEUseCase
 import com.example.healthtracker.domain.usecase.SaveUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidateUserProfileUseCase
+import com.example.healthtracker.domain.usecase.ValidationError
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,6 +23,7 @@ import com.example.healthtracker.R
 import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import java.time.LocalDate
 import androidx.annotation.StringRes
 
@@ -30,7 +33,8 @@ class OnboardingViewModel(
     private val calculateBMRUseCase: CalculateBMRUseCase,
     private val calculateTDEEUseCase: CalculateTDEEUseCase,
     private val calculateBMIUseCase: CalculateBMIUseCase,
-    private val saveUserProfileUseCase: SaveUserProfileUseCase
+    private val saveUserProfileUseCase: SaveUserProfileUseCase,
+    private val validateUserProfileUseCase: ValidateUserProfileUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnboardingUiState())
@@ -43,19 +47,20 @@ class OnboardingViewModel(
         _uiState.update { it.copy(name = name) }
     }
 
-    fun updateAge(age: Int) {
-        _uiState.update { it.copy(age = age) }
+    fun updateDateOfBirth(dob: LocalDate) {
+        val age = java.time.Period.between(dob, LocalDate.now()).years
+        _uiState.update { it.copy(dateOfBirth = dob, age = age) }
     }
 
     fun updateGender(gender: Gender) {
         _uiState.update { it.copy(gender = gender) }
     }
 
-    fun updateWeight(weight: Float) {
+    fun updateWeight(weight: String) {
         _uiState.update { it.copy(weight = weight) }
     }
 
-    fun updateHeight(height: Float) {
+    fun updateHeight(height: String) {
         _uiState.update { it.copy(height = height) }
     }
 
@@ -70,14 +75,31 @@ class OnboardingViewModel(
     fun nextStep() {
         when (_uiState.value.currentStep) {
             1 -> {
-                if (_uiState.value.name.isBlank()) { emitError(R.string.error_empty_name); return }
+                val nameResult = validateUserProfileUseCase.validateName(_uiState.value.name)
+                if (!nameResult.successful) {
+                    nameResult.error?.let { emitError(it.toErrorMessageId()) }
+                    return
+                }
+                val dobResult = validateUserProfileUseCase.validateDateOfBirth(_uiState.value.dateOfBirth)
+                if (!dobResult.successful) {
+                    dobResult.error?.let { emitError(it.toErrorMessageId()) }
+                    return
+                }
                 _uiState.update { it.copy(currentStep = 2) }
             }
             2 -> {
-                val weight = _uiState.value.weight
-                val height = _uiState.value.height
-                if (weight <= 0f) { emitError(R.string.error_invalid_weight); return }
-                if (height <= 0f) { emitError(R.string.error_invalid_height); return }
+                val weight = _uiState.value.weight.replace(",", ".").toFloatOrNull() ?: 0f
+                val height = _uiState.value.height.replace(",", ".").toFloatOrNull() ?: 0f
+                val weightResult = validateUserProfileUseCase.validateWeight(weight)
+                if (!weightResult.successful) {
+                    weightResult.error?.let { emitError(it.toErrorMessageId()) }
+                    return
+                }
+                val heightResult = validateUserProfileUseCase.validateHeight(height)
+                if (!heightResult.successful) {
+                    heightResult.error?.let { emitError(it.toErrorMessageId()) }
+                    return
+                }
                 _uiState.update { it.copy(currentStep = 3) }
             }
             3 -> {
@@ -101,17 +123,18 @@ class OnboardingViewModel(
 
     private fun calculateResults() {
         val state = _uiState.value
-        val weight = state.weight
-        val height = state.height
-        val dob = LocalDate.now().minusYears(state.age.toLong())
+        val weight = state.weight.replace(",", ".").toFloatOrNull() ?: 0f
+        val height = state.height.replace(",", ".").toFloatOrNull() ?: 0f
+        val dob = requireNotNull(state.dateOfBirth) { "DateOfBirth must not be null when calculating results" }
 
         val bmr = calculateBMRUseCase(weight, height, state.gender, dob)
-        val tdee = calculateTDEEUseCase(bmr, state.activityLevel, state.goal)
+        val tdeeResult = calculateTDEEUseCase(bmr, state.activityLevel, state.goal)
         val bmi = calculateBMIUseCase(weight, height)
 
         _uiState.update {
             it.copy(
-                calculatedTdee = tdee,
+                calculatedTdee = tdeeResult.maintenance,
+                targetCalories = tdeeResult.target,
                 calculatedBmi = bmi
             )
         }
@@ -119,15 +142,18 @@ class OnboardingViewModel(
 
     private fun saveUserAndFinish() {
         val state = _uiState.value
+        val weight = state.weight.replace(",", ".").toFloatOrNull() ?: 0f
+        val height = state.height.replace(",", ".").toFloatOrNull() ?: 0f
         val user = User(
             name = state.name,
-            dateOfBirth = LocalDate.now().minusYears(state.age.toLong()),
+            dateOfBirth = requireNotNull(state.dateOfBirth) { "DateOfBirth must not be null when saving user" },
             gender = state.gender,
-            weightKg = state.weight,
-            heightCm = state.height,
+            weightKg = weight,
+            heightCm = height,
             activityLevel = state.activityLevel,
             goal = state.goal,
-            targetCalories = state.calculatedTdee,
+            tdee = state.calculatedTdee,
+            targetCalories = state.targetCalories,
             bmi = state.calculatedBmi
         )
         viewModelScope.launch {
@@ -138,6 +164,7 @@ class OnboardingViewModel(
                 }
                 _uiEvent.emit(OnboardingUiEvent.NavigateToDashboard)
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 _uiEvent.emit(OnboardingUiEvent.ShowError(R.string.error_occurred))
             }
         }
@@ -150,4 +177,11 @@ class OnboardingViewModel(
             _uiEvent.emit(OnboardingUiEvent.ShowError(messageId))
         }
     }
+}
+
+private fun ValidationError.toErrorMessageId(): Int = when(this) {
+    ValidationError.EMPTY_NAME -> R.string.error_empty_name
+    ValidationError.INVALID_DOB -> R.string.error_invalid_dob
+    ValidationError.INVALID_WEIGHT -> R.string.error_invalid_weight
+    ValidationError.INVALID_HEIGHT -> R.string.error_invalid_height
 }

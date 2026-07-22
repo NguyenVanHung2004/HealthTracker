@@ -1,12 +1,13 @@
-package com.example.healthtracker.presentation.main
+package com.example.healthtracker.presentation.home
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -21,29 +22,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
-import com.example.healthtracker.R
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.healthtracker.R
 import com.example.healthtracker.presentation.activity.ActivityScreen
 import com.example.healthtracker.presentation.activity.AddExerciseScreen
-import com.example.healthtracker.presentation.settings.SettingsScreen
-import com.example.healthtracker.presentation.meal.MealScreen
 import com.example.healthtracker.presentation.dashboard.DashboardScreen
+import com.example.healthtracker.presentation.meal.MealScreen
+import com.example.healthtracker.presentation.settings.SettingsScreen
 
 @Composable
-fun MainScreen(navController: NavController) {
+fun HomeContainer() {
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
+    val activityNavController = rememberNavController()
     val items = listOf(
         Pair(R.string.tab_dashboard, Icons.Filled.Home),
         Pair(R.string.tab_meal, Icons.Filled.RestaurantMenu),
@@ -51,37 +53,39 @@ fun MainScreen(navController: NavController) {
         Pair(R.string.tab_setting, Icons.Filled.Settings)
     )
 
-    val configuration = LocalConfiguration.current
-    val isTablet = configuration.screenWidthDp > 600
+    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
+    val containerWidthDp = with(density) { windowInfo.containerSize.width.toDp() }
+    val isTablet = containerWidthDp > 600.dp
 
-    val screenContent = remember(selectedItem) {
-        movableContentOf {
-            if (selectedItem == 0) {
-                DashboardScreen(
-                    onNavigateToMeal = { selectedItem = 1 },
-                    onNavigateToActivity = { selectedItem = 2 }
-                )
-            }
-            if (selectedItem == 1) {
-                MealScreen()
-            }
-            if (selectedItem == 2) {
-                val activityNavController = rememberNavController()
-                NavHost(navController = activityNavController, startDestination = "activity_list") {
-                    composable("activity_list") {
-                        ActivityScreen(
-                            onNavigateToAdd = { activityNavController.navigate("add_exercise") }
-                        )
+    val screenContent = remember {
+        movableContentOf<Int> { currentTab ->
+            AnimatedContent(
+                targetState = currentTab,
+                label = "tab_animation"
+            ) { targetTab ->
+                when (targetTab) {
+                    0 -> DashboardScreen(
+                        onNavigateToMeal = { selectedItem = 1 },
+                        onNavigateToActivity = { selectedItem = 2 }
+                    )
+                    1 -> MealScreen()
+                    2 -> {
+                        NavHost(navController = activityNavController, startDestination = "activity_list") {
+                            composable("activity_list") {
+                                ActivityScreen(
+                                    onNavigateToAdd = { activityNavController.navigate("add_exercise") }
+                                )
+                            }
+                            composable("add_exercise") {
+                                AddExerciseScreen(
+                                    onNavigateBack = { activityNavController.popBackStack() }
+                                )
+                            }
+                        }
                     }
-                    composable("add_exercise") {
-                        AddExerciseScreen(
-                            onNavigateBack = { activityNavController.popBackStack() }
-                        )
-                    }
+                    3 -> SettingsScreen()
                 }
-            }
-            if (selectedItem == 3) {
-                SettingsScreen()
             }
         }
     }
@@ -109,7 +113,7 @@ fun MainScreen(navController: NavController) {
                 }
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                screenContent()
+                screenContent(selectedItem)
             }
         }
     } else {
@@ -142,7 +146,7 @@ fun MainScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding())
             ) {
-                screenContent()
+                screenContent(selectedItem)
             }
         }
     }

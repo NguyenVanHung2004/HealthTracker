@@ -72,6 +72,16 @@
     <string name="hint_weight">e.g., 65.0</string>
     <string name="hint_height">e.g., 170</string>
     
+    <!-- Notifications -->
+    <string name="notification_title">HealthTracker</string>
+    <string name="notification_channel_name">Daily Reminders</string>
+    <string name="notification_channel_description">Channel for daily health logging reminders</string>
+    <string name="notification_morning">Good morning! Don\'t forget to log your breakfast and prepare energy for the new day.</string>
+    <string name="notification_noon">It\'s noon! Have you logged your lunch today?</string>
+    <string name="notification_evening">Good evening! Today you consumed %1$d kcal and burned %2$d kcal. Let\'s review your day!</string>
+    <string name="notification_evening_empty">Good evening! Don\'t forget to log your dinner and activities today.</string>
+    <string name="notification_default">Don\'t forget to log your health journal!</string>
+    
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_meal">Meals</string>
     <string name="tab_activity">Activity</string>
@@ -86,7 +96,19 @@
     <string name="settings_theme_green_dark">Green Dark</string>
     <string name="settings_theme_blue_light">Blue Light</string>
     <string name="settings_theme_blue_dark">Blue Dark</string>
+    <string name="settings_theme_purple_light">Purple Light</string>
+    <string name="settings_theme_purple_dark">Purple Dark</string>
+    <string name="settings_theme_rose_light">Rose Light</string>
+    <string name="settings_theme_rose_dark">Rose Dark</string>
+    <string name="settings_theme_teal_light">Teal Light</string>
+    <string name="settings_theme_teal_dark">Teal Dark</string>
     <string name="settings_language">Language</string>
+    <string name="settings_font_size">Font Size</string>
+    <string name="settings_daily_reminders">Daily Reminders</string>
+    <string name="settings_test_notification">Test notification now</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_medium">Medium</string>
+    <string name="font_size_large">Large</string>
     <string name="loading">Loading...</string>
     <string name="settings_edit_profile">Edit Profile</string>
     <string name="settings_name">Name</string>
@@ -97,6 +119,9 @@
     <string name="settings_gender_female">Female</string>
     <string name="settings_save_btn">Save Profile &amp; Recalculate TDEE</string>
     <string name="profile_saved_successfully">Profile saved successfully!</string>
+    <string name="toast_notifications_enabled">Daily reminders enabled</string>
+    <string name="toast_notifications_disabled">Daily reminders disabled</string>
+    <string name="toast_test_notification_sent">Test notification sent</string>
     <string name="total_calories_burned">Total calories burned</string>
     <string name="today_activities">Today\'s Activities</string>
     <string name="no_activities_yet">No activities yet today</string>
@@ -199,4 +224,31 @@
     <string name="dashboard_no_meals_today">No meals added yet today.</string>
     <string name="dashboard_no_exercises_today">No exercises added yet today.</string>
     <string name="dashboard_serving">serving</string>
+    <string name="splash_welcome">Welcome to FitHealth, where your journey to fitness and well-being begins now!</string>
+    <string name="splash_get_started">GET STARTED</string>
+    <string name="logo_content_description">FitHealth Logo</string>
+
+    <!-- New Goal-based strings -->
+    <string name="result_tdee">TDEE (Maintenance): %1$d kcal</string>
+    <string name="result_target">Daily Target: %1$d kcal</string>
+    
+    <string name="advice_lose_weight">To lose weight safely, maintain a slight calorie deficit compared to your TDEE.</string>
+    <string name="advice_maintain_weight">Great! Keep your calorie intake around your TDEE to maintain your shape.</string>
+    <string name="advice_gain_weight">To gain weight, aim to reach your target calorie surplus daily with nutrient-dense foods.</string>
+    <string name="advice_build_muscle">Focus on protein-rich meals and resistance training to build muscle effectively.</string>
+
+    <string name="dash_msg_lose_good">You are maintaining a great calorie deficit!</string>
+    <string name="dash_msg_lose_bad">Weight loss target exceeded! Need to burn %1$d more kcal.</string>
+    <string name="dash_msg_maintain_bad">Maintenance level exceeded! Need more activity.</string>
+    <string name="dash_msg_maintain_good">You are maintaining your calorie level perfectly!</string>
+    <string name="dash_msg_gain_bad">You need to eat %1$d more kcal to reach your goal.</string>
+    <string name="dash_msg_gain_good">Weight gain goal reached for today!</string>
+    <string name="dash_msg_muscle_good">Calorie goal reached for today!</string>
+    <string name="dash_label_tdee">TDEE</string>
+
+      
+    <string name="bmi_scale_18_5">18.5</string>
+    <string name="bmi_scale_25">25</string>
+    <string name="bmi_scale_30">30</string>
+    <string name="bmi_scale_40">40</string>
 </resources>

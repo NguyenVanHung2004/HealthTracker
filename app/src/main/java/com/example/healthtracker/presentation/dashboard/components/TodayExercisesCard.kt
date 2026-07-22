@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseLog
+import com.example.healthtracker.presentation.activity.nameRes
 import com.example.healthtracker.ui.theme.LocalSpacing
 
 @Composable
