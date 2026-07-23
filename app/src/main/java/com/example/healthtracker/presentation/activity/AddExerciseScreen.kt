@@ -3,11 +3,23 @@ package com.example.healthtracker.presentation.activity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -16,33 +28,47 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.automirrored.filled.DirectionsRun
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ExerciseType
-import com.example.healthtracker.presentation.activity.nameRes
-import com.example.healthtracker.ui.theme.*
 import com.example.healthtracker.presentation.components.SnackbarController
+import com.example.healthtracker.ui.theme.LocalSpacing
 import org.koin.androidx.compose.koinViewModel
-
 
 
 @Composable
@@ -78,10 +104,8 @@ fun AddExerciseScreen(
     AddExerciseScreenContent(
         selectedType    = uiState.selectedExerciseType,
         durationInput   = uiState.durationInput,
-        onTypeSelected  = viewModel::selectExerciseType,
-        onDurationChange = viewModel::setDurationInput,
-        onConfirm = viewModel::addExercise,
-        onNavigateBack = onNavigateBack
+        onEvent         = viewModel::onEvent,
+        onNavigateBack  = onNavigateBack
     )
 }
 
@@ -90,9 +114,7 @@ fun AddExerciseScreen(
 fun AddExerciseScreenContent(
     selectedType: ExerciseType?,
     durationInput: String,
-    onTypeSelected: (ExerciseType) -> Unit,
-    onDurationChange: (String) -> Unit,
-    onConfirm: () -> Unit,
+    onEvent: (ActivityEvent) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -124,89 +146,97 @@ fun AddExerciseScreenContent(
             )
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = spacing.large)
+                .padding(innerPadding),
+            contentAlignment = Alignment.TopCenter
         ) {
-            // Selected activity preview banner
-            if (selectedType != null) {
-                SelectedActivityBanner(
-                    type = selectedType,
-                    modifier = Modifier.padding(bottom = spacing.medium)
-                )
-            } else {
-                // Section header when nothing selected
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .widthIn(max = spacing.maxFormWidth)
+                    .padding(horizontal = spacing.large)
+            ) {
+                // Selected activity preview banner
+                if (selectedType != null) {
+                    SelectedActivityBanner(
+                        type = selectedType,
+                        modifier = Modifier.padding(bottom = spacing.medium)
+                    )
+                } else {
+                    // Section header when nothing selected
+                    Text(
+                        text = stringResource(R.string.select_activity),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = spacing.small)
+                    )
+                }
+
+                // Activity grid – adaptive layout
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = spacing.minGridCardSize),
+                    contentPadding = PaddingValues(spacing.small),
+                    horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                    verticalArrangement = Arrangement.spacedBy(spacing.small),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(ExerciseType.entries) { type ->
+                        ActivityTypeCard(
+                            type = type,
+                            isSelected = type == selectedType,
+                            onClick = { onEvent(ActivityEvent.OnExerciseTypeSelected(type)) }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(spacing.medium))
+
+                // Duration label + quick-preset chips + text field
                 Text(
-                    text = stringResource(R.string.select_activity),
+                    text = stringResource(R.string.duration_minutes),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = spacing.small)
                 )
-            }
 
-            // Activity grid – fills remaining space above bottom controls
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalArrangement = Arrangement.spacedBy(spacing.small),
-                modifier = Modifier.weight(1f)
-            ) {
-                items(ExerciseType.values().toList()) { type ->
-                    ActivityTypeCard(
-                        type = type,
-                        isSelected = type == selectedType,
-                        onClick = { onTypeSelected(type) }
+                DurationInputRow(
+                    durationInput = durationInput,
+                    onDurationChange = { onEvent(ActivityEvent.OnDurationInputChanged(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(spacing.medium))
+
+                // Confirm button – always enabled; validation shown via snackbar
+                Button(
+                    onClick = { onEvent(ActivityEvent.OnAddExercise) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(spacing.buttonHeight),
+                    shape = RoundedCornerShape(spacing.cornerLarge),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(spacing.medium)
+                    )
+                    Spacer(modifier = Modifier.width(spacing.small))
+                    Text(
+                        text = stringResource(R.string.add),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 }
+
+                Spacer(modifier = Modifier.height(spacing.medium))
             }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Duration label + quick-preset chips + text field
-            Text(
-                text = stringResource(R.string.duration_minutes),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = spacing.small)
-            )
-
-            DurationInputRow(
-                durationInput = durationInput,
-                onDurationChange = onDurationChange
-            )
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Confirm button – always enabled; validation shown via snackbar
-            Button(
-                onClick = onConfirm,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(spacing.buttonHeight),
-                shape = RoundedCornerShape(spacing.cornerLarge),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    modifier = Modifier.size(spacing.medium)
-                )
-                Spacer(modifier = Modifier.width(spacing.small))
-                Text(
-                    text = stringResource(R.string.add),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
     }
 }
@@ -263,35 +293,39 @@ private fun ActivityTypeCard(
     val displayName = stringResource(type.nameRes)
 
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.05f else 1f,
+        targetValue = if (isSelected) 1.04f else 1f,
         animationSpec = tween(150),
         label = "card_scale"
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
         animationSpec = tween(150),
         label = "border_color"
     )
+    val containerColor = if (isSelected) {
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(0.85f)
+            .height(spacing.maxGridCardHeight)
             .scale(scale)
-            .border(
-                width = if (isSelected) spacing.extraSmall / 2 else spacing.default,
-                color = borderColor,
-                shape = RoundedCornerShape(spacing.cornerMedium)
-            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick
             ),
         shape = RoundedCornerShape(spacing.cornerMedium),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        border = BorderStroke(
+            width = if (isSelected) spacing.borderWidthSelected else spacing.borderWidthUnselected,
+            color = borderColor
+        ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) spacing.extraSmall else spacing.extraSmall / 4
+            defaultElevation = if (isSelected) spacing.extraSmall / 2 else spacing.default
         )
     ) {
         Column(
@@ -301,17 +335,16 @@ private fun ActivityTypeCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Circle icon with gradient when selected, surfaceVariant when not
             Box(
                 modifier = Modifier
-                    .size(spacing.extraLarge)
+                    .size(spacing.gridCardIconSize)
                     .clip(CircleShape)
                     .background(
                         if (isSelected) gradient
                         else Brush.linearGradient(
                             listOf(
-                                MaterialTheme.colorScheme.surfaceVariant,
-                                MaterialTheme.colorScheme.surfaceVariant
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                             )
                         )
                     ),
@@ -320,7 +353,7 @@ private fun ActivityTypeCard(
                 Icon(
                     imageVector = meta?.icon ?: Icons.Default.FitnessCenter,
                     contentDescription = displayName,
-                    tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(spacing.medium + spacing.extraSmall)
                 )
             }
@@ -330,11 +363,11 @@ private fun ActivityTypeCard(
             Text(
                 text = displayName,
                 style = MaterialTheme.typography.labelSmall,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = if (isSelected) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }

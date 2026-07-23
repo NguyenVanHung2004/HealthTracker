@@ -21,11 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.healthtracker.R
-import com.example.healthtracker.domain.model.FoodItem
 import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
-import com.example.healthtracker.presentation.meal.nameRes
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
@@ -63,18 +61,7 @@ fun MealScreen(
 
     MealScreenContent(
         uiState = uiState,
-        onDateChange = viewModel::setDate,
-        onAddFoodClicked = viewModel::openAddFoodDialog,
-        onDeleteFoodClicked = viewModel::deleteMealLog,
-        onSearchQueryChange = viewModel::setSearchQuery,
-        onFoodSelected = viewModel::selectFoodItem,
-        onQuantityChange = viewModel::updateQuantityInput,
-        onCustomFoodModeChanged = viewModel::setCustomFoodMode,
-        onCustomNameChange = viewModel::updateCustomFoodName,
-        onCustomCaloriesChange = viewModel::updateCustomCalories,
-        onCustomServingChange = viewModel::updateCustomServingInfo,
-        onConfirmAddFood = viewModel::addMealLog,
-        onDismissDialog = viewModel::closeAddFoodDialog
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -82,18 +69,7 @@ fun MealScreen(
 @Composable
 fun MealScreenContent(
     uiState: MealUiState,
-    onDateChange: (LocalDate) -> Unit,
-    onAddFoodClicked: (MealType) -> Unit,
-    onDeleteFoodClicked: (MealLog) -> Unit,
-    onSearchQueryChange: (String) -> Unit,
-    onFoodSelected: (FoodItem) -> Unit,
-    onQuantityChange: (String) -> Unit,
-    onCustomFoodModeChanged: (Boolean) -> Unit,
-    onCustomNameChange: (String) -> Unit,
-    onCustomCaloriesChange: (String) -> Unit,
-    onCustomServingChange: (String) -> Unit,
-    onConfirmAddFood: () -> Unit,
-    onDismissDialog: () -> Unit
+    onEvent: (MealEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -129,7 +105,7 @@ fun MealScreenContent(
                             val date = Instant.ofEpochMilli(millis)
                                 .atZone(ZoneId.systemDefault())
                                 .toLocalDate()
-                            onDateChange(date)
+                            onEvent(MealEvent.OnDateChanged(date))
                         }
                         showDatePicker = false
                     }
@@ -150,15 +126,15 @@ fun MealScreenContent(
     if (uiState.isAddFoodDialogVisible) {
         AddFoodDialog(
             uiState = uiState,
-            onSearchQueryChange = onSearchQueryChange,
-            onFoodSelected = onFoodSelected,
-            onQuantityChange = onQuantityChange,
-            onCustomFoodModeChanged = onCustomFoodModeChanged,
-            onCustomNameChange = onCustomNameChange,
-            onCustomCaloriesChange = onCustomCaloriesChange,
-            onCustomServingChange = onCustomServingChange,
-            onConfirm = onConfirmAddFood,
-            onDismiss = onDismissDialog
+            onSearchQueryChange = { onEvent(MealEvent.OnSearchQueryChanged(it)) },
+            onFoodSelected = { onEvent(MealEvent.OnFoodSelected(it)) },
+            onQuantityChange = { onEvent(MealEvent.OnQuantityInputChanged(it)) },
+            onCustomFoodModeChanged = { onEvent(MealEvent.OnCustomFoodModeToggled(it)) },
+            onCustomNameChange = { onEvent(MealEvent.OnCustomFoodNameChanged(it)) },
+            onCustomCaloriesChange = { onEvent(MealEvent.OnCustomCaloriesChanged(it)) },
+            onCustomServingChange = { onEvent(MealEvent.OnCustomServingInfoChanged(it)) },
+            onConfirm = { onEvent(MealEvent.OnConfirmAddFood) },
+            onDismiss = { onEvent(MealEvent.OnDismissDialog) }
         )
     }
 
@@ -191,7 +167,7 @@ fun MealScreenContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { onDateChange(uiState.selectedDate.minusDays(1)) }) {
+                IconButton(onClick = { onEvent(MealEvent.OnDateChanged(uiState.selectedDate.minusDays(1))) }) {
                     Icon(
                         imageVector = Icons.Default.ChevronLeft,
                         contentDescription = null
@@ -221,7 +197,7 @@ fun MealScreenContent(
                     )
                 }
 
-                IconButton(onClick = { onDateChange(uiState.selectedDate.plusDays(1)) }) {
+                IconButton(onClick = { onEvent(MealEvent.OnDateChanged(uiState.selectedDate.plusDays(1))) }) {
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
                         contentDescription = null
@@ -248,7 +224,7 @@ fun MealScreenContent(
                     top = spacing.small,
                     bottom = spacing.large
                 ),
-                verticalArrangement = Arrangement.spacedBy(spacing.medium)
+                verticalArrangement = Arrangement.spacedBy(spacing.large)
             ) {
                 MealType.entries.forEach { mealType ->
                     val mealsForType = uiState.loggedMeals.filter { it.mealType == mealType }
@@ -259,8 +235,8 @@ fun MealScreenContent(
                             mealType = mealType,
                             loggedMeals = mealsForType,
                             totalCalories = mealCalories,
-                            onAddFood = { onAddFoodClicked(mealType) },
-                            onDeleteFood = onDeleteFoodClicked
+                            onAddFood = { onEvent(MealEvent.OnAddFoodClicked(mealType)) },
+                            onDeleteFood = { onEvent(MealEvent.OnDeleteMealLog(it)) }
                         )
                     }
                 }

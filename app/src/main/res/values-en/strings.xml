@@ -251,4 +251,20 @@
     <string name="bmi_scale_25">25</string>
     <string name="bmi_scale_30">30</string>
     <string name="bmi_scale_40">40</string>
+
+    <!-- Report Share Strings -->
+    <string name="weekly_report_title">Weekly Health Report</string>
+    <string name="report_badge_title">HealthTracker Report</string>
+    <string name="report_export_date">Export Date: %1$s</string>
+    <string name="report_target_calories">Target Calories</string>
+    <string name="report_slogan">Track your health and maintain peak performance every day!</string>
+    <string name="share_report_error">Sharing failed: %1$s</string>
+    <string name="share_chooser_title">Share Health Report</string>
+    <string name="share_now">Share Now</string>
+    <string name="close">Close</string>
+    <string name="preview_report">Preview Report</string>
+    <string name="save_pdf">Save PDF</string>
+    <string name="pdf_saved_success">PDF report saved: %1$s</string>
+    <string name="pdf_save_error">Error saving PDF: %1$s</string>
+    <string name="open_pdf_title">Open PDF Report</string>
 </resources>

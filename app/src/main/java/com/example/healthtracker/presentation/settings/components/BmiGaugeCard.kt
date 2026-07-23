@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import com.example.healthtracker.ui.theme.LocalSpacing
 
@@ -50,7 +49,7 @@ fun BmiGaugeCard(bmi: Float, modifier: Modifier = Modifier) {
     val overweightColor = primary
     val obeseColor = error
 
-    val (categoryRes, statusColor, description) = when {
+    val (categoryRes, statusColor, _) = when {
         bmi < 18.5f -> Triple(
             R.string.bmi_category_underweight,
             underweightColor,
@@ -103,7 +102,7 @@ fun BmiGaugeCard(bmi: Float, modifier: Modifier = Modifier) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(spacing.avatarSizeMedium)
                             .clip(RoundedCornerShape(spacing.small))
                             .background(statusColor.copy(alpha = 0.1f)),
                         contentAlignment = Alignment.Center
@@ -112,7 +111,7 @@ fun BmiGaugeCard(bmi: Float, modifier: Modifier = Modifier) {
                             Icons.Outlined.MonitorWeight,
                             contentDescription = null,
                             tint = statusColor,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(spacing.medium + spacing.extraSmall)
                         )
                     }
                     Spacer(modifier = Modifier.width(spacing.small))
@@ -157,7 +156,7 @@ fun BmiGaugeCard(bmi: Float, modifier: Modifier = Modifier) {
                     text = "kg/m²",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = spacing.extraSmall + 2.dp)
+                    modifier = Modifier.padding(bottom = spacing.small)
                 )
             }
 

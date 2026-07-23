@@ -14,7 +14,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import kotlinx.coroutines.delay
 import com.example.healthtracker.ui.theme.LocalSpacing
@@ -57,12 +56,12 @@ fun SplashScreen(
             }
         }
 
-        // Logo - matches splash_background.xml: 160dp centered
+        // Logo - matches splash_background.xml: centered
         Image(
             painter = painterResource(id = R.drawable.ic_splash_logo),
             contentDescription = stringResource(R.string.logo_content_description),
             modifier = Modifier
-                .size(160.dp)
+                .size(spacing.loadingCardSize + spacing.small)
                 .align(Alignment.Center)
         )
 
@@ -92,7 +91,7 @@ fun SplashScreen(
                         .fillMaxWidth()
                         .height(spacing.buttonHeight),
                     shape = CircleShape,
-                    contentPadding = PaddingValues(0.dp)
+                    contentPadding = PaddingValues(spacing.default)
                 ) {
                     Box(
                         modifier = Modifier

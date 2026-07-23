@@ -46,7 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ActivityLevel
 import com.example.healthtracker.domain.model.Gender
@@ -354,8 +353,8 @@ private fun GenderChip(
         modifier = modifier,
         shape = RoundedCornerShape(spacing.cornerSmall),
         color = bgColor,
-        tonalElevation = if (isSelected) 0.dp else 0.dp,
-        shadowElevation = if (isSelected) 2.dp else 0.dp
+        tonalElevation = spacing.default,
+        shadowElevation = if (isSelected) spacing.elevationSmall else spacing.default
     ) {
         Row(
             modifier = Modifier
@@ -419,7 +418,7 @@ fun <T> SettingDropdownItem(
                 shape = RoundedCornerShape(spacing.cornerSmall),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                 border = androidx.compose.foundation.BorderStroke(
-                    1.dp, 
+                    spacing.borderWidthUnselected, 
                     MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                 )
             ) {
@@ -469,7 +468,7 @@ fun <T> SettingDropdownItem(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(spacing.medium + spacing.extraSmall)
                                 )
                             }
                         } else null

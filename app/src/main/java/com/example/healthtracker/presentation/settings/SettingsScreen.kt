@@ -29,7 +29,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,9 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.healthtracker.R
-import com.example.healthtracker.domain.model.ActivityLevel
-import com.example.healthtracker.domain.model.Gender
-import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.settings.components.PreferencesSection
 import com.example.healthtracker.presentation.settings.components.ProfileSection
@@ -59,11 +55,15 @@ fun SettingsScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.snackbarEvent.collect { messageId ->
-            SnackbarController.showSnackbar(
-                message = context.getString(messageId),
-                isError = false
-            )
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is SettingsUiEvent.ShowSnackbar -> {
+                    SnackbarController.showSnackbar(
+                        message = context.getString(event.messageId),
+                        isError = event.isError
+                    )
+                }
+            }
         }
     }
 
@@ -73,19 +73,7 @@ fun SettingsScreen(
         languagePreference = languagePreference,
         fontSizePreference = fontSizePreference,
         notificationsEnabled = notificationsEnabled,
-        onThemeChange = viewModel::updateTheme,
-        onLanguageChange = viewModel::updateLanguage,
-        onFontSizeChange = viewModel::updateFontSize,
-        onNotificationsChange = viewModel::toggleNotifications,
-        onNameChange = viewModel::onNameChange,
-        onDateOfBirthChange = viewModel::onDateOfBirthChange,
-        onWeightChange = viewModel::onWeightChange,
-        onHeightChange = viewModel::onHeightChange,
-        onGenderChange = viewModel::onGenderChange,
-        onActivityLevelChange = viewModel::onActivityLevelChange,
-        onGoalChange = viewModel::onGoalChange,
-        onSaveProfile = viewModel::saveProfile,
-        onTestNotification = viewModel::testNotification
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -97,19 +85,7 @@ fun SettingsContent(
     languagePreference: String,
     fontSizePreference: String,
     notificationsEnabled: Boolean,
-    onThemeChange: (String) -> Unit,
-    onLanguageChange: (String) -> Unit,
-    onFontSizeChange: (String) -> Unit,
-    onNotificationsChange: (Boolean) -> Unit,
-    onNameChange: (String) -> Unit,
-    onDateOfBirthChange: (String) -> Unit,
-    onWeightChange: (String) -> Unit,
-    onHeightChange: (String) -> Unit,
-    onGenderChange: (Gender) -> Unit,
-    onActivityLevelChange: (ActivityLevel) -> Unit,
-    onGoalChange: (Goal) -> Unit,
-    onSaveProfile: () -> Unit,
-    onTestNotification: () -> Unit
+    onEvent: (SettingsEvent) -> Unit
 ) {
     val spacing = LocalSpacing.current
 
@@ -117,7 +93,7 @@ fun SettingsContent(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            onNotificationsChange(true)
+            onEvent(SettingsEvent.OnNotificationsToggled(true))
         }
     }
 
@@ -142,7 +118,7 @@ fun SettingsContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = onSaveProfile,
+                    onClick = { onEvent(SettingsEvent.OnSaveProfile) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = spacing.medium, vertical = spacing.small)
@@ -187,27 +163,27 @@ fun SettingsContent(
             ) {
                 ProfileSection(
                     uiState = uiState,
-                    onNameChange = onNameChange,
-                    onDateOfBirthChange = onDateOfBirthChange,
-                    onWeightChange = onWeightChange,
-                    onHeightChange = onHeightChange,
-                    onGenderChange = onGenderChange,
-                    onActivityLevelChange = onActivityLevelChange,
-                    onGoalChange = onGoalChange
+                    onNameChange = { onEvent(SettingsEvent.OnNameChanged(it)) },
+                    onDateOfBirthChange = { onEvent(SettingsEvent.OnDateOfBirthChanged(it)) },
+                    onWeightChange = { onEvent(SettingsEvent.OnWeightChanged(it)) },
+                    onHeightChange = { onEvent(SettingsEvent.OnHeightChanged(it)) },
+                    onGenderChange = { onEvent(SettingsEvent.OnGenderChanged(it)) },
+                    onActivityLevelChange = { onEvent(SettingsEvent.OnActivityLevelChanged(it)) },
+                    onGoalChange = { onEvent(SettingsEvent.OnGoalChanged(it)) }
                 )
                 PreferencesSection(
                     themePreference = themePreference,
                     languagePreference = languagePreference,
                     fontSizePreference = fontSizePreference,
                     notificationsEnabled = notificationsEnabled,
-                    onThemeChange = onThemeChange,
-                    onLanguageChange = onLanguageChange,
-                    onFontSizeChange = onFontSizeChange,
-                    onNotificationsChange = onNotificationsChange,
+                    onThemeChange = { onEvent(SettingsEvent.OnThemeChanged(it)) },
+                    onLanguageChange = { onEvent(SettingsEvent.OnLanguageChanged(it)) },
+                    onFontSizeChange = { onEvent(SettingsEvent.OnFontSizeChanged(it)) },
+                    onNotificationsChange = { onEvent(SettingsEvent.OnNotificationsToggled(it)) },
                     onLaunchPermissions = {
                         permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                     },
-                    onTestNotification = onTestNotification
+                    onTestNotification = { onEvent(SettingsEvent.OnTestNotification) }
                 )
 
                 Spacer(modifier = Modifier.height(spacing.extraLarge))

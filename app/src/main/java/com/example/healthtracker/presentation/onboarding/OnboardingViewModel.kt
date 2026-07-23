@@ -43,6 +43,27 @@ class OnboardingViewModel(
     private val _uiEvent = MutableSharedFlow<OnboardingUiEvent>()
     val uiEvent: SharedFlow<OnboardingUiEvent> = _uiEvent.asSharedFlow()
 
+    fun onEvent(event: OnboardingEvent) {
+        when (event) {
+            is OnboardingEvent.OnNameChanged -> updateName(event.name)
+            is OnboardingEvent.OnDateOfBirthChanged -> updateDateOfBirth(event.dob)
+            is OnboardingEvent.OnGenderChanged -> updateGender(event.gender)
+            is OnboardingEvent.OnWeightChanged -> updateWeight(event.weight)
+            is OnboardingEvent.OnHeightChanged -> updateHeight(event.height)
+            is OnboardingEvent.OnActivityLevelChanged -> updateActivityLevel(event.level)
+            is OnboardingEvent.OnGoalChanged -> updateGoal(event.goal)
+            is OnboardingEvent.OnNextClicked -> nextStep()
+            is OnboardingEvent.OnBackClicked -> previousStep()
+            is OnboardingEvent.OnSkipClicked -> skipToDashboard()
+        }
+    }
+
+    private fun skipToDashboard() {
+        viewModelScope.launch {
+            _uiEvent.emit(OnboardingUiEvent.NavigateToDashboard)
+        }
+    }
+
     fun updateName(name: String) {
         _uiState.update { it.copy(name = name) }
     }

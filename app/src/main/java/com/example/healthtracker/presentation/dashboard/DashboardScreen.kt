@@ -1,5 +1,8 @@
 package com.example.healthtracker.presentation.dashboard
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.healthtracker.data.local.preferences.UserPreferences
+import org.koin.compose.koinInject
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -30,17 +31,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import com.example.healthtracker.presentation.components.PremiumSpinner
 import com.example.healthtracker.presentation.dashboard.components.CalorieCircularProgress
 import com.example.healthtracker.presentation.dashboard.components.BarChart
-import com.example.healthtracker.presentation.dashboard.components.CalorieStatItem
 import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.presentation.dashboard.components.DashboardCard
 import com.example.healthtracker.presentation.dashboard.components.LineChart
@@ -52,6 +53,15 @@ import com.example.healthtracker.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.platform.LocalContext
+import com.example.healthtracker.presentation.dashboard.components.ShareReportPreviewDialog
+import com.example.healthtracker.presentation.dashboard.components.WeeklyReportCard
+import com.example.healthtracker.presentation.utils.ReportShareUtils
 
 @Composable
 fun DashboardScreen(
@@ -77,6 +87,54 @@ fun DashboardScreenContent(
 ) {
     val spacing = LocalSpacing.current
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    val userPreferences: UserPreferences = koinInject()
+    val themePref by userPreferences.themePreference.collectAsStateWithLifecycle(initialValue = "system")
+    val systemDark = isSystemInDarkTheme()
+    val darkTheme = when (themePref) {
+        "light", "green_light", "blue_light", "purple_light", "rose_light", "teal_light" -> false
+        "dark", "green_dark", "blue_dark", "purple_dark", "rose_dark", "teal_dark" -> true
+        else -> systemDark
+    }
+
+    var showSharePreview by remember { mutableStateOf(false) }
+
+    val onShareReport = {
+        ReportShareUtils.shareComposableAsImage(
+            context = context,
+            chooserTitle = context.getString(R.string.share_chooser_title),
+            themePref = themePref,
+            darkTheme = darkTheme
+        ) {
+            WeeklyReportCard(uiState = uiState)
+        }
+    }
+
+    val onSavePdfReport = {
+        ReportShareUtils.saveComposableAsPdf(
+            context = context,
+            themePref = themePref,
+            darkTheme = darkTheme
+        ) {
+            WeeklyReportCard(uiState = uiState)
+        }
+    }
+
+    if (showSharePreview) {
+        ShareReportPreviewDialog(
+            uiState = uiState,
+            onDismiss = { showSharePreview = false },
+            onConfirmShare = {
+                showSharePreview = false
+                onShareReport()
+            },
+            onSavePdf = {
+                showSharePreview = false
+                onSavePdfReport()
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -86,6 +144,15 @@ fun DashboardScreenContent(
                         text = stringResource(R.string.tab_dashboard),
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = { showSharePreview = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = stringResource(R.string.weekly_report_title),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
@@ -100,7 +167,7 @@ fun DashboardScreenContent(
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                PremiumSpinner(modifier = Modifier.size(48.dp))
+                PremiumSpinner(modifier = Modifier.size(spacing.loadingSpinnerSize))
             }
         } else {
             Column(
@@ -273,6 +340,28 @@ fun DashboardScreenContent(
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
+                        OutlinedButton(
+                            onClick = { showSharePreview = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(spacing.cornerMedium),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = null,
+                                modifier = Modifier.size(spacing.medium)
+                            )
+                            Spacer(modifier = Modifier.width(spacing.small))
+                            Text(
+                                text = stringResource(R.string.weekly_report_title),
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }

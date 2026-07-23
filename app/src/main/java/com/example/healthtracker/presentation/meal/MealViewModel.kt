@@ -3,32 +3,37 @@ package com.example.healthtracker.presentation.meal
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthtracker.R
+import com.example.healthtracker.data.local.FoodItemSeedData
 import com.example.healthtracker.domain.model.FoodItem
+import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
-import com.example.healthtracker.domain.usecase.GetUserUseCase
-import com.example.healthtracker.domain.usecase.SeedFoodItemsUseCase
-import com.example.healthtracker.domain.usecase.GetAllFoodItemsUseCase
-import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
-import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.AddFoodItemUseCase
 import com.example.healthtracker.domain.usecase.AddMealUseCase
 import com.example.healthtracker.domain.usecase.DeleteMealUseCase
-import com.example.healthtracker.domain.usecase.AddFoodItemUseCase
+import com.example.healthtracker.domain.usecase.GetAllFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.GetMealsByDateUseCase
+import com.example.healthtracker.domain.usecase.GetUserUseCase
+import com.example.healthtracker.domain.usecase.SearchFoodItemsUseCase
+import com.example.healthtracker.domain.usecase.SeedFoodItemsUseCase
+import com.example.healthtracker.presentation.components.LoadingController
 import com.example.healthtracker.presentation.widget.WidgetUpdater
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CancellationException
-import com.example.healthtracker.data.local.FoodItemSeedData
 import java.time.LocalDate
-import com.example.healthtracker.presentation.components.LoadingController
-import kotlinx.coroutines.delay
+import kotlin.coroutines.cancellation.CancellationException
 
 class MealViewModel(
     private val getUserUseCase: GetUserUseCase,
@@ -42,111 +47,111 @@ class MealViewModel(
     private val widgetUpdater: WidgetUpdater
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MealUiState())
-    val uiState: StateFlow<MealUiState> = _uiState.asStateFlow()
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
+    private val _dialogState = MutableStateFlow(MealDialogState())
 
     private val _uiEvent = MutableSharedFlow<MealUiEvent>()
     val uiEvent: SharedFlow<MealUiEvent> = _uiEvent.asSharedFlow()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _mealsForDateFlow = _selectedDate.flatMapLatest { date ->
+        getMealsByDateUseCase(date)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _filteredFoodsFlow = _dialogState.map { it.searchQuery }.distinctUntilChanged().flatMapLatest { query ->
+        if (query.isBlank()) {
+            getAllFoodItemsUseCase()
+        } else {
+            searchFoodItemsUseCase(query)
+        }
+    }
+
+    private val _foodsFlow = combine(getAllFoodItemsUseCase(), _filteredFoodsFlow) { all, filtered ->
+        all to filtered
+    }
+
+    val uiState: StateFlow<MealUiState> = combine(
+        getUserUseCase(),
+        _selectedDate,
+        _mealsForDateFlow,
+        _foodsFlow,
+        _dialogState
+    ) { user, date, logs, (allFoods, filteredFoods), dialog ->
+        val target = if (user != null && user.targetCalories > 0) user.targetCalories else 2000
+        val goal = user?.goal ?: Goal.MAINTAIN_WEIGHT
+        val totalCals = logs.sumOf { it.totalCalories }
+
+        MealUiState(
+            selectedDate = date,
+            targetCalories = target,
+            goal = goal,
+            loggedMeals = logs,
+            totalCalories = totalCals,
+            availableFoods = allFoods,
+            filteredFoods = filteredFoods,
+            searchQuery = dialog.searchQuery,
+            isAddFoodDialogVisible = dialog.isVisible,
+            selectedMealType = dialog.selectedMealType,
+            selectedFoodItem = dialog.selectedFoodItem,
+            quantityInput = dialog.quantityInput,
+            customFoodName = dialog.customFoodName,
+            customCalories = dialog.customCalories,
+            customServingInfo = dialog.customServingInfo,
+            isCustomFoodMode = dialog.isCustomFoodMode
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = MealUiState()
+    )
+
     init {
-        val today = LocalDate.now()
-        loadUserData()
-        
         viewModelScope.launch {
-            // Seed food items in database if empty
             seedFoodItemsUseCase(FoodItemSeedData.sampleFoods)
         }
-
-        observeFoodItems()
-        observeLogsForDate(today)
     }
 
-    private fun loadUserData() {
-        viewModelScope.launch {
-            getUserUseCase().collect { user ->
-                val target = if (user != null && user.targetCalories > 0) user.targetCalories else 2000
-                val goal = user?.goal ?: com.example.healthtracker.domain.model.Goal.MAINTAIN_WEIGHT
-                _uiState.update { it.copy(targetCalories = target, goal = goal) }
-            }
-        }
-    }
-
-    private var observeFoodsJob: Job? = null
-
-    private fun observeFoodItems() {
-        observeFoodsJob?.cancel()
-        observeFoodsJob = viewModelScope.launch {
-            getAllFoodItemsUseCase().collect { foods ->
-                _uiState.update { state ->
-                    state.copy(
-                        availableFoods = foods,
-                        filteredFoods = if (state.searchQuery.isBlank()) foods else state.filteredFoods
-                    )
-                }
-            }
+    fun onEvent(event: MealEvent) {
+        when (event) {
+            is MealEvent.OnDateChanged -> setDate(event.date)
+            is MealEvent.OnAddFoodClicked -> openAddFoodDialog(event.mealType)
+            is MealEvent.OnDeleteMealLog -> deleteMealLog(event.mealLog)
+            is MealEvent.OnSearchQueryChanged -> setSearchQuery(event.query)
+            is MealEvent.OnFoodSelected -> selectFoodItem(event.foodItem)
+            is MealEvent.OnQuantityInputChanged -> updateQuantityInput(event.quantity)
+            is MealEvent.OnCustomFoodModeToggled -> setCustomFoodMode(event.enabled)
+            is MealEvent.OnCustomFoodNameChanged -> updateCustomFoodName(event.name)
+            is MealEvent.OnCustomCaloriesChanged -> updateCustomCalories(event.calories)
+            is MealEvent.OnCustomServingInfoChanged -> updateCustomServingInfo(event.servingInfo)
+            is MealEvent.OnConfirmAddFood -> addMealLog()
+            is MealEvent.OnDismissDialog -> closeAddFoodDialog()
         }
     }
 
     fun setDate(date: LocalDate) {
-        _uiState.update { it.copy(selectedDate = date) }
-        observeLogsForDate(date)
+        _selectedDate.value = date
     }
-
-    private var observeLogsJob: Job? = null
-    private fun observeLogsForDate(date: LocalDate) {
-        observeLogsJob?.cancel()
-        observeLogsJob = viewModelScope.launch {
-            getMealsByDateUseCase(date).collect { logs ->
-                val total = logs.sumOf { it.totalCalories }
-                _uiState.update { state ->
-                    state.copy(
-                        loggedMeals = logs,
-                        totalCalories = total
-                    )
-                }
-            }
-        }
-    }
-
-    private var searchJob: Job? = null
 
     fun setSearchQuery(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            if (query.isBlank()) {
-                _uiState.update { it.copy(filteredFoods = it.availableFoods) }
-            } else {
-                searchFoodItemsUseCase(query).collect { filtered ->
-                    _uiState.update { it.copy(filteredFoods = filtered) }
-                }
-            }
-        }
+        _dialogState.update { it.copy(searchQuery = query) }
     }
 
     fun openAddFoodDialog(mealType: MealType) {
-        _uiState.update {
-            it.copy(
-                isAddFoodDialogVisible = true,
-                selectedMealType = mealType,
-                searchQuery = "",
-                filteredFoods = it.availableFoods,
-                selectedFoodItem = null,
-                quantityInput = "1",
-                customFoodName = "",
-                customCalories = "",
-                customServingInfo = "100g",
-                isCustomFoodMode = false
+        _dialogState.update {
+            MealDialogState(
+                isVisible = true,
+                selectedMealType = mealType
             )
         }
     }
 
     fun closeAddFoodDialog() {
-        _uiState.update { it.copy(isAddFoodDialogVisible = false) }
+        _dialogState.update { it.copy(isVisible = false) }
     }
 
     fun selectFoodItem(foodItem: FoodItem) {
-        _uiState.update {
+        _dialogState.update {
             it.copy(
                 selectedFoodItem = foodItem,
                 quantityInput = "1"
@@ -155,7 +160,7 @@ class MealViewModel(
     }
 
     fun setCustomFoodMode(enabled: Boolean) {
-        _uiState.update {
+        _dialogState.update {
             it.copy(
                 isCustomFoodMode = enabled,
                 selectedFoodItem = null,
@@ -166,26 +171,26 @@ class MealViewModel(
 
     fun updateQuantityInput(quantity: String) {
         if (quantity.isEmpty() || quantity.all { it.isDigit() || it == '.' }) {
-            _uiState.update { it.copy(quantityInput = quantity) }
+            _dialogState.update { it.copy(quantityInput = quantity) }
         }
     }
 
     fun updateCustomFoodName(name: String) {
-        _uiState.update { it.copy(customFoodName = name) }
+        _dialogState.update { it.copy(customFoodName = name) }
     }
 
     fun updateCustomCalories(calories: String) {
         if (calories.isEmpty() || calories.all { it.isDigit() }) {
-            _uiState.update { it.copy(customCalories = calories) }
+            _dialogState.update { it.copy(customCalories = calories) }
         }
     }
 
     fun updateCustomServingInfo(info: String) {
-        _uiState.update { it.copy(customServingInfo = info) }
+        _dialogState.update { it.copy(customServingInfo = info) }
     }
 
     fun addMealLog() {
-        val state = _uiState.value
+        val state = uiState.value
         val date = state.selectedDate
         val quantity = state.quantityInput.toDoubleOrNull() ?: 1.0
 
@@ -241,7 +246,6 @@ class MealViewModel(
         viewModelScope.launch {
             try {
                 LoadingController.withLoading {
-                    delay(600)
                     addMealUseCase(newLog)
                 }
                 widgetUpdater.updateWidget()
@@ -258,7 +262,6 @@ class MealViewModel(
         viewModelScope.launch {
             try {
                 LoadingController.withLoading {
-                    delay(500)
                     deleteMealUseCase(mealLog)
                 }
                 widgetUpdater.updateWidget()
@@ -276,3 +279,15 @@ class MealViewModel(
         }
     }
 }
+
+private data class MealDialogState(
+    val isVisible: Boolean = false,
+    val selectedMealType: MealType = MealType.BREAKFAST,
+    val selectedFoodItem: FoodItem? = null,
+    val quantityInput: String = "1",
+    val searchQuery: String = "",
+    val customFoodName: String = "",
+    val customCalories: String = "",
+    val customServingInfo: String = "100g",
+    val isCustomFoodMode: Boolean = false
+)

@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivityResultRegistryOwner
+
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -20,9 +20,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.runtime.CompositionLocalProvider
+
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,11 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.healthtracker.data.local.preferences.UserPreferences
-import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.navigation.AppNavigation
@@ -44,6 +41,7 @@ import org.koin.android.ext.android.inject
 import java.util.Locale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.example.healthtracker.presentation.components.CustomSnackbar
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -109,45 +107,41 @@ class MainActivity : ComponentActivity() {
             }
 
             HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme, fontSizePref = fontSizePref) {
-                CompositionLocalProvider(
-                    LocalActivityResultRegistryOwner provides this
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        AppNavigation(isOnboardingCompleted = isOnboardingCompleted)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AppNavigation(isOnboardingCompleted = isOnboardingCompleted)
 
-                        // Stacked Toast Overlay
-                            val activeMessages = SnackbarController.activeMessages
-                            Column(
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .statusBarsPadding()
-                                    .padding(top = LocalSpacing.current.medium)
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                activeMessages.forEach { msg ->
-                                    androidx.compose.runtime.key(msg.id) {
-                                        var visible by remember { mutableStateOf(false) }
-                                        LaunchedEffect(Unit) { visible = true }
+                    // Stacked Toast Overlay
+                    val activeMessages = SnackbarController.activeMessages
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .statusBarsPadding()
+                            .padding(top = LocalSpacing.current.medium)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        activeMessages.forEach { msg ->
+                            key(msg.id) {
+                                var visible by remember { mutableStateOf(false) }
+                                LaunchedEffect(Unit) { visible = true }
 
-                                        AnimatedVisibility(
-                                            visible = visible,
-                                            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                                            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
-                                        ) {
-                                            CustomSnackbar(
-                                                message = msg.message,
-                                                isError = msg.isError
-                                            )
-                                        }
-                                    }
+                                AnimatedVisibility(
+                                    visible = visible,
+                                    enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                                    exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+                                ) {
+                                    CustomSnackbar(
+                                        message = msg.message,
+                                        isError = msg.isError
+                                    )
                                 }
                             }
-
-                        // Global Loading Overlay
-                        GlobalLoadingOverlay()
+                        }
                     }
+
+                    // Global Loading Overlay
+                    GlobalLoadingOverlay()
                 }
             }
         }

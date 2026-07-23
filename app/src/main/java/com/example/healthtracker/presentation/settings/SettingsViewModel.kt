@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,6 +31,7 @@ import java.time.format.DateTimeParseException
 import com.example.healthtracker.presentation.components.LoadingController
 import kotlinx.coroutines.delay
 import com.example.healthtracker.domain.alarm.AlarmScheduler
+import kotlinx.coroutines.flow.SharedFlow
 
 data class SettingsUiState(
     val user: User? = null,
@@ -116,25 +116,41 @@ class SettingsViewModel(
         }
     }
 
-    fun onNameChange(name: String) { _uiState.update { it.copy(name = name) } }
-    fun onWeightChange(weight: String) { _uiState.update { it.copy(weight = weight) } }
-    fun onHeightChange(height: String) { _uiState.update { it.copy(height = height) } }
-    fun onDateOfBirthChange(dob: String) { _uiState.update { it.copy(dateOfBirth = dob) } }
-    fun onGenderChange(gender: Gender) { _uiState.update { it.copy(gender = gender) } }
-    fun onActivityLevelChange(level: ActivityLevel) { _uiState.update { it.copy(activityLevel = level) } }
-    fun onGoalChange(goal: Goal) { _uiState.update { it.copy(goal = goal) } }
+    private val _uiEvent = MutableSharedFlow<SettingsUiEvent>()
+    val uiEvent: SharedFlow<SettingsUiEvent> = _uiEvent.asSharedFlow()
 
-    private val _snackbarEvent = MutableSharedFlow<Int>()
-    val snackbarEvent = _snackbarEvent.asSharedFlow()
+    fun onEvent(event: SettingsEvent) {
+        when (event) {
+            is SettingsEvent.OnNameChanged -> _uiState.update { it.copy(name = event.name) }
+            is SettingsEvent.OnWeightChanged -> _uiState.update { it.copy(weight = event.weight) }
+            is SettingsEvent.OnHeightChanged -> _uiState.update { it.copy(height = event.height) }
+            is SettingsEvent.OnDateOfBirthChanged -> _uiState.update { it.copy(dateOfBirth = event.dob) }
+            is SettingsEvent.OnGenderChanged -> _uiState.update { it.copy(gender = event.gender) }
+            is SettingsEvent.OnActivityLevelChanged -> _uiState.update { it.copy(activityLevel = event.level) }
+            is SettingsEvent.OnGoalChanged -> _uiState.update { it.copy(goal = event.goal) }
+            is SettingsEvent.OnThemeChanged -> updateTheme(event.theme)
+            is SettingsEvent.OnLanguageChanged -> updateLanguage(event.language)
+            is SettingsEvent.OnFontSizeChanged -> updateFontSize(event.size)
+            is SettingsEvent.OnNotificationsToggled -> toggleNotifications(event.enabled)
+            is SettingsEvent.OnSaveProfile -> saveProfile()
+            is SettingsEvent.OnTestNotification -> testNotification()
+        }
+    }
 
-    fun saveProfile() {
+    private fun emitEvent(event: SettingsUiEvent) {
+        viewModelScope.launch {
+            _uiEvent.emit(event)
+        }
+    }
+
+    private fun saveProfile() {
         viewModelScope.launch {
             val currentState = _uiState.value
             
             // Validate name
             val nameResult = validateUserProfileUseCase.validateName(currentState.name)
             if (!nameResult.successful) {
-                nameResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                nameResult.error?.let { emitEvent(SettingsUiEvent.ShowSnackbar(it.toErrorMessageId(), isError = true)) }
                 return@launch
             }
 
@@ -146,7 +162,7 @@ class SettingsViewModel(
             }
             val dobResult = validateUserProfileUseCase.validateDateOfBirth(birthDate)
             if (!dobResult.successful) {
-                dobResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                dobResult.error?.let { emitEvent(SettingsUiEvent.ShowSnackbar(it.toErrorMessageId(), isError = true)) }
                 return@launch
             }
 
@@ -154,7 +170,7 @@ class SettingsViewModel(
             val newWeight = currentState.weight.replace(",", ".").toFloatOrNull() ?: -1f
             val weightResult = validateUserProfileUseCase.validateWeight(newWeight)
             if (!weightResult.successful) {
-                weightResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                weightResult.error?.let { emitEvent(SettingsUiEvent.ShowSnackbar(it.toErrorMessageId(), isError = true)) }
                 return@launch
             }
 
@@ -162,7 +178,7 @@ class SettingsViewModel(
             val newHeight = currentState.height.replace(",", ".").toFloatOrNull() ?: -1f
             val heightResult = validateUserProfileUseCase.validateHeight(newHeight)
             if (!heightResult.successful) {
-                heightResult.error?.let { _snackbarEvent.emit(it.toErrorMessageId()) }
+                heightResult.error?.let { emitEvent(SettingsUiEvent.ShowSnackbar(it.toErrorMessageId(), isError = true)) }
                 return@launch
             }
 
@@ -189,49 +205,47 @@ class SettingsViewModel(
                     saveUserProfileUseCase(updatedUser)
                 }
                 widgetUpdater.updateWidget()
-                _snackbarEvent.emit(R.string.profile_saved_successfully)
+                emitEvent(SettingsUiEvent.ShowSnackbar(R.string.profile_saved_successfully))
             } catch (e: Exception) {
-                _snackbarEvent.emit(R.string.error_occurred)
+                emitEvent(SettingsUiEvent.ShowSnackbar(R.string.error_occurred, isError = true))
             }
         }
     }
 
-    fun updateTheme(theme: String) {
+    private fun updateTheme(theme: String) {
         viewModelScope.launch {
             userPreferences.setThemePreference(theme)
         }
     }
 
-    fun updateLanguage(language: String) {
+    private fun updateLanguage(language: String) {
         viewModelScope.launch {
             userPreferences.setLanguagePreference(language)
         }
     }
 
-    fun updateFontSize(size: String) {
+    private fun updateFontSize(size: String) {
         viewModelScope.launch {
             userPreferences.setFontSizePreference(size)
         }
     }
 
-    fun toggleNotifications(enabled: Boolean) {
+    private fun toggleNotifications(enabled: Boolean) {
         viewModelScope.launch {
             userPreferences.setNotificationsEnabled(enabled)
             if (enabled) {
                 alarmScheduler.scheduleDailyReminders()
-                _snackbarEvent.emit(R.string.toast_notifications_enabled)
+                emitEvent(SettingsUiEvent.ShowSnackbar(R.string.toast_notifications_enabled))
             } else {
                 alarmScheduler.cancelReminders()
-                _snackbarEvent.emit(R.string.toast_notifications_disabled)
+                emitEvent(SettingsUiEvent.ShowSnackbar(R.string.toast_notifications_disabled))
             }
         }
     }
 
-    fun testNotification() {
+    private fun testNotification() {
         alarmScheduler.testNotification()
-        viewModelScope.launch {
-            _snackbarEvent.emit(R.string.toast_test_notification_sent)
-        }
+        emitEvent(SettingsUiEvent.ShowSnackbar(R.string.toast_test_notification_sent))
     }
 }
 

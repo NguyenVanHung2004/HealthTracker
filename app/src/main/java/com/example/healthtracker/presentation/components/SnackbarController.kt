@@ -28,7 +28,4 @@ object SnackbarController {
         }
     }
 
-    fun dismiss(msg: SnackbarMessage) {
-        activeMessages.remove(msg)
-    }
 }

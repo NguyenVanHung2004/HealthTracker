@@ -15,9 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.healthtracker.ui.theme.LocalSpacing
 
 @Composable
@@ -40,7 +39,7 @@ fun ShortcutButton(
         Icon(
             icon, 
             contentDescription = label,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(spacing.medium + spacing.extraSmall / 2)
         )
         Spacer(modifier = Modifier.width(spacing.extraSmall))
         Text(

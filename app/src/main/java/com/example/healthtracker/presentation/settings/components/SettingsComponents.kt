@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import com.example.healthtracker.ui.theme.BackgroundLight
 import com.example.healthtracker.ui.theme.LocalSpacing
@@ -190,7 +189,7 @@ fun ThemeGridItem(
 ) {
     val spacing = LocalSpacing.current
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-    val borderThickness = if (isSelected) 2.dp else 1.dp
+    val borderThickness = if (isSelected) spacing.borderWidthSelected else spacing.borderWidthUnselected
 
     Column(
         modifier = modifier.clickable { onClick() },
@@ -200,7 +199,7 @@ fun ThemeGridItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
+                .height(spacing.extraLarge)
                 .clip(RoundedCornerShape(spacing.cornerMedium))
                 .background(lightBg)
                 .border(borderThickness, borderColor, RoundedCornerShape(spacing.cornerMedium))
@@ -221,20 +220,20 @@ fun ThemeGridItem(
             // Primary color accent circle in the center
             Box(
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(spacing.cornerLarge)
                     .align(Alignment.Center)
                     .clip(CircleShape)
                     .background(primaryColor)
-                    .border(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else Color.White, CircleShape)
+                    .border(spacing.borderWidthSelected, if (isSelected) MaterialTheme.colorScheme.primary else Color.White, CircleShape)
             )
 
             // Checkmark overlay if selected
             if (isSelected) {
                 Box(
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(spacing.medium + spacing.extraSmall)
                         .align(Alignment.TopEnd)
-                        .padding(4.dp)
+                        .padding(spacing.extraSmall)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary),
                     contentAlignment = Alignment.Center
@@ -243,7 +242,7 @@ fun ThemeGridItem(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(12.dp)
+                        modifier = Modifier.size(spacing.cornerSmall)
                     )
                 }
             }
