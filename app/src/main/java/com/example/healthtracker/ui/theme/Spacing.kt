@@ -20,7 +20,8 @@ data class Spacing(
     val loadingCardSize: Dp = 150.dp,
     val loadingSpinnerSize: Dp = 56.dp,
     val circularProgressSize: Dp = 180.dp,
-    val circularProgressStroke: Dp = 12.dp
+    val circularProgressStroke: Dp = 12.dp,
+    val reportCardWidth: Dp = 360.dp
 )
 
 val LocalSpacing = compositionLocalOf { Spacing() }

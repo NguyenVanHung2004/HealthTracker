@@ -49,6 +49,14 @@ import com.example.healthtracker.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.platform.LocalContext
+import com.example.healthtracker.presentation.dashboard.components.WeeklyReportCard
+import com.example.healthtracker.presentation.utils.ReportShareUtils
 
 @Composable
 fun DashboardScreen(
@@ -74,6 +82,16 @@ fun DashboardScreenContent(
 ) {
     val spacing = LocalSpacing.current
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    val onShareReport = {
+        ReportShareUtils.shareComposableAsImage(
+            context = context,
+            chooserTitle = context.getString(R.string.share_chooser_title)
+        ) {
+            WeeklyReportCard(uiState = uiState)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -83,6 +101,15 @@ fun DashboardScreenContent(
                         text = stringResource(R.string.tab_dashboard),
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = onShareReport) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = stringResource(R.string.weekly_report_title),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
@@ -270,6 +297,28 @@ fun DashboardScreenContent(
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
+                        OutlinedButton(
+                            onClick = onShareReport,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(spacing.cornerMedium),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = null,
+                                modifier = Modifier.size(spacing.medium)
+                            )
+                            Spacer(modifier = Modifier.width(spacing.small))
+                            Text(
+                                text = stringResource(R.string.weekly_report_title),
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
