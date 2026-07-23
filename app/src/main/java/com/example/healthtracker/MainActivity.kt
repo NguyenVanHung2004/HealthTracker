@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivityResultRegistryOwner
+
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.runtime.CompositionLocalProvider
+
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -106,45 +106,41 @@ class MainActivity : ComponentActivity() {
             }
 
             HealthTrackerTheme(themePref = themePref, darkTheme = darkTheme, fontSizePref = fontSizePref) {
-                CompositionLocalProvider(
-                    LocalActivityResultRegistryOwner provides this
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        AppNavigation(isOnboardingCompleted = isOnboardingCompleted)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AppNavigation(isOnboardingCompleted = isOnboardingCompleted)
 
-                        // Stacked Toast Overlay
-                            val activeMessages = SnackbarController.activeMessages
-                            Column(
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .statusBarsPadding()
-                                    .padding(top = LocalSpacing.current.medium)
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                activeMessages.forEach { msg ->
-                                    androidx.compose.runtime.key(msg.id) {
-                                        var visible by remember { mutableStateOf(false) }
-                                        LaunchedEffect(Unit) { visible = true }
+                    // Stacked Toast Overlay
+                    val activeMessages = SnackbarController.activeMessages
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .statusBarsPadding()
+                            .padding(top = LocalSpacing.current.medium)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        activeMessages.forEach { msg ->
+                            androidx.compose.runtime.key(msg.id) {
+                                var visible by remember { mutableStateOf(false) }
+                                LaunchedEffect(Unit) { visible = true }
 
-                                        AnimatedVisibility(
-                                            visible = visible,
-                                            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                                            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
-                                        ) {
-                                            CustomSnackbar(
-                                                message = msg.message,
-                                                isError = msg.isError
-                                            )
-                                        }
-                                    }
+                                AnimatedVisibility(
+                                    visible = visible,
+                                    enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                                    exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+                                ) {
+                                    CustomSnackbar(
+                                        message = msg.message,
+                                        isError = msg.isError
+                                    )
                                 }
                             }
-
-                        // Global Loading Overlay
-                        GlobalLoadingOverlay()
+                        }
                     }
+
+                    // Global Loading Overlay
+                    GlobalLoadingOverlay()
                 }
             }
         }
