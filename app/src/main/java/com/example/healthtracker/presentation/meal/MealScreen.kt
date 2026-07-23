@@ -21,11 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.healthtracker.R
-import com.example.healthtracker.domain.model.FoodItem
 import com.example.healthtracker.domain.model.Goal
 import com.example.healthtracker.domain.model.MealLog
 import com.example.healthtracker.domain.model.MealType
-import com.example.healthtracker.presentation.meal.nameRes
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel

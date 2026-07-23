@@ -24,53 +24,6 @@ class CustomSnackbarVisuals(
 
 @Composable
 fun CustomSnackbar(
-    snackbarData: SnackbarData,
-    modifier: Modifier = Modifier
-) {
-    val visuals = snackbarData.visuals as? CustomSnackbarVisuals
-    val isError = visuals?.isError ?: false
-    val spacing = LocalSpacing.current
-
-    val containerColor = if (isError) MaterialTheme.colorScheme.errorContainer else SuccessGreen
-    val contentColor = if (isError) MaterialTheme.colorScheme.onErrorContainer else Color.White
-    val icon = if (isError) Icons.Default.Error else Icons.Default.CheckCircle
-
-    Card(
-        shape = RoundedCornerShape(spacing.cornerSmall),
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor,
-            contentColor = contentColor
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = spacing.extraSmall + spacing.extraSmall / 2),
-        modifier = modifier
-            .padding(horizontal = spacing.medium, vertical = spacing.small)
-            .fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(spacing.medium)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(spacing.small)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = contentColor
-            )
-            Text(
-                text = snackbarData.visuals.message,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = contentColor,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-fun CustomSnackbar(
     message: String,
     isError: Boolean,
     modifier: Modifier = Modifier

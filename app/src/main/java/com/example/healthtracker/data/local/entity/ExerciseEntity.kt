@@ -3,7 +3,6 @@ package com.example.healthtracker.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.healthtracker.domain.model.ExerciseType
-import java.time.LocalDate
 
 @Entity(tableName = "exercises")
 data class ExerciseEntity(

@@ -5,8 +5,6 @@ import androidx.compose.ui.graphics.Color
 val PrimaryOrange = Color(0xFFFF6D00)
 val PrimaryOrangeDark = Color(0xFFE65100)
 val PrimaryOrangeLight = Color(0xFFFF9E80)
-val OrangeGradientStart = Color(0xFFFF9800)
-val OrangeGradientEnd = Color(0xFFFF5722)
 
 // Green Theme Colors
 val PrimaryGreen = Color(0xFF2E7D32)
@@ -36,12 +34,10 @@ val PrimaryTealLight = Color(0xFF80CBC4)
 val BackgroundLight = Color(0xFFFFFFFF)
 val SurfaceLight = Color(0xFFF5F6F8)
 val TextPrimaryLight = Color(0xFF1E1E1E)
-val TextSecondaryLight = Color(0xFF757575)
 
 val BackgroundDark = Color(0xFF121212)
 val SurfaceDark = Color(0xFF1E1E1E)
 val TextPrimaryDark = Color(0xFFF5F5F5)
-val TextSecondaryDark = Color(0xFFAAAAAA)
 
 val SurfaceVariantLight = Color(0xFFEDEEF2)
 val OnSurfaceVariantLight = Color(0xFF44474A)
@@ -63,22 +59,6 @@ val OnErrorDark = Color(0xFF690005)
 val ErrorContainerDark = Color(0xFF93000A)
 val OnErrorContainerDark = Color(0xFFFFDAD6)
 
-val GradientOrangeStart = PrimaryOrange
-val GradientOrangeEnd = PrimaryOrangeLight
-
-val GradientGreenStart = PrimaryGreen
-val GradientGreenEnd = PrimaryGreenLight
-
-val GradientBlueStart = PrimaryBlue
-val GradientBlueEnd = PrimaryBlueLight
-
-val GradientPurpleStart = PrimaryPurple
-val GradientPurpleEnd = PrimaryPurpleLight
-
-val GradientRoseStart = PrimaryRose
-val GradientRoseEnd = PrimaryRoseLight
-
-val GradientTealStart = PrimaryTeal
 val GradientTealEnd = PrimaryTealLight
 
 val CalorieRed = Color(0xFFE53935)

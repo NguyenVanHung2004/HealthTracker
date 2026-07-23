@@ -2,7 +2,6 @@ package com.example.healthtracker.domain.usecase
 
 import com.example.healthtracker.domain.model.ExerciseLog
 import com.example.healthtracker.domain.model.ExerciseType
-import com.example.healthtracker.domain.model.User
 import com.example.healthtracker.domain.repository.ExerciseRepository
 import com.example.healthtracker.domain.repository.UserRepository
 import java.time.LocalDate

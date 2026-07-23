@@ -30,11 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.healthtracker.data.local.preferences.UserPreferences
-import com.example.healthtracker.presentation.components.CustomSnackbar
 import com.example.healthtracker.presentation.components.GlobalLoadingOverlay
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.navigation.AppNavigation
@@ -44,6 +40,7 @@ import org.koin.android.ext.android.inject
 import java.util.Locale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.example.healthtracker.presentation.components.CustomSnackbar
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

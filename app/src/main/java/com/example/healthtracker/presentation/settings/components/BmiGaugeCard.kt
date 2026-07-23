@@ -49,7 +49,7 @@ fun BmiGaugeCard(bmi: Float, modifier: Modifier = Modifier) {
     val overweightColor = primary
     val obeseColor = error
 
-    val (categoryRes, statusColor, description) = when {
+    val (categoryRes, statusColor, _) = when {
         bmi < 18.5f -> Triple(
             R.string.bmi_category_underweight,
             underweightColor,

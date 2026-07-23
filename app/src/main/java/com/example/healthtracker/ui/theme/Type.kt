@@ -6,8 +6,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val Typography = getTypography(1f)
-
 fun getTypography(fontScale: Float = 1f): Typography {
     return Typography(
         displayLarge = TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Normal, fontSize = 57.sp * fontScale, lineHeight = 64.sp * fontScale, letterSpacing = (-0.25).sp),

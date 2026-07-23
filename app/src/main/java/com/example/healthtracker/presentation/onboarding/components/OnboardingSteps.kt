@@ -29,7 +29,6 @@ import com.example.healthtracker.presentation.onboarding.OnboardingEvent
 import com.example.healthtracker.presentation.onboarding.OnboardingUiState
 import com.example.healthtracker.ui.theme.LocalSpacing
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -103,7 +102,7 @@ fun Step1Profile(
         Spacer(modifier = Modifier.height(spacing.medium))
         
         val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
-        val dobText = uiState.dateOfBirth?.format(dateFormatter) ?: ""
+        uiState.dateOfBirth?.format(dateFormatter) ?: ""
         var showDatePicker by remember { mutableStateOf(false) }
         
         if (showDatePicker) {

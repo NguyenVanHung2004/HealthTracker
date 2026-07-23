@@ -39,7 +39,7 @@ fun AddFoodDialog(
     onDismiss: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    val localContext = LocalContext.current
+    LocalContext.current
 
     Dialog(
         onDismissRequest = onDismiss,
