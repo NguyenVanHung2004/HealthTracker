@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
 // NOTE on onPrimary choices below: all five saturated theme families
@@ -314,7 +315,7 @@ fun HealthTrackerTheme(
         else -> 1f
     }
 
-    androidx.compose.runtime.CompositionLocalProvider(
+    CompositionLocalProvider(
         LocalSpacing provides Spacing()
     ) {
         MaterialTheme(

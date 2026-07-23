@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -121,7 +122,7 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         activeMessages.forEach { msg ->
-                            androidx.compose.runtime.key(msg.id) {
+                            key(msg.id) {
                                 var visible by remember { mutableStateOf(false) }
                                 LaunchedEffect(Unit) { visible = true }
 
