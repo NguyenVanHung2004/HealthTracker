@@ -25,8 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.healthtracker.R
 import com.example.healthtracker.presentation.components.SnackbarController
 import com.example.healthtracker.presentation.onboarding.components.*
@@ -89,21 +87,21 @@ fun OnboardingScreen(
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                         }
                     } else {
-                        Spacer(modifier = Modifier.size(48.dp))
+                        Spacer(modifier = Modifier.size(spacing.loadingSpinnerSize - spacing.small))
                     }
                     
                     TextButton(onClick = { onEvent(OnboardingEvent.OnSkipClicked) }) {
-                        Text(stringResource(R.string.skip), color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(stringResource(R.string.skip), color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                     }
                 }
                 
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = spacing.medium)) {
                     StepDot(step = 1, currentStep = uiState.currentStep)
-                    HorizontalDivider(modifier = Modifier.width(32.dp), color = if (uiState.currentStep >= 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, thickness = 2.dp)
+                    HorizontalDivider(modifier = Modifier.width(spacing.large), color = if (uiState.currentStep >= 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, thickness = spacing.dividerThickness)
                     StepDot(step = 2, currentStep = uiState.currentStep)
-                    HorizontalDivider(modifier = Modifier.width(32.dp), color = if (uiState.currentStep >= 3) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, thickness = 2.dp)
+                    HorizontalDivider(modifier = Modifier.width(spacing.large), color = if (uiState.currentStep >= 3) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, thickness = spacing.dividerThickness)
                     StepDot(step = 3, currentStep = uiState.currentStep)
-                    HorizontalDivider(modifier = Modifier.width(32.dp), color = if (uiState.currentStep >= 4) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, thickness = 2.dp)
+                    HorizontalDivider(modifier = Modifier.width(spacing.large), color = if (uiState.currentStep >= 4) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, thickness = spacing.dividerThickness)
                     StepDot(step = 4, currentStep = uiState.currentStep)
                 }
             }
@@ -118,10 +116,10 @@ fun OnboardingScreen(
                 Button(
                     onClick = { onEvent(OnboardingEvent.OnNextClicked) },
                     modifier = Modifier
-                        .height(56.dp)
+                        .height(spacing.buttonHeight)
                         .fillMaxWidth(),
                     shape = CircleShape,
-                    contentPadding = PaddingValues(0.dp)
+                    contentPadding = PaddingValues(spacing.default)
                 ) {
                     Box(
                         modifier = Modifier
@@ -133,8 +131,7 @@ fun OnboardingScreen(
                             text = if (uiState.currentStep == 5) stringResource(R.string.start_journey) else stringResource(R.string.proceed),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            letterSpacing = 1.sp
+                            color = Color.White
                         )
                     }
                 }
@@ -160,10 +157,10 @@ fun OnboardingScreen(
                 }, label = "onboarding_transition"
             ) { targetStep ->
                 Surface(
-                    modifier = Modifier.fillMaxSize().padding(top = 16.dp),
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                    modifier = Modifier.fillMaxSize().padding(top = spacing.medium),
+                    shape = RoundedCornerShape(topStart = spacing.large, topEnd = spacing.large),
                     color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 8.dp
+                    shadowElevation = spacing.elevationMedium
                 ) {
                     Column(
                         modifier = Modifier
@@ -179,7 +176,7 @@ fun OnboardingScreen(
                             4 -> Step4Goals(uiState, onEvent)
                             else -> ResultSection(bmi = uiState.calculatedBmi, tdee = uiState.calculatedTdee, targetCalories = uiState.targetCalories, goal = uiState.goal, name = uiState.name)
                         }
-                        Spacer(modifier = Modifier.height(100.dp))
+                        Spacer(modifier = Modifier.height(spacing.maxGridCardHeight))
                     }
                 }
             }

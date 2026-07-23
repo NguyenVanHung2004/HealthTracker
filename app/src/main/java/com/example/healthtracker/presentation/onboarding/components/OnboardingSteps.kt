@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
@@ -16,13 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.healthtracker.R
 import com.example.healthtracker.domain.model.ActivityLevel
 import com.example.healthtracker.domain.model.Gender
@@ -37,20 +35,21 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun StepDot(step: Int, currentStep: Int) {
+    val spacing = LocalSpacing.current
     val isPast = currentStep > step
     val isCurrent = currentStep == step
     
     Box(
         modifier = Modifier
-            .size(32.dp)
+            .size(spacing.avatarSizeSmall)
             .background(if (isPast || isCurrent) MaterialTheme.colorScheme.primary else Color.Transparent, CircleShape)
-            .border(width = 1.dp, color = if (isPast || isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape),
+            .border(width = spacing.borderWidthUnselected, color = if (isPast || isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape),
         contentAlignment = Alignment.Center
     ) {
         if (isPast) {
-            Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(spacing.medium + spacing.extraSmall))
         } else {
-            Text(text = step.toString(), color = if (isCurrent) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(text = step.toString(), color = if (isCurrent) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -81,7 +80,7 @@ fun Step1Profile(
         Spacer(modifier = Modifier.height(spacing.large))
         SectionTitle(stringResource(R.string.biological_sex))
         Spacer(modifier = Modifier.height(spacing.medium))
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.paddingVertical)) {
             PillSelection(
                 text = stringResource(R.string.gender_male),
                 isSelected = uiState.gender == Gender.MALE,
@@ -143,10 +142,11 @@ fun Step1Profile(
                 .clickable { showDatePicker = true }
         ) {
             OutlinedTextField(
-                value = dobText,
+                value = uiState.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "",
                 onValueChange = {},
                 readOnly = true,
                 placeholder = { Text(stringResource(R.string.dob_hint), color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)) },
+                trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = "Date of birth") },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = false,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -155,7 +155,7 @@ fun Step1Profile(
                     disabledPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
                     disabledLabelColor = MaterialTheme.colorScheme.onBackground
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(spacing.cornerSmall)
             )
         }
         
@@ -206,6 +206,7 @@ fun NumberInputField(
     suffix: String,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalSpacing.current
     OutlinedTextField(
         modifier = modifier,
         value = value,
@@ -219,12 +220,12 @@ fun NumberInputField(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(end = 12.dp)
+                modifier = Modifier.padding(end = spacing.paddingVertical)
             )
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(spacing.cornerSmall),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -257,7 +258,7 @@ fun Step3Activity(
                 text = stringResource(levelTextId),
                 isSelected = level == uiState.activityLevel,
                 onClick = { onEvent(OnboardingEvent.OnActivityLevelChanged(level)) },
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = spacing.paddingVertical)
             )
         }
     }
@@ -268,9 +269,10 @@ fun Step4Goals(
     uiState: OnboardingUiState,
     onEvent: (OnboardingEvent) -> Unit
 ) {
+    val spacing = LocalSpacing.current
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
         SectionTitle(stringResource(R.string.step_4_title))
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing.medium))
         Goal.entries.forEach { g ->
             val goalTextId = when (g) {
                 Goal.LOSE_WEIGHT -> R.string.goal_lose_weight
@@ -282,7 +284,7 @@ fun Step4Goals(
                 text = stringResource(goalTextId),
                 isSelected = g == uiState.goal,
                 onClick = { onEvent(OnboardingEvent.OnGoalChanged(g)) },
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = spacing.paddingVertical)
             )
         }
     }
@@ -331,6 +333,7 @@ fun SimpleTextField(
 
 @Composable
 fun PillSelection(text: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val spacing = LocalSpacing.current
     val bgColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -340,9 +343,9 @@ fun PillSelection(text: String, isSelected: Boolean, onClick: () -> Unit, modifi
             .fillMaxWidth()
             .clip(CircleShape)
             .background(bgColor)
-            .border(width = 1.dp, color = borderColor, shape = CircleShape)
+            .border(width = spacing.borderWidthUnselected, color = borderColor, shape = CircleShape)
             .clickable { onClick() }
-            .padding(vertical = 16.dp),
+            .padding(vertical = spacing.medium),
         contentAlignment = Alignment.Center
     ) {
         Text(text = text, color = textColor, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, style = MaterialTheme.typography.bodyLarge)
@@ -376,7 +379,7 @@ fun ResultSection(bmi: Float, tdee: Int, targetCalories: Int, goal: Goal, name: 
             Icons.Default.CheckCircle,
             contentDescription = "Success",
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(80.dp).padding(bottom = spacing.large)
+            modifier = Modifier.size(spacing.avatarSizeLarge).padding(bottom = spacing.large)
         )
         Text(text = stringResource(R.string.bmi_result, bmi), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
         Spacer(modifier = Modifier.height(spacing.medium))

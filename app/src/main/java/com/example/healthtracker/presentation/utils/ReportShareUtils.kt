@@ -24,6 +24,8 @@ object ReportShareUtils {
     fun shareComposableAsImage(
         context: Context,
         chooserTitle: String = context.getString(R.string.share_chooser_title),
+        themePref: String = "system",
+        darkTheme: Boolean = false,
         content: @Composable () -> Unit
     ) {
         val activity = context as? Activity ?: run {
@@ -35,7 +37,10 @@ object ReportShareUtils {
         val composeView = ComposeView(context).apply {
             visibility = View.INVISIBLE
             setContent {
-                HealthTrackerTheme {
+                HealthTrackerTheme(
+                    themePref = themePref,
+                    darkTheme = darkTheme
+                ) {
                     content()
                 }
             }
@@ -102,6 +107,8 @@ object ReportShareUtils {
 
     fun saveComposableAsPdf(
         context: Context,
+        themePref: String = "system",
+        darkTheme: Boolean = false,
         content: @Composable () -> Unit
     ) {
         val activity = context as? Activity ?: run {
@@ -113,7 +120,10 @@ object ReportShareUtils {
         val composeView = ComposeView(context).apply {
             visibility = View.INVISIBLE
             setContent {
-                HealthTrackerTheme {
+                HealthTrackerTheme(
+                    themePref = themePref,
+                    darkTheme = darkTheme
+                ) {
                     content()
                 }
             }

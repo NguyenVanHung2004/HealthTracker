@@ -1,5 +1,8 @@
 package com.example.healthtracker.presentation.dashboard
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.healthtracker.data.local.preferences.UserPreferences
+import org.koin.compose.koinInject
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.healthtracker.R
 import com.example.healthtracker.presentation.components.PremiumSpinner
 import com.example.healthtracker.presentation.dashboard.components.CalorieCircularProgress
@@ -87,19 +89,34 @@ fun DashboardScreenContent(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
+    val userPreferences: UserPreferences = koinInject()
+    val themePref by userPreferences.themePreference.collectAsStateWithLifecycle(initialValue = "system")
+    val systemDark = isSystemInDarkTheme()
+    val darkTheme = when (themePref) {
+        "light", "green_light", "blue_light", "purple_light", "rose_light", "teal_light" -> false
+        "dark", "green_dark", "blue_dark", "purple_dark", "rose_dark", "teal_dark" -> true
+        else -> systemDark
+    }
+
     var showSharePreview by remember { mutableStateOf(false) }
 
     val onShareReport = {
         ReportShareUtils.shareComposableAsImage(
             context = context,
-            chooserTitle = context.getString(R.string.share_chooser_title)
+            chooserTitle = context.getString(R.string.share_chooser_title),
+            themePref = themePref,
+            darkTheme = darkTheme
         ) {
             WeeklyReportCard(uiState = uiState)
         }
     }
 
     val onSavePdfReport = {
-        ReportShareUtils.saveComposableAsPdf(context = context) {
+        ReportShareUtils.saveComposableAsPdf(
+            context = context,
+            themePref = themePref,
+            darkTheme = darkTheme
+        ) {
             WeeklyReportCard(uiState = uiState)
         }
     }
@@ -150,7 +167,7 @@ fun DashboardScreenContent(
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                PremiumSpinner(modifier = Modifier.size(48.dp))
+                PremiumSpinner(modifier = Modifier.size(spacing.loadingSpinnerSize))
             }
         } else {
             Column(

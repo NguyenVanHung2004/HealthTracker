@@ -23,7 +23,6 @@ import com.example.healthtracker.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.util.Locale
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.Alignment
 import java.time.Instant
@@ -271,7 +270,7 @@ fun ActivityScreenContent(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(36.dp)
+                            .height(spacing.avatarSizeMedium)
                             .background(containerColor, RoundedCornerShape(spacing.cornerSmall))
                             .clickable {
                                 if (type == DateFilterType.CUSTOM) {
