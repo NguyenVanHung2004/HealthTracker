@@ -21,7 +21,14 @@ data class Spacing(
     val loadingSpinnerSize: Dp = 56.dp,
     val circularProgressSize: Dp = 180.dp,
     val circularProgressStroke: Dp = 12.dp,
-    val reportCardWidth: Dp = 360.dp
+    val reportCardWidth: Dp = 360.dp,
+    val maxFormWidth: Dp = 640.dp,
+    val maxDialogWidth: Dp = 560.dp,
+    val minGridCardSize: Dp = 85.dp,
+    val maxGridCardHeight: Dp = 96.dp,
+    val gridCardIconSize: Dp = 38.dp,
+    val borderWidthSelected: Dp = 2.dp,
+    val borderWidthUnselected: Dp = 1.dp
 )
 
 val LocalSpacing = compositionLocalOf { Spacing() }

@@ -48,6 +48,7 @@ fun AddFoodDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .widthIn(max = spacing.maxDialogWidth)
                 .fillMaxHeight(0.85f)
                 .padding(spacing.medium),
             shape = RoundedCornerShape(spacing.cornerLarge),
