@@ -23,7 +23,7 @@ data class Spacing(
     val circularProgressStroke: Dp = 12.dp,
     val reportCardWidth: Dp = 360.dp,
     val maxFormWidth: Dp = 640.dp,
-    val maxDialogWidth: Dp = 560.dp,
+    val maxDialogWidth: Dp = 410.dp,
     val minGridCardSize: Dp = 85.dp,
     val maxGridCardHeight: Dp = 96.dp,
     val gridCardIconSize: Dp = 38.dp,

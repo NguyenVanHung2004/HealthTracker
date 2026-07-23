@@ -28,7 +28,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -55,6 +57,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.platform.LocalContext
+import com.example.healthtracker.presentation.dashboard.components.ShareReportPreviewDialog
 import com.example.healthtracker.presentation.dashboard.components.WeeklyReportCard
 import com.example.healthtracker.presentation.utils.ReportShareUtils
 
@@ -84,6 +87,8 @@ fun DashboardScreenContent(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
+    var showSharePreview by remember { mutableStateOf(false) }
+
     val onShareReport = {
         ReportShareUtils.shareComposableAsImage(
             context = context,
@@ -91,6 +96,27 @@ fun DashboardScreenContent(
         ) {
             WeeklyReportCard(uiState = uiState)
         }
+    }
+
+    val onSavePdfReport = {
+        ReportShareUtils.saveComposableAsPdf(context = context) {
+            WeeklyReportCard(uiState = uiState)
+        }
+    }
+
+    if (showSharePreview) {
+        ShareReportPreviewDialog(
+            uiState = uiState,
+            onDismiss = { showSharePreview = false },
+            onConfirmShare = {
+                showSharePreview = false
+                onShareReport()
+            },
+            onSavePdf = {
+                showSharePreview = false
+                onSavePdfReport()
+            }
+        )
     }
 
     Scaffold(
@@ -103,7 +129,7 @@ fun DashboardScreenContent(
                     )
                 },
                 actions = {
-                    IconButton(onClick = onShareReport) {
+                    IconButton(onClick = { showSharePreview = true }) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = stringResource(R.string.weekly_report_title),
@@ -303,7 +329,7 @@ fun DashboardScreenContent(
                         Spacer(modifier = Modifier.height(spacing.small))
 
                         OutlinedButton(
-                            onClick = onShareReport,
+                            onClick = { showSharePreview = true },
                             modifier = Modifier.fillMaxWidth(),
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(spacing.cornerMedium),
                             colors = ButtonDefaults.outlinedButtonColors(

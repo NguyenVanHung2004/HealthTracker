@@ -257,7 +257,14 @@
     <string name="report_badge_title">HealthTracker Report</string>
     <string name="report_export_date">Ngày xuất: %1$s</string>
     <string name="report_target_calories">Calo mục tiêu</string>
-    <string name="report_slogan">Cùng theo dõi sức khỏe và giữ phong độ mỗi ngày! 💪</string>
+    <string name="report_slogan">Cùng theo dõi sức khỏe và giữ phong độ mỗi ngày!</string>
     <string name="share_report_error">Lỗi chia sẻ: %1$s</string>
     <string name="share_chooser_title">Chia sẻ báo cáo sức khỏe</string>
+    <string name="share_now">Chia sẻ ngay</string>
+    <string name="close">Đóng</string>
+    <string name="preview_report">Xem trước báo cáo</string>
+    <string name="save_pdf">Lưu PDF</string>
+    <string name="pdf_saved_success">Đã lưu báo cáo PDF: %1$s</string>
+    <string name="pdf_save_error">Lỗi lưu PDF: %1$s</string>
+    <string name="open_pdf_title">Mở báo cáo PDF</string>
 </resources>

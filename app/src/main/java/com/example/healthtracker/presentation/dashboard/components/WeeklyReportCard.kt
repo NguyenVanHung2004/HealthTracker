@@ -38,7 +38,7 @@ fun WeeklyReportCard(
     Card(
         modifier = modifier
             .width(spacing.reportCardWidth)
-            .padding(spacing.medium),
+            .padding(spacing.small),
         shape = RoundedCornerShape(spacing.cornerLarge),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = spacing.small)
@@ -54,7 +54,7 @@ fun WeeklyReportCard(
                         )
                     )
                 )
-                .padding(spacing.large),
+                .padding(spacing.medium),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header Badge
@@ -200,7 +200,10 @@ private fun MetricRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
@@ -211,14 +214,17 @@ private fun MetricRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(end = spacing.small)
             )
         }
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
