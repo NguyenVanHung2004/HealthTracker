@@ -298,7 +298,7 @@ fun ActivityScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = spacing.medium)
-                    .padding(bottom = spacing.medium),
+                    .padding(bottom = spacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -315,8 +315,6 @@ fun ActivityScreenContent(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
 
             // Exercise List Content
             if (uiState.exercises.isEmpty()) {
