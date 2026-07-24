@@ -22,7 +22,7 @@ fun AppNavigation(
         ) {
             composable("splash") {
                 SplashScreen(
-                    isOnboardingCompleted = isOnboardingCompleted == true,
+                    isOnboardingCompleted = isOnboardingCompleted,
                     onNavigateToOnboarding = {
                         navController.navigate("onboarding") {
                             popUpTo("splash") { inclusive = true }
