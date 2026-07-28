@@ -1,6 +1,7 @@
 package com.example.healthtracker.ui.theme
 
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -37,4 +38,4 @@ data class Spacing(
     val avatarSizeLarge: Dp = 80.dp
 )
 
-val LocalSpacing = compositionLocalOf { Spacing() }
+val LocalSpacing = staticCompositionLocalOf { Spacing() }
